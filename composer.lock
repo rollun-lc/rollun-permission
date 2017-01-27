@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6d026a34bf856e5bcbf298c515e881ec",
-    "content-hash": "a6b56b4dc28439dd90b9e9c6a920230f",
+    "hash": "0434adbbba31a7a8e9c1cfe7236dcc7d",
+    "content-hash": "a4e2b421a55a1897f517ef1ab2bc06cf",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -645,12 +645,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/Roave/SecurityAdvisories.git",
-                "reference": "1991086b35313dd4e3c5b351f4b22760deea0910"
+                "reference": "3db4b0df21d1f527304650e717c66af48981f1c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/1991086b35313dd4e3c5b351f4b22760deea0910",
-                "reference": "1991086b35313dd4e3c5b351f4b22760deea0910",
+                "url": "https://api.github.com/repos/Roave/SecurityAdvisories/zipball/3db4b0df21d1f527304650e717c66af48981f1c4",
+                "reference": "3db4b0df21d1f527304650e717c66af48981f1c4",
                 "shasum": ""
             },
             "conflict": {
@@ -694,7 +694,7 @@
                 "phpmailer/phpmailer": ">=5,<5.2.22",
                 "pusher/pusher-php-server": "<2.2.1",
                 "sabre/dav": ">=1.6,<1.6.99|>=1.7,<1.7.11|>=1.8,<1.8.9",
-                "shopware/shopware": "<4.3.7|>=5,<5.1.5",
+                "shopware/shopware": "<4.4|>=5,<5.2.15",
                 "silverstripe/cms": ">=3.1,<3.1.11|>=3,<=3.0.11",
                 "silverstripe/forum": "<=0.6.1|>=0.7,<=0.7.3",
                 "silverstripe/framework": ">=3,<3.3",
@@ -768,20 +768,20 @@
                 }
             ],
             "description": "Prevents installation of composer packages with known security vulnerabilities: no API, simply require it",
-            "time": "2017-01-19 15:04:18"
+            "time": "2017-01-24 18:32:04"
         },
         {
             "name": "rollun-com/rollun-actionrender",
-            "version": "1.0.0",
+            "version": "2.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rollun-com/rollun-actionrender.git",
-                "reference": "8bb8d61700b221e48eeb2b220e91f28c38fd6b47"
+                "reference": "a0544e351c99dd62af1e4cccee7c3669f2d0e9e0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rollun-com/rollun-actionrender/zipball/8bb8d61700b221e48eeb2b220e91f28c38fd6b47",
-                "reference": "8bb8d61700b221e48eeb2b220e91f28c38fd6b47",
+                "url": "https://api.github.com/repos/rollun-com/rollun-actionrender/zipball/a0544e351c99dd62af1e4cccee7c3669f2d0e9e0",
+                "reference": "a0544e351c99dd62af1e4cccee7c3669f2d0e9e0",
                 "shasum": ""
             },
             "require": {
@@ -824,20 +824,20 @@
                 }
             ],
             "description": "Skeleton for app or lib",
-            "time": "2017-01-24 16:25:27"
+            "time": "2017-01-27 11:03:04"
         },
         {
             "name": "rollun-com/rollun-installer",
-            "version": "1.0.7",
+            "version": "1.0.8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rollun-com/rollun-installer.git",
-                "reference": "46749d8dc3e3a398d49517b9ae5e898b5a3ca392"
+                "reference": "2e0eccea7c58ecceb09cfdfe280906ecdf389ba0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rollun-com/rollun-installer/zipball/46749d8dc3e3a398d49517b9ae5e898b5a3ca392",
-                "reference": "46749d8dc3e3a398d49517b9ae5e898b5a3ca392",
+                "url": "https://api.github.com/repos/rollun-com/rollun-installer/zipball/2e0eccea7c58ecceb09cfdfe280906ecdf389ba0",
+                "reference": "2e0eccea7c58ecceb09cfdfe280906ecdf389ba0",
                 "shasum": ""
             },
             "require": {
@@ -881,7 +881,7 @@
                 }
             ],
             "description": "Installer",
-            "time": "2017-01-23 13:48:29"
+            "time": "2017-01-27 11:08:12"
         },
         {
             "name": "seld/cli-prompt",
@@ -2839,16 +2839,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "4.8.32",
+            "version": "4.8.34",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "f5e1941a8dacf0d904753ff2895c6f68e54bcee1"
+                "reference": "7eb45205d27edd94bd2b3614085ea158bd1e2bca"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/f5e1941a8dacf0d904753ff2895c6f68e54bcee1",
-                "reference": "f5e1941a8dacf0d904753ff2895c6f68e54bcee1",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/7eb45205d27edd94bd2b3614085ea158bd1e2bca",
+                "reference": "7eb45205d27edd94bd2b3614085ea158bd1e2bca",
                 "shasum": ""
             },
             "require": {
@@ -2907,7 +2907,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2017-01-22 08:37:05"
+            "time": "2017-01-26 16:15:36"
         },
         {
             "name": "phpunit/phpunit-mock-objects",

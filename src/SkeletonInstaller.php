@@ -6,7 +6,7 @@
  * Time: 12:59
  */
 
-namespace rollun\skeleton;
+namespace rollun\permission;
 
 use rollun\installer\Command;
 use rollun\installer\Install\InstallerAbstract;

@@ -6,7 +6,7 @@
  * Time: 14:19
  */
 
-namespace rollun\skeleton\Api;
+namespace rollun\permission\Api;
 
 use Zend\Stratigility\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface;
