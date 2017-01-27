@@ -4,9 +4,13 @@ return [
     'dependencies' => [
         'invokables' => [
             Zend\Expressive\Router\RouterInterface::class => Zend\Expressive\Router\FastRouteRouter::class,
+            \rollun\permission\Api\OAuth2Action::class =>
+                \rollun\permission\Api\OAuth2Action::class,
+            \rollun\permission\Api\OAuth2RedirectAction::class =>
+                \rollun\permission\Api\OAuth2RedirectAction::class,
         ],
         'factories' => [
-            ],
+        ],
     ],
 
     'routes' => [
@@ -31,13 +35,25 @@ return [
         [
             'name' => 'interrupt.cron',
             'path' => '/interrupt/cron',
-            'middleware' => \rollun\skeleton\Api\CronExceptionMiddleware::class,
+            'middleware' => \rollun\permission\Api\CronExceptionMiddleware::class,
             'allowed_methods' => ['GET', 'POST'],
         ],
-        [
+        /*[
             'name' => 'home-page',
             'path' => '/[{name}]',
             'middleware' => 'home-service',
+            'allowed_methods' => ['GET'],
+        ],*/
+        [
+            'name' => 'home',
+            'path' => '/',
+            'middleware' => \rollun\permission\Api\OAuth2Action::class,
+            'allowed_methods' => ['GET'],
+        ],
+        [
+            'name' => 'oAuth2r',
+            'path' => '/oauth2r',
+            'middleware' => \rollun\permission\Api\OAuth2RedirectAction::class,
             'allowed_methods' => ['GET'],
         ],
     ],
