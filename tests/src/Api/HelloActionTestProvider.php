@@ -6,7 +6,7 @@
  * Time: 14:47
  */
 
-namespace rollun\test\skeleton\Api;
+namespace rollun\test\permission\Api;
 
 use PHPUnit_Framework_TestCase;
 

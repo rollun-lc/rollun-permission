@@ -6,10 +6,10 @@
  * Time: 14:13
  */
 
-namespace rollun\test\skeleton\Api;
+namespace rollun\test\permission\Api;
 
 use PHPUnit_Framework_TestCase;
-use rollun\skeleton\Api\HelloAction;
+use rollun\permission\Api\HelloAction;
 use Zend\Http\Client;
 
 class HelloActionTest extends HelloActionTestProvider
