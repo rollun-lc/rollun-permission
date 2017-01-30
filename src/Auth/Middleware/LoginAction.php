@@ -8,28 +8,19 @@
 
 namespace rollun\permission\Auth\Middleware;
 
-use Google_Service_Drive;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use rollun\installer\Command;
-use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\AuthenticationServiceInterface;
-use Zend\Diactoros\Response\JsonResponse;
 use Zend\Stratigility\MiddlewareInterface;
 
 class LoginAction implements MiddlewareInterface
 {
-
-    /** @var  AdapterInterface */
-    protected $authAdapter;
-
     /** @var  AuthenticationServiceInterface */
     protected $authService;
 
-    public function __construct(AuthenticationServiceInterface $authenticationService, AdapterInterface $adapter)
+    public function __construct(AuthenticationServiceInterface $authenticationService)
     {
         $this->authService = $authenticationService;
-        $this->authAdapter = $adapter;
     }
 
     /**
@@ -59,6 +50,14 @@ class LoginAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
+        if (!$this->authService->hasIdentity()) {
+            $result = $this->authService->authenticate();
+        }
 
+        if (isset($out)) {
+            return $out($request, $response);
+        }
+
+        return $response;
     }
 }

@@ -8,7 +8,11 @@
 
 namespace rollun\permission\Api;
 
+use Google_Service;
 use Google_Service_Drive;
+use Google_Service_Gmail;
+use Google_Service_Plus;
+use Google_Service_Plus_PersonEmails;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\installer\Command;
@@ -55,14 +59,20 @@ class OAuth2Action implements MiddlewareInterface
         $client->setAuthConfig($clientCredentials);
         $client->setRedirectUri('http://' . constant("HOST") . '/oauth2r');
         $client->setAccessType("offline");
-        $client->addScope(Google_Service_Drive::DRIVE_METADATA_READONLY);
+        $client->addScope(Google_Service_Plus::USERINFO_EMAIL);
 
         if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
             $client->setAccessToken($_SESSION['access_token']);
-            $driveService = new Google_Service_Drive($client);
-            //new \Google_Service_Gmail()
-            $filesList = $driveService->files->listFiles()->getFiles();
-            $response = new JsonResponse($filesList);
+            if($client->isAccessTokenExpired()) {
+                $refreshToken = $client->getRefreshToken();
+                $client->fetchAccessTokenWithRefreshToken($refreshToken);
+                $accessToken = $client->getAccessToken();
+                $accessToken['refresh_token'] = $refreshToken;
+                $_SESSION['access_token'] = $accessToken;
+            }
+            //http://stackoverflow.com/questions/11606101/how-to-get-user-email-from-google-plus-oauth
+            $email = '';
+            $response = new JsonResponse(['email' => $email]);
         } else {
             $authUrl = $client->createAuthUrl();
             $response = new RedirectResponse($authUrl, 302, ['Location' => filter_var($authUrl, FILTER_SANITIZE_URL)]);
