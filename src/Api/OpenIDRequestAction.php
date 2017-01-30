@@ -11,6 +11,7 @@ namespace rollun\permission\Api;
 use Google_Service;
 use Google_Service_Drive;
 use Google_Service_Gmail;
+use Google_Service_Oauth2;
 use Google_Service_Plus;
 use Google_Service_Plus_PersonEmails;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -20,7 +21,7 @@ use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Stratigility\MiddlewareInterface;
 
-class OAuth2Action implements MiddlewareInterface
+class OpenIDRequestAction implements MiddlewareInterface
 {
 
     /**
@@ -57,26 +58,35 @@ class OAuth2Action implements MiddlewareInterface
             'Api' . DIRECTORY_SEPARATOR .
             'client_secret.json';
         $client->setAuthConfig($clientCredentials);
-        $client->setRedirectUri('http://' . constant("HOST") . '/oauth2r');
         //$client->setAccessType("offline");
-        $client->addScope(Google_Service_Plus::USERINFO_EMAIL);
+        $client->setRedirectUri('http://' . constant("HOST") . '/openidr');
 
-        if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-            $client->setAccessToken($_SESSION['access_token']);
-            if($client->isAccessTokenExpired()) {
-                $refreshToken = $client->getRefreshToken();
-                $client->fetchAccessTokenWithRefreshToken($refreshToken);
-                $accessToken = $client->getAccessToken();
-                $accessToken['refresh_token'] = $refreshToken;
-                $_SESSION['access_token'] = $accessToken;
-            }
-            //http://stackoverflow.com/questions/11606101/how-to-get-user-email-from-google-plus-oauth
-            $email = '';
-            $response = new JsonResponse(['email' => $email]);
-        } else {
-            $authUrl = $client->createAuthUrl();
-            $response = new RedirectResponse($authUrl, 302, ['Location' => filter_var($authUrl, FILTER_SANITIZE_URL)]);
+
+        $query = $request->getQueryParams();
+        if (!isset($query['state']) ||
+            !isset($_SESSION['state']) ||
+            strcmp($query['state'], $_SESSION['state']) !== 0
+        ) {
+            return new JsonResponse(['error' => "Invalid state parameter"], 401);
         }
+
+        if (!isset($query['code'])) {
+            return new JsonResponse(['error' => "Invalid code parameter"], 401);
+        } else {
+
+            $code = $query['code'];
+            $auth = $client->authenticate($code);
+            $_SESSION['code'] = $code;
+            $_SESSION['auth'] = $auth;
+
+            $homeRedirectUrl = 'http://' . constant("HOST") . '/openid';
+            $response = new RedirectResponse(
+                $homeRedirectUrl,
+                302,
+                ['Location' => filter_var($homeRedirectUrl, FILTER_SANITIZE_URL)]
+            );
+        }
+
 
         return $response;
     }

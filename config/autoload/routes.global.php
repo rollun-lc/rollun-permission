@@ -56,5 +56,16 @@ return [
             'middleware' => \rollun\permission\Api\OAuth2RedirectAction::class,
             'allowed_methods' => ['GET'],
         ],
+        [
+            'name' => 'openidr',
+            'path' => '/openidr',
+            'middleware' => \rollun\permission\Api\OpenIDRequestAction::class,
+            'allowed_methods' => ['GET'],
+        ], [
+            'name' => 'openid',
+            'path' => '/openid',
+            'middleware' => \rollun\permission\Api\OpenIDConnectAction::class,
+            'allowed_methods' => ['GET'],
+        ],
     ],
 ];

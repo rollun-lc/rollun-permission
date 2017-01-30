@@ -11,6 +11,7 @@ namespace rollun\permission\Api;
 use Google_Service;
 use Google_Service_Drive;
 use Google_Service_Gmail;
+use Google_Service_Oauth2;
 use Google_Service_Plus;
 use Google_Service_Plus_PersonEmails;
 use Psr\Http\Message\ResponseInterface as Response;
@@ -18,9 +19,10 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\installer\Command;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
+use Zend\Http\Client;
 use Zend\Stratigility\MiddlewareInterface;
 
-class OAuth2Action implements MiddlewareInterface
+class OpenIDConnectAction implements MiddlewareInterface
 {
 
     /**
@@ -57,25 +59,22 @@ class OAuth2Action implements MiddlewareInterface
             'Api' . DIRECTORY_SEPARATOR .
             'client_secret.json';
         $client->setAuthConfig($clientCredentials);
-        $client->setRedirectUri('http://' . constant("HOST") . '/oauth2r');
         //$client->setAccessType("offline");
-        $client->addScope(Google_Service_Plus::USERINFO_EMAIL);
+        $client->setRedirectUri('http://' . constant("HOST") . '/openidr');
 
-        if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-            $client->setAccessToken($_SESSION['access_token']);
-            if($client->isAccessTokenExpired()) {
-                $refreshToken = $client->getRefreshToken();
-                $client->fetchAccessTokenWithRefreshToken($refreshToken);
-                $accessToken = $client->getAccessToken();
-                $accessToken['refresh_token'] = $refreshToken;
-                $_SESSION['access_token'] = $accessToken;
+        if (!isset($_SESSION['code']) ) {
+            if (!isset($_SESSION['state'])) {
+                $state = sha1(openssl_random_pseudo_bytes(1024));
+                $_SESSION['state'] = $state;
+            } else {
+                $state = $_SESSION['state'];
             }
-            //http://stackoverflow.com/questions/11606101/how-to-get-user-email-from-google-plus-oauth
-            $email = '';
-            $response = new JsonResponse(['email' => $email]);
-        } else {
+            $client->setState($state);
+            $client->addScope('openid');
             $authUrl = $client->createAuthUrl();
             $response = new RedirectResponse($authUrl, 302, ['Location' => filter_var($authUrl, FILTER_SANITIZE_URL)]);
+        } else {
+            $response = new JsonResponse($_SESSION['auth']);
         }
 
         return $response;
