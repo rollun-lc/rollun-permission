@@ -10,6 +10,8 @@ namespace rollun\permission\Auth\Adapter;
 
 use rollun\api\Api\Google\ClientAbstract;
 use rollun\datastore\DataStore\DataStoreAbstract;
+use rollun\datastore\Rql\RqlQuery;
+use rollun\permission\Api\Google\Client\OpenID;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 
@@ -19,8 +21,8 @@ class OpenIDAdapter implements AdapterInterface
     /** @var  DataStoreAbstract */
     protected $userDataStore;
 
-    /** @var  ClientAbstract */
-    protected $googleClient;
+    /** @var  OpenID */
+    protected $openIDGoogleClient;
 
     /** @var  string */
     protected $code;
@@ -31,9 +33,8 @@ class OpenIDAdapter implements AdapterInterface
      */
     public function __construct(ClientAbstract $googleClient)
     {
-        $this->googleClient = $googleClient;
+        $this->openIDGoogleClient = $googleClient;
     }
-
 
     /**
      * @param $code
@@ -53,8 +54,22 @@ class OpenIDAdapter implements AdapterInterface
     {
         $result = '';
         try {
-            $authData = $this->googleClient->authenticate($this->code);
-            $authData[''];
+            if ($this->openIDGoogleClient->trySetCredential()) {
+                $userId = $this->openIDGoogleClient->getUniqueId();
+                $user = $this->userDataStore->read($userId);
+                if (!empty($user)) {
+                    return new Result(
+                        Result::SUCCESS,
+                        $user,//$userId
+                        ['Fail credential']
+                    );
+                }
+            }
+            $result = new Result(
+                Result::FAILURE,
+                null,
+                ['Fail credential']
+            );
         } catch (\Exception $e) {
             $result = new Result(
                 Result::FAILURE,

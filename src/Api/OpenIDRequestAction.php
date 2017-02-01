@@ -78,7 +78,6 @@ class OpenIDRequestAction implements MiddlewareInterface
             $auth = $client->authenticate($code);
             $_SESSION['code'] = $code;
             $_SESSION['auth'] = $auth;
-
             $homeRedirectUrl = 'http://' . constant("HOST") . '/openid';
             $response = new RedirectResponse(
                 $homeRedirectUrl,

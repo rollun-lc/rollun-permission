@@ -18,12 +18,16 @@ use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AclDataStoreFactory implements FactoryInterface
+class AclFromDataStoreFactory implements FactoryInterface
 {
 
     const KEY_DS_RULE_SERVICE = 'dataStoreRuleService';
+
     const KEY_DS_ROLE_SERVICE = 'dataStoreRoleService';
+
     const KEY_DS_RESOURCE_SERVICE = 'dataStoreResourceService';
+
+    const KEY_DS_PRIVILEGE_SERVICE = 'dataStorePrivilegeService';
 
     const KEY_DS_ID = 'id';
 
@@ -65,6 +69,8 @@ class AclDataStoreFactory implements FactoryInterface
         $dataStoreRule = $container->get(static::KEY_DS_RULE_SERVICE);
         /** @var DataStoreAbstract $dataStoreRole */
         $dataStoreRole = $container->get(static::KEY_DS_ROLE_SERVICE);
+        /** @var DataStoreAbstract $dataStorePrivilege */
+        $dataStorePrivilege = $container->get(static::KEY_DS_PRIVILEGE_SERVICE);
         /** @var DataStoreAbstract $dataStoreResource */
         $dataStoreResource = $container->get(static::KEY_DS_RESOURCE_SERVICE);
 
@@ -74,7 +80,14 @@ class AclDataStoreFactory implements FactoryInterface
         $this->aclAdd($dataStoreResource, $acl, "Resource");
 
         foreach ($dataStoreRule as $item) {
-            $acl->allow($item['role'], $item['resource'], $item['privileges']);
+            $role = $dataStoreRole->read($item['role_id']);
+            $resource = $dataStoreResource->read($item['resource_id']);
+            $privilege = $dataStorePrivilege->read($item['privilege_id']);
+            if($item['allow_flag']) {
+                $acl->allow($role,$resource,$privilege);
+            } else {
+                $acl->deny($role,$resource,$privilege);
+            }
         }
 
         return $acl;
