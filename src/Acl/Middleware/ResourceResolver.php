@@ -2,28 +2,25 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 27.01.17
- * Time: 14:56
+ * Date: 02.02.17
+ * Time: 17:05
  */
 
 namespace rollun\permission\Acl\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use rollun\permission\Acl\AccessForbiddenException;
-use Zend\Permissions\Acl\Acl;
-use Zend\Permissions\Acl\AclInterface;
+use rollun\datastore\DataStore\DataStoreAbstract;
 use Zend\Stratigility\MiddlewareInterface;
 
-class AclMiddleware implements MiddlewareInterface
+class ResourceResolver implements MiddlewareInterface
 {
+    /** @var  DataStoreAbstract */
+    protected $resourceDataStore;
 
-    /** @var  AclInterface */
-    protected $acl;
-
-    public function __construct(AclInterface $acl)
+    public function __construct(DataStoreAbstract $dataStore)
     {
-        $this->acl = $acl;
+        $this->resourceDataStore = $dataStore;
     }
 
     /**
@@ -50,17 +47,18 @@ class AclMiddleware implements MiddlewareInterface
      * @param Response $response
      * @param null|callable $out
      * @return null|Response
-     * @throws AccessForbiddenException
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $role = $request->getAttribute('role');
-        $resource = $request->getAttribute('resource');
-        if (!$this->acl->hasResource($resource) || !$this->acl->isAllowed($role, $resource, $request->getMethod())) {
-            throw new AccessForbiddenException(
-                "Access forbidden for 'role: $role;resource: $resource;method: {$request->getMethod()}'"
-            );
+        $resource = 'none';
+        $urlWithPath = rtrim($request->getUri()->getPath() . '?' . $request->getUri()->getQuery(), '?');
+        foreach($this->resourceDataStore as $item) {
+            if(preg_match($item['pattern'], $urlWithPath)) {
+                $resource = $item['name'];
+                break;
+            }
         }
+        $request = $request->withAttribute('resource', $resource);
 
         if (isset($out)) {
             return $out($request, $response);

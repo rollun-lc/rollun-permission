@@ -55,14 +55,18 @@ class OpenIDAuthManager
         ) {
             $this->openIDAdapter->setCode($code);
             $result = $this->authService->authenticate();
-
         } else {
             throw new \InvalidArgumentException("Invalid state parameter!");
         }
+        return $result;
     }
 
     public function logout()
     {
-
+        if (!$this->authService->hasIdentity()) {
+            throw new \Exception("You not logged in.");
+        }
+        $this->sessionManger->expireSessionCookie();
+        $this->authService->clearIdentity();
     }
 }

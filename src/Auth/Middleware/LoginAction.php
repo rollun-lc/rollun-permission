@@ -11,9 +11,13 @@ namespace rollun\permission\Auth\Middleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\api\Api\Google\ClientAbstract;
+use rollun\permission\Acl\AccessForbiddenException;
+use rollun\permission\Api\Google\Client\OpenID;
 use rollun\permission\Auth\OpenIDAuthManager;
 use Zend\Authentication\AuthenticationServiceInterface;
+use Zend\Authentication\Result;
 use Zend\Diactoros\Response\RedirectResponse;
+use Zend\Expressive\Helper\UrlHelper;
 use Zend\Session\Container;
 use Zend\Session\SessionManager;
 use Zend\Stratigility\MiddlewareInterface;
@@ -30,15 +34,20 @@ class LoginAction implements MiddlewareInterface
     /** @var  Container */
     protected $sessionContainer;
 
-    /** @var  ClientAbstract */
+    /** @var  OpenID */
     protected $googleClient;
 
-    public function __construct(Container $sessionContainer, OpenIDAuthManager $authManager, ClientAbstract $googleClient)
+    /** @var  UrlHelper */
+    protected $urlHelper;
+
+    public function __construct(Container $sessionContainer, OpenIDAuthManager $authManager, ClientAbstract $googleClient, UrlHelper $urlHelper)
     {
         $this->authManager = $authManager;
         $this->googleClient = $googleClient;
         $this->sessionContainer = $sessionContainer;
+        $this->urlHelper = $urlHelper;
     }
+
 
     /**
      * Process an incoming request and/or response.
@@ -68,31 +77,28 @@ class LoginAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $queryParams = $request->getQueryParams();
-
-        if (isset($queryParams['code'])) {
-            //add check if exists...
-            //ПРоверка соответсвия стейта тоже должна лежать на AuthManager
-
+        $this->googleClient->initCode($request);
+        if (($code = $this->googleClient->getAuthCode()) !== null) {
+            $state = $this->sessionContainer->state;
+            $result = $this->authManager->login($code, $state);
+            if ($result->getCode() === Result::SUCCESS){
+                $url = $request->getAttribute('redirectUrl') ?: $this->urlHelper->generate('home-page');
+                $response = new RedirectResponse($url, 302, ['Location' => filter_var($url, FILTER_SANITIZE_URL)]);
+            }else {
+                throw new AccessForbiddenException("Auth credential error.");
+            }
         } else {
             //add session status check
             //Проверять валидность и наличие токена должен authManager.
             //if(isset($this->sessionContainer->{static::KEY_ASSESS_TOKEN}))
             $state = sha1(openssl_random_pseudo_bytes(1024));
-            $this->sessionContainer->{static::KEY_STATE} = $state;
-            $this->googleClient->setState($state);
-
-            $authUrl = $this->googleClient->createAuthUrl();
-
-            $header = array_merge($response->getHeaders(), ['Location' => filter_var($authUrl, FILTER_SANITIZE_URL)]);
-            $response = new RedirectResponse($authUrl, 302, $header);
-            $request = $request->withAttribute(Response::class, $response);
+            $response = $this->googleClient->getCodeResponse($state);
         }
+        $request = $request->withAttribute(Response::class, $response);
 
         if (isset($out)) {
             return $out($request, $response);
         }
-
         return $response;
     }
 }

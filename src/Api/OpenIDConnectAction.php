@@ -64,6 +64,7 @@ class OpenIDConnectAction implements MiddlewareInterface
         $client->setAuthConfig($clientCredentials);
         //$client->setAccessType("offline");
         $client->setRedirectUri('http://' . constant("HOST") . '/openidr');
+
         if (!isset($_SESSION['code']) ) {
             if (!isset($_SESSION['state'])) {
                 $state = sha1(openssl_random_pseudo_bytes(1024));

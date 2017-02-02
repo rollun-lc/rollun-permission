@@ -32,6 +32,12 @@ return [
         // defined in multiple configuration files/locations. This file defines
         // some conventional keys for middleware to execute early, routing
         // middleware, and error middleware.
+        'acl' => [
+            'middleware' => [
+                'aclPipes'
+            ],
+            'priority' => 9999,
+        ],
         'always' => [
             'middleware' => [
                 // Add more middleware here that you want to execute on
@@ -61,6 +67,7 @@ return [
         'error' => [
             'middleware' => [
                 // Add error middleware here.
+                \rollun\permission\Auth\Middleware\AuthErrorHandlerMiddleware::class
             ],
             'error'    => true,
             'priority' => -10000,

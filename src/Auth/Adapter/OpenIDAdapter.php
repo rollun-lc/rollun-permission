@@ -29,11 +29,13 @@ class OpenIDAdapter implements AdapterInterface
 
     /**
      * OpenIDAdapter constructor.
-     * @param ClientAbstract $googleClient
+     * @param OpenID $googleClient
+     * @param DataStoreAbstract $dataStore
      */
-    public function __construct(ClientAbstract $googleClient)
+    public function __construct(OpenID $googleClient, DataStoreAbstract $dataStore)
     {
         $this->openIDGoogleClient = $googleClient;
+        $this->userDataStore = $dataStore;
     }
 
     /**
@@ -52,7 +54,6 @@ class OpenIDAdapter implements AdapterInterface
      */
     public function authenticate()
     {
-        $result = '';
         try {
             if ($this->openIDGoogleClient->trySetCredential()) {
                 $userId = $this->openIDGoogleClient->getUniqueId();
@@ -60,24 +61,22 @@ class OpenIDAdapter implements AdapterInterface
                 if (!empty($user)) {
                     return new Result(
                         Result::SUCCESS,
-                        $user,//$userId
+                        $userId,//$userId
                         ['Fail credential']
                     );
                 }
             }
-            $result = new Result(
+            return new Result(
                 Result::FAILURE,
                 null,
                 ['Fail credential']
             );
         } catch (\Exception $e) {
-            $result = new Result(
+            return new Result(
                 Result::FAILURE,
                 null,
                 [$e->getMessage()]
             );
         }
-
-        return $result;
     }
 }

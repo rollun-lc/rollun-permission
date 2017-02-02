@@ -20,7 +20,7 @@ class Identification implements MiddlewareInterface
     /** @var  AuthenticationServiceInterface */
     protected $authService;
 
-    protected function __construct(AuthenticationServiceInterface $authenticationService)
+    public function __construct(AuthenticationServiceInterface $authenticationService)
     {
         $this->authService = $authenticationService;
     }

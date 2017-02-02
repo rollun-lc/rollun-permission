@@ -21,6 +21,8 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 class AclFromDataStoreFactory implements FactoryInterface
 {
 
+    const KEY_ACL = 'acl';
+
     const KEY_DS_RULE_SERVICE = 'dataStoreRuleService';
 
     const KEY_DS_ROLE_SERVICE = 'dataStoreRoleService';
@@ -52,27 +54,29 @@ class AclFromDataStoreFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('config');
-        if (!isset($config['acl'][static::KEY_DS_RULE_SERVICE]) ||
-            !isset($config['acl'][static::KEY_DS_ROLE_SERVICE]) ||
-            !isset($config['acl'][static::KEY_DS_RESOURCE_SERVICE])
+        if (!isset($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]) ||
+            !isset($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]) ||
+            !isset($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]) ||
+            !isset($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE])
         ) {
             throw new ServiceNotCreatedException('Not set acl config');
         }
-        if (!$container->has(static::KEY_DS_RULE_SERVICE) ||
-            !$container->has(static::KEY_DS_ROLE_SERVICE) ||
-            !$container->has(static::KEY_DS_RESOURCE_SERVICE)
+        if (!$container->has($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]) ||
+            !$container->has($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]) ||
+            !$container->has($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]) ||
+            !$container->has($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE])
         ) {
             throw new ServiceNotCreatedException('Not found dataStore service');
         }
 
         /** @var DataStoreAbstract $dataStoreRule */
-        $dataStoreRule = $container->get(static::KEY_DS_RULE_SERVICE);
+        $dataStoreRule = $container->get($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]);
         /** @var DataStoreAbstract $dataStoreRole */
-        $dataStoreRole = $container->get(static::KEY_DS_ROLE_SERVICE);
+        $dataStoreRole = $container->get($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]);
         /** @var DataStoreAbstract $dataStorePrivilege */
-        $dataStorePrivilege = $container->get(static::KEY_DS_PRIVILEGE_SERVICE);
+        $dataStorePrivilege = $container->get($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]);
         /** @var DataStoreAbstract $dataStoreResource */
-        $dataStoreResource = $container->get(static::KEY_DS_RESOURCE_SERVICE);
+        $dataStoreResource = $container->get($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE]);
 
         $acl = new Acl();
 
@@ -83,10 +87,10 @@ class AclFromDataStoreFactory implements FactoryInterface
             $role = $dataStoreRole->read($item['role_id']);
             $resource = $dataStoreResource->read($item['resource_id']);
             $privilege = $dataStorePrivilege->read($item['privilege_id']);
-            if($item['allow_flag']) {
-                $acl->allow($role,$resource,$privilege);
+            if ($item['allow_flag']) {
+                $acl->allow($role['name'], $resource['name'], $privilege['name']);
             } else {
-                $acl->deny($role,$resource,$privilege);
+                $acl->deny($role['name'], $resource['name'], $privilege['name']);
             }
         }
 
@@ -95,11 +99,11 @@ class AclFromDataStoreFactory implements FactoryInterface
 
     private function aclAdd(DataStoreAbstract $dataStore, Acl $acl, $addType)
     {
-        foreach ($dataStore as $role)
-        {
-            $parentId = $role['parent_id'];
-            $parent = $dataStore->query(new RqlQuery("eq(id,$parentId)"));
-            $acl->${"add" . $addType}($role['name'], $parent);
+        $iterator = $dataStore->getIterator();
+        foreach ($iterator as $role) {
+            //todo: Check if exist role and resources.
+            $parent = isset($role['parent_id']) ? $dataStore->read($role['parent_id'])['name'] : null;
+            $acl->{"add" . $addType}($role['name'], $parent);
         }
     }
 

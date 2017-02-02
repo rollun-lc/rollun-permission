@@ -41,9 +41,9 @@ class MemoryDSFromConfigFactory extends DataStoreAbstractFactory
         $config = $container->get('config');
         $serviceConfig = $config[self::KEY_DATASTORE][$requestedName];
         $requestedClassName = $serviceConfig[self::KEY_CLASS];
-        $config = $config[static::KEY_CONFIG];
+        $confName = $serviceConfig[static::KEY_CONFIG];
         $this::$KEY_IN_CREATE = 0;
-        return new $requestedClassName($config);
+        return new $requestedClassName($config[$confName]);
     }
 
     /**

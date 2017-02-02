@@ -10,18 +10,19 @@ namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use rollun\permission\Auth\OpenIDAuthManager;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Stratigility\MiddlewareInterface;
 
 class LogoutAction implements MiddlewareInterface
 {
 
-    /** @var  AuthenticationServiceInterface */
-    protected $authService;
+    /** @var  OpenIDAuthManager */
+    protected $authManager;
 
-    public function __construct(AuthenticationServiceInterface $authenticationService)
+    public function __construct(OpenIDAuthManager $authManager)
     {
-        $this->authService = $authenticationService;
+        $this->authManager = $authManager;
     }
 
     /**
@@ -51,15 +52,10 @@ class LogoutAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-
-        if ($this->authService->hasIdentity()) {
-            $this->authService->clearIdentity();
-        }
-
+        $this->authManager->logout();
         if (isset($out)) {
             return ($out($request, $response));
         }
-
         return $response;
     }
 }

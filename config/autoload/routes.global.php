@@ -33,18 +33,42 @@ return [
          ],
          */
         [
-            'name' => 'interrupt.cron',
+            'name' => 'interrupt_cron',
             'path' => '/interrupt/cron',
             'middleware' => \rollun\permission\Api\CronExceptionMiddleware::class,
             'allowed_methods' => ['GET', 'POST'],
         ],
+        [
+            'name' => 'login',
+            'path' => '/login',
+            'middleware' => \rollun\permission\Auth\Middleware\LoginAction::class,
+            'allowed_methods' => ['GET', 'POST'],
+        ],
+        [
+            'name' => 'logout',
+            'path' => '/logout',
+            'middleware' => \rollun\permission\Auth\Middleware\LogoutAction::class,
+            'allowed_methods' => ['GET', 'POST'],
+        ],
         /*[
+            'name' => 'openidr',
+            'path' => '/openidr',
+            'middleware' => \rollun\permission\Api\OpenIDRequestAction::class,
+            'allowed_methods' => ['GET'],
+        ],
+        [
+            'name' => 'openid',
+            'path' => '/openid',
+            'middleware' => \rollun\permission\Api\OpenIDConnectAction::class,
+            'allowed_methods' => ['GET'],
+        ],*/
+        [
             'name' => 'home-page',
             'path' => '/[{name}]',
             'middleware' => 'home-service',
             'allowed_methods' => ['GET'],
-        ],*/
-        [
+        ],
+        /*[
             'name' => 'home',
             'path' => '/',
             'middleware' => \rollun\permission\Api\OAuth2Action::class,
@@ -55,17 +79,7 @@ return [
             'path' => '/oauth2r',
             'middleware' => \rollun\permission\Api\OAuth2RedirectAction::class,
             'allowed_methods' => ['GET'],
-        ],
-        [
-            'name' => 'openidr',
-            'path' => '/openidr',
-            'middleware' => \rollun\permission\Api\OpenIDRequestAction::class,
-            'allowed_methods' => ['GET'],
-        ], [
-            'name' => 'openid',
-            'path' => '/openid',
-            'middleware' => \rollun\permission\Api\OpenIDConnectAction::class,
-            'allowed_methods' => ['GET'],
-        ],
+        ],*/
+
     ],
 ];
