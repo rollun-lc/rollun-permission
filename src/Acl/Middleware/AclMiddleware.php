@@ -54,9 +54,11 @@ class AclMiddleware implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $role = $request->getAttribute('role');
-        $resource = $request->getAttribute('resource');
-        if (!$this->acl->hasResource($resource) || !$this->acl->isAllowed($role, $resource, $request->getMethod())) {
+        $role = $request->getAttribute(RoleResolver::KEY_ROLE_ATTRIBUTE);
+        $resource = $request->getAttribute(ResourceResolver::KEY_RESOURCE_ATTRIBUTE);
+        $privilege = $request->getAttribute(PrivilegeResolver::KEY_PRIVILEGE_ATTRIBUTE);
+
+        if (!$this->acl->hasResource($resource) || !$this->acl->isAllowed($role, $resource, $privilege)) {
             throw new AccessForbiddenException(
                 "Access forbidden for 'role: $role;resource: $resource;method: {$request->getMethod()}'"
             );

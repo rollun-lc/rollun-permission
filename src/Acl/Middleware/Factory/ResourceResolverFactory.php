@@ -6,11 +6,12 @@
  * Time: 17:19
  */
 
-namespace rollun\permission\Acl\Factory;
+namespace rollun\permission\Acl\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use rollun\datastore\DataStore\DataStoreAbstract;
+use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
 use rollun\permission\Acl\Middleware\ResourceResolver;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;

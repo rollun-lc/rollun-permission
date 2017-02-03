@@ -116,20 +116,10 @@ return [
             \rollun\permission\Auth\OpenIDAuthManager::class =>
                 \rollun\permission\Auth\Factory\OpenIDAuthManagerFactory::class,
 
-            \rollun\permission\Acl\Middleware\ResourceResolver::class =>
-                \rollun\permission\Acl\Factory\ResourceResolverFactory::class,
-
-            \rollun\permission\Auth\Middleware\Identification::class =>
-                \rollun\permission\Auth\Middleware\Factory\IdentificationFactory::class,
-
             \rollun\permission\Auth\Middleware\AuthErrorHandlerMiddleware::class =>
                 \rollun\permission\Auth\Middleware\Factory\AuthErrorHandlerFactory::class,
 
             \Zend\Session\SessionManager::class => \Zend\Session\Service\SessionManagerFactory::class,
-
-            \rollun\permission\Acl\Middleware\AclMiddleware::class =>
-                \rollun\permission\Acl\Factory\AclMiddlewareFactory::class,
-            Acl::class => AclFromDataStoreFactory::class
         ],
 
         'abstract_factories' => [

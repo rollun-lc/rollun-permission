@@ -2,21 +2,21 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 02.02.17
- * Time: 17:38
+ * Date: 03.02.17
+ * Time: 10:30
  */
 
-namespace rollun\permission\Auth\Middleware\Factory;
+namespace rollun\permission\Acl\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
-use rollun\permission\Auth\Middleware\Identification;
-use Zend\Authentication\AuthenticationService;
+use rollun\permission\Acl\Middleware\AclMiddleware;
+use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class IdentificationFactory implements FactoryInterface
+class AclMiddlewareFactory implements FactoryInterface
 {
 
     /**
@@ -33,7 +33,7 @@ class IdentificationFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $authService = $container->get(AuthenticationService::class);
-        return new Identification($authService);
+        $acl = $container->get(Acl::class);
+        return new AclMiddleware($acl);
     }
 }
