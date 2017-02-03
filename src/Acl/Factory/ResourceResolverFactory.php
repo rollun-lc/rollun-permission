@@ -35,18 +35,18 @@ class ResourceResolverFactory implements FactoryInterface
     {
         $config = $container->get('config');
         if (!isset(
-            $config[AclFromDataStoreFactory::KEY_ACL][AclFromDataStoreFactory::KEY_DS_PRIVILEGE_SERVICE])
+            $config[AclFromDataStoreFactory::KEY_ACL][AclFromDataStoreFactory::KEY_DS_RESOURCE_SERVICE])
         ) {
             throw new ServiceNotCreatedException('Not set acl config');
         }
         if (!$container->has(
-            $config[AclFromDataStoreFactory::KEY_ACL][AclFromDataStoreFactory::KEY_DS_PRIVILEGE_SERVICE])
+            $config[AclFromDataStoreFactory::KEY_ACL][AclFromDataStoreFactory::KEY_DS_RESOURCE_SERVICE])
         ) {
             throw new ServiceNotCreatedException('Not found dataStore service');
         }
         /** @var DataStoreAbstract $dataStorePrivilege */
         $dataStorePrivilege = $container->get(
-            $config[AclFromDataStoreFactory::KEY_ACL][AclFromDataStoreFactory::KEY_DS_PRIVILEGE_SERVICE]);
+            $config[AclFromDataStoreFactory::KEY_ACL][AclFromDataStoreFactory::KEY_DS_RESOURCE_SERVICE]);
         return new ResourceResolver($dataStorePrivilege);
     }
 }

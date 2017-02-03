@@ -10,6 +10,7 @@ namespace rollun\permission\Acl\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\UriInterface;
 use rollun\datastore\DataStore\DataStoreAbstract;
 use Zend\Stratigility\MiddlewareInterface;
 
@@ -51,7 +52,7 @@ class ResourceResolver implements MiddlewareInterface
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
         $resource = 'none';
-        $urlWithPath = rtrim($request->getUri()->getPath() . '?' . $request->getUri()->getQuery(), '?');
+        $urlWithPath = rtrim($request->getUri() . '?' . $request->getUri()->getQuery(), '?');
         foreach($this->resourceDataStore as $item) {
             if(preg_match($item['pattern'], $urlWithPath)) {
                 $resource = $item['name'];

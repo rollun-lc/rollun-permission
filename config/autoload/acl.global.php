@@ -9,6 +9,7 @@
 use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
 use rollun\permission\Api\Google\Client\Factory\OpenIDClientAbstractFactory;
 use rollun\permission\DataStore\Factory\MemoryDSFromConfigFactory;
+use Zend\Permissions\Acl\Acl;
 
 return [
 
@@ -51,24 +52,24 @@ return [
     ],
 
     'aclUser' => [
-        ['id' => 108787658858627228573, 'name' => 'victor', 'role' => 'user']
+        ['id' => "108787658858627228573", 'name' => 'victor', 'role' => 'user']
     ],
 
     'aclRules' => [
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 1],
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 2],
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 3],
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 4],
+        ['id' => 1, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 2, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 2, 'allow_flag' => 1],
+        ['id' => 3, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 3, 'allow_flag' => 1],
+        ['id' => 4, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 4, 'allow_flag' => 1],
 
-        ['id' => 1, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 1],
-        ['id' => 1, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 2],
-        ['id' => 1, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 3],
-        ['id' => 1, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 4],
+        ['id' => 5, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 6, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 2, 'allow_flag' => 1],
+        ['id' => 7, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 3, 'allow_flag' => 1],
+        ['id' => 8, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 4, 'allow_flag' => 1],
 
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 1],
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 2],
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 3],
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 4],
+        ['id' => 9,  'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 10, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 2, 'allow_flag' => 1],
+        ['id' => 11, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 3, 'allow_flag' => 1],
+        ['id' => 12, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 4, 'allow_flag' => 1],
 
     ],
 
@@ -79,12 +80,12 @@ return [
     ],
 
     'aclResource' => [
-        ['id' => 1, 'name' => '', 'pattern' => '/http:\/\/' . constant("HOST") . '/', 'parent_id' => null],
-        ['id' => 2, 'name' => '', 'pattern' => '/http:\/\/' . constant("HOST") . '\/login/', 'parent_id' => null],
-        ['id' => 3, 'name' => '', 'pattern' => '/http:\/\/' . constant("HOST") . '\/logout/', 'parent_id' => null],
-        ['id' => 4, 'name' => '', 'pattern' => '/http:\/\/' . constant("HOST") . '\/api/', 'parent_id' => null],
-        ['id' => 5, 'name' => '', 'pattern' => '/http:\/\/' . constant("HOST") . '\/interrupt/', 'parent_id' => null],
-        ['id' => 6, 'name' => '', 'pattern' => '/http:\/\/' . constant("HOST") . '\/api\/rest/', 'parent_id' => 2],
+        ['id' => 1, 'name' => 'root', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/$/', 'parent_id' => null],
+        ['id' => 2, 'name' => 'login', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/login/', 'parent_id' => null],
+        ['id' => 3, 'name' => 'logout', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/logout$/', 'parent_id' => null],
+        ['id' => 4, 'name' => 'interrupt', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/interrupt/', 'parent_id' => null],
+        ['id' => 5, 'name' => 'api-rest', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/api\/rest/', 'parent_id' => null],
+        ['id' => 6, 'name' => 'api', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/api/', 'parent_id' => 5],
     ],
 
     'aclPrivilege' => [
@@ -100,7 +101,7 @@ return [
         ],
 
         'factories' => [
-            \rollun\permission\Auth\Middleware\LogoutAction::class =>
+            \rollun\permission\Auth\Middleware\LoginAction::class =>
                 \rollun\permission\Auth\Middleware\Factory\LoginActionFactory::class,
 
             \rollun\permission\Auth\Middleware\LogoutAction::class =>
@@ -127,7 +128,8 @@ return [
             \Zend\Session\SessionManager::class => \Zend\Session\Service\SessionManagerFactory::class,
 
             \rollun\permission\Acl\Middleware\AclMiddleware::class =>
-                AclFromDataStoreFactory::class
+                \rollun\permission\Acl\Factory\AclMiddlewareFactory::class,
+            Acl::class => AclFromDataStoreFactory::class
         ],
 
         'abstract_factories' => [

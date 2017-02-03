@@ -40,7 +40,7 @@ class LoginAction implements MiddlewareInterface
     /** @var  UrlHelper */
     protected $urlHelper;
 
-    public function __construct(Container $sessionContainer, OpenIDAuthManager $authManager, ClientAbstract $googleClient, UrlHelper $urlHelper)
+    public function __construct(Container $sessionContainer, OpenIDAuthManager $authManager, OpenID $googleClient, UrlHelper $urlHelper)
     {
         $this->authManager = $authManager;
         $this->googleClient = $googleClient;
@@ -77,9 +77,9 @@ class LoginAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $this->googleClient->initCode($request);
+        $this->googleClient->initByRequest($request);
         if (($code = $this->googleClient->getAuthCode()) !== null) {
-            $state = $this->sessionContainer->state;
+            $state = $this->googleClient->getState();
             $result = $this->authManager->login($code, $state);
             if ($result->getCode() === Result::SUCCESS){
                 $url = $request->getAttribute('redirectUrl') ?: $this->urlHelper->generate('home-page');
@@ -95,10 +95,10 @@ class LoginAction implements MiddlewareInterface
             $response = $this->googleClient->getCodeResponse($state);
         }
         $request = $request->withAttribute(Response::class, $response);
-
-        if (isset($out)) {
+        /*if (isset($out)) {
             return $out($request, $response);
-        }
+        }*/
+
         return $response;
     }
 }

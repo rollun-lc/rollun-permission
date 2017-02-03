@@ -63,7 +63,7 @@ abstract class ClientAbstract extends Google_Client
                 return true;
             }
         } elseif (($authCode = $this->getAuthCode()) !== null) {
-            $accessToken = $this->fetchAccessTokenWithAuthCode($authCode);
+            $accessToken = $this->refreshAccessToken($accessToken);
             $this->saveCredential($accessToken);
             return true;
         }
@@ -72,18 +72,20 @@ abstract class ClientAbstract extends Google_Client
 
     abstract public function getSavedCredential();
 
-    public function refreshAccessToken()
+    public function refreshAccessToken($accessToken = null)
     {
         // save refresh token to some variable
         $refreshTokenSaved = $this->getRefreshToken();
-        // update access token
-        $this->fetchAccessTokenWithRefreshToken($refreshTokenSaved);
-        // pass access token to some variable
-        $accessTokenUpdated = $this->getAccessToken();
-        // append refresh token
-        $accessTokenUpdated['refresh_token'] = $refreshTokenSaved;
-
-        return $accessTokenUpdated;
+        if ($refreshTokenSaved && $accessToken) {
+            // update access token
+            $this->fetchAccessTokenWithRefreshToken($refreshTokenSaved);
+            // append refresh token
+            $accessToken['refresh_token'] = $refreshTokenSaved;
+        } else {
+            $authCode = $this->getAuthCode();
+            $accessToken = $this->fetchAccessTokenWithAuthCode($authCode);
+        }
+        return $accessToken;
     }
 
     abstract public function saveCredential($accessToken);

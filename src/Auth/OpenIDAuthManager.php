@@ -41,7 +41,7 @@ class OpenIDAuthManager
         $this->authService = $authenticationService;
         $this->openIDAdapter = $authenticationService->getAdapter();
         $this->sessionManger = $sessionManager;
-        $this->sessionContainer = new Container(Container::class, $sessionManager);
+        $this->sessionContainer = new Container('SessionContainer', $sessionManager);
     }
 
     public function login($code, $state)

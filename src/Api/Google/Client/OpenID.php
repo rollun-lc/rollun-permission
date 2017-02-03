@@ -17,6 +17,9 @@ class OpenID extends ClientAbstract
     /** @var SessionContainer */
     protected $sessionContainer;
 
+    /** @var string */
+    protected $state;
+
     public function __construct(array $config = [], SessionContainer $sessionContainer, $code = null, $clientName = null)
     {
         $this->sessionContainer = $sessionContainer;
@@ -57,11 +60,19 @@ class OpenID extends ClientAbstract
         return null;
     }
 
-    public function initCode(Request $request)
+    public function getState()
+    {
+        return $this->state ?: null;
+    }
+
+    public function initByRequest(Request $request)
     {
         $query = $request->getQueryParams();
         if (isset($query['code'])) {
             $this->setCode($query['code']);
+        }
+        if (isset($query['state'])) {
+            $this->state = $query['state'];
         }
     }
 }

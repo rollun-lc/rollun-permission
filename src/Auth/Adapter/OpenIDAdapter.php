@@ -61,7 +61,7 @@ class OpenIDAdapter implements AdapterInterface
                 if (!empty($user)) {
                     return new Result(
                         Result::SUCCESS,
-                        $userId,//$userId
+                        ['id' => $userId, 'role' => $user['role']],//$userId
                         ['Fail credential']
                     );
                 }

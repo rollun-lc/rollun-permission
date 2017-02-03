@@ -14,7 +14,13 @@ class MemoryConfig extends Memory
 {
     public function __construct($items = [])
     {
-        $this->items = $items;
+        foreach ($items as $key => $item) {
+            if (isset($item['id'])) {
+                $this->items[$item['id']] = $item;
+            } else {
+                $this->items[$key] = $item;
+            }
+        }
         parent::__construct();
     }
 }
