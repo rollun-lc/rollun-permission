@@ -34,7 +34,7 @@ return [
         // middleware, and error middleware.
         'acl' => [
             'middleware' => [
-                'aclPipes'
+                //'aclPipes'
             ],
             'priority' => 9999,
         ],

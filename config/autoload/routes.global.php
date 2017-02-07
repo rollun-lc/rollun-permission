@@ -8,12 +8,19 @@ return [
                 \rollun\permission\Api\OAuth2Action::class,
             \rollun\permission\Api\OAuth2RedirectAction::class =>
                 \rollun\permission\Api\OAuth2RedirectAction::class,
+            \rollun\permission\Api\ServiceAuthAction::class => \rollun\permission\Api\ServiceAuthAction::class,
         ],
         'factories' => [
         ],
     ],
 
     'routes' => [
+        [
+            'name' => 'service',
+            'path' => '/service',
+            'middleware' => \rollun\permission\Api\ServiceAuthAction::class,
+            'allowed_methods' => ['GET'],
+        ],
         /*
          * if you use rollun-datastore uncomment this. and add Config.
          [
@@ -80,6 +87,7 @@ return [
             'middleware' => \rollun\permission\Api\OAuth2RedirectAction::class,
             'allowed_methods' => ['GET'],
         ],*/
+
 
     ],
 ];
