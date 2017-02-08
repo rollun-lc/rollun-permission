@@ -9,6 +9,15 @@
 namespace rollun\permission\Api;
 
 use Firebase\JWT\JWT;
+use Google\Auth\Credentials\AppIdentityCredentials;
+use Google\Auth\Credentials\ServiceAccountCredentials;
+use Google\Auth\OAuth2;
+use Google_Service_Drive;
+use Google_Service_Gmail;
+use Google_Service_Oauth2;
+use function GuzzleHttp\Psr7\build_query;
+use GuzzleHttp\Psr7\Stream;
+use GuzzleHttp\Psr7\StreamWrapper;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\installer\Command;
@@ -46,14 +55,53 @@ class ServiceAuthAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $client = new \Google_Client();
         $clientCredentials = Command::getDataDir() . DIRECTORY_SEPARATOR .
             'Api' . DIRECTORY_SEPARATOR .
             'Google' . DIRECTORY_SEPARATOR .
             'OpenIDAuthClient.json';
-        $client->setAuthConfig($clientCredentials);
+        //$client->setAuthConfig($clientCredentials);
 
-        $date = new \DateTime();
+        //$credentials = new AppIdentityCredentials('https://www.googleapis.com/auth/sqlservice.admin');
+
+        $stream = new Stream(fopen($clientCredentials, "r"));
+        $credentials = ServiceAccountCredentials::makeCredentials([\Google_Service_Drive::DRIVE_READONLY], $stream);
+        $data1 = [];
+        try {
+            //$credentials->setSub("it.professor02@gmail.com");
+            $data1 = $credentials->fetchAuthToken();
+            $http = new Client("www.googleapis.com/oauth2/v4/token");
+            $http->setHeaders([
+                'Cache-Control' => 'no-store',
+                'Content-Type' => 'application/x-www-form-urlencoded',
+            ]);
+            $http->setMethod("POST");
+            //$http->setRawBody(build_query($params));
+            $params = [
+                "grant_type" => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+                "assertion" => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0ZXN0LTgwOUByb2xsdW4tcGVybWlzc2lvbi5pYW0uZ3NlcnZpY2VhY2NvdW50LmNvbSIsImF1ZCI6Imh0dHBzOlwvXC93d3cuZ29vZ2xlYXBpcy5jb21cL29hdXRoMlwvdjRcL3Rva2VuIiwiZXhwIjoxNDg2NTY3NTEyLCJpYXQiOjE0ODY1NjM4NTIsInNjb3BlIjoiaHR0cHM6XC9cL3d3dy5nb29nbGVhcGlzLmNvbVwvYXV0aFwvZHJpdmUucmVhZG9ubHkifQ.Whaa5EaJkmffB7O8t4286OlnxKkjEMt3Ygpk7RihLbf1I7zu918zsDDsotMzVTwIWJKNTJ6VhnOc59FAmRt_3l3o_NDPOyzsDMpZ3c-rAHaxhM-WR6ErXMuKOOAE-x_fPFar9uwtmHaHtMgVmyQDzpyjyRLYKsDw-nMbHRb6ZWFFviHjb1KLniffq33hGHSGp142JICGAlr1iFpxciemWsRgcs2sJ8wjYhP54Uvk95fZxjh3F7pBFRled6cJrPNV2a599ZqMRGUHy4VPjDLdmBm_MmCsGINszM5PxndlNY_dLs4lUJszpP9kAP-tcx24R4x9VPFOuNNy0SAU8iptnA'
+            ];
+            $http->setParameterPost($params);
+
+
+        } catch (\Exception $e) {
+            $error = $e->getMessage();
+        }
+        $data2 = [];
+        try {
+            $client = new \Google_Client();
+            $client->setAccessToken($data1);
+            //$client->setAuthConfigFile($clientCredentials);
+            $client->addScope([\Google_Service_Drive::DRIVE_READONLY]);
+            //$client->setSubject("test-809@rollun-permission.iam.gserviceaccount.com");
+            $client->setAccessType('offline');
+
+            $gDriveService = new Google_Service_Drive($client);
+            $files = $gDriveService->files->listFiles()->getFiles();
+
+        } catch (\Exception $e) {
+            $error = isset($error) ? [ $error, $e->getMessage() ]: $e->getMessage();
+        }
+        /*$date = new \DateTime();
         $data = [
             "iss" => $client->getClientId(),
             "scope" => 'https://www.googleapis.com/auth/prediction',
@@ -66,21 +114,21 @@ class ServiceAuthAction implements MiddlewareInterface
         $keyId = "e9a3538dec7570ab19e76e9387826a7910c62877";
         $jwt = JWT::encode($data, $key, "RS256", $keyId);
 
-        $url = 'https://www.googleapis.com/oauth2/v4/token';
+        $url = 'https://accounts.google.com/o/oauth2/token';
         $clientHttp = new Client($url);
         $clientHttp->setMethod("POST");
         $clientHttp->setParameterPost([
-            'grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            'grant_type' => rawurlencode('urn:ietf:params:oauth:grant-type:jwt-bearer'),
             'assertion' => $jwt
         ]);
 
-        $resp = $clientHttp->send();
-        if($resp->isOk() ){
-            $dataEncoded = $resp->getBody();
-            $data = JWT::decode($dataEncoded, $key);
-            return new JsonResponse(['status' => 'success', 'data' => $data]);
+
+
+        $resp = $clientHttp->send();*/
+        if (!empty($data1) && isset($files) && !isset($error)) {
+            return new JsonResponse(['status' => 'success', 'data1' => $data1, 'files' => $files ]);
         } else {
-            return new JsonResponse(['status' => 'error', 'resp' => $resp->getStatusCode()]);
+            return new JsonResponse(['status' => 'error', 'error' => $error]);
         }
     }
 }
