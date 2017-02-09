@@ -9,6 +9,7 @@
 namespace rollun\permission\Api;
 
 use Google_Service_Drive;
+use Google_Service_Plus;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\installer\Command;
@@ -49,13 +50,13 @@ class OAuth2RedirectAction implements MiddlewareInterface
         session_start();
         $client = new \Google_Client();
         $clientCredentials = Command::getDataDir() . DIRECTORY_SEPARATOR .
-            'Google' . DIRECTORY_SEPARATOR .
             'Api' . DIRECTORY_SEPARATOR .
-            'client_secret.json';
+            'Google' . DIRECTORY_SEPARATOR .
+            'OpenIDAuthClient.json';
         $client->setAuthConfig($clientCredentials);
         $client->setAccessType("offline");
         $client->setRedirectUri('http://' . constant("HOST") . '/oauth2r');
-        $client->addScope(Google_Service_Drive::DRIVE_METADATA_READONLY);
+        $client->addScope(Google_Service_Plus::USERINFO_EMAIL);
 
         $query = $request->getQueryParams();
 

@@ -53,26 +53,41 @@ class OAuth2Action implements MiddlewareInterface
         session_start();
         $client = new \Google_Client();
         $clientCredentials = Command::getDataDir() . DIRECTORY_SEPARATOR .
-            'Google' . DIRECTORY_SEPARATOR .
             'Api' . DIRECTORY_SEPARATOR .
-            'client_secret.json';
+            'Google' . DIRECTORY_SEPARATOR .
+            'OpenIDAuthClient.json';
+        $client->setAccessType('offline');
         $client->setAuthConfig($clientCredentials);
         $client->setRedirectUri('http://' . constant("HOST") . '/oauth2r');
         //$client->setAccessType("offline");
         $client->addScope(Google_Service_Plus::USERINFO_EMAIL);
-
+/*unset($_SESSION['access_token']);
+return null;*/
         if (isset($_SESSION['access_token']) && $_SESSION['access_token']) {
-            $client->setAccessToken($_SESSION['access_token']);
-            if($client->isAccessTokenExpired()) {
-                $refreshToken = $client->getRefreshToken();
-                $client->fetchAccessTokenWithRefreshToken($refreshToken);
-                $accessToken = $client->getAccessToken();
-                $accessToken['refresh_token'] = $refreshToken;
-                $_SESSION['access_token'] = $accessToken;
+            //if($client->isAccessTokenExpired()) {
+            $about = [];
+            //TODO: можно рефрешить сколько влезет
+            for ($i = 0; $i < 250; $i++) {
+                try {
+                    $client->setAccessToken($_SESSION['access_token']);
+                    $refreshToken = $client->getRefreshToken();
+                    $client->fetchAccessTokenWithRefreshToken($refreshToken);
+                    $accessToken = $client->getAccessToken();
+                    $accessToken['refresh_token'] = $refreshToken;
+                    $_SESSION['access_token'] = $accessToken;
+
+                    $service = new Google_Service_Plus($client);
+                    $about[] = $service->people->get('me')->getEmails();
+                    //$client->revokeToken($accessToken);
+                } catch (\Exception $exception) {
+                    $about[] = $exception->getMessage();
+                }
             }
+
+            //}
             //http://stackoverflow.com/questions/11606101/how-to-get-user-email-from-google-plus-oauth
             $email = '';
-            $response = new JsonResponse(['email' => $email]);
+            $response = new JsonResponse($about);
         } else {
             $authUrl = $client->createAuthUrl();
             $response = new RedirectResponse($authUrl, 302, ['Location' => filter_var($authUrl, FILTER_SANITIZE_URL)]);
