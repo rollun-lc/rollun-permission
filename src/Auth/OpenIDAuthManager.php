@@ -2,8 +2,6 @@
 
 namespace rollun\permission\Auth;
 
-use rollun\api\Api\Google\ClientAbstract;
-use rollun\permission\Auth\Adapter\OAuth2Adapter;
 use rollun\permission\Auth\Adapter\OpenIDAdapter;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\AuthenticationServiceInterface;

@@ -4,8 +4,8 @@ return [
     'dependencies' => [
         'invokables' => [
             Zend\Expressive\Router\RouterInterface::class => Zend\Expressive\Router\FastRouteRouter::class,
-            \rollun\permission\Api\OAuth2Action::class => \rollun\permission\Api\OAuth2Action::class,
-            \rollun\permission\Api\OAuth2RedirectAction::class => \rollun\permission\Api\OAuth2RedirectAction::class,
+           /* \rollun\permission\Api\OAuth2Action::class => \rollun\permission\Api\OAuth2Action::class,
+            \rollun\permission\Api\OAuth2RedirectAction::class => \rollun\permission\Api\OAuth2RedirectAction::class,*/
             //\rollun\permission\Api\ServiceAuthAction::class => \rollun\permission\Api\ServiceAuthAction::class,
         ],
         'factories' => [
@@ -13,7 +13,7 @@ return [
     ],
 
     'routes' => [
-        [
+        /*[
             'name' => 'home',
             'path' => '/',
             'middleware' => \rollun\permission\Api\OAuth2Action::class,
@@ -24,13 +24,13 @@ return [
             'path' => '/oauth2r',
             'middleware' => \rollun\permission\Api\OAuth2RedirectAction::class,
             'allowed_methods' => ['GET'],
-        ],
-        [
+        ],*/
+        /*[
             'name' => 'service',
             'path' => '/service',
             'middleware' => \rollun\permission\Api\ServiceAuthAction::class,
             'allowed_methods' => ['GET'],
-        ],
+        ],*/
         /*
          * if you use rollun-datastore uncomment this. and add Config.
          [
@@ -79,11 +79,11 @@ return [
             'middleware' => \rollun\permission\Api\OpenIDConnectAction::class,
             'allowed_methods' => ['GET'],
         ],*/
-        /*[
+        [
             'name' => 'home-page',
             'path' => '/[{name}]',
             'middleware' => 'home-service',
             'allowed_methods' => ['GET'],
-        ],*/
+        ],
     ],
 ];

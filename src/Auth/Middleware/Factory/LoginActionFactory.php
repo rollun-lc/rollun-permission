@@ -10,7 +10,7 @@ namespace rollun\permission\Auth\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
-use rollun\permission\Api\Google\Client\OpenID;
+use rollun\api\Api\Google\Client\Web;
 use rollun\permission\Auth\Middleware\LoginAction;
 use rollun\permission\Auth\OpenIDAuthManager;
 use Zend\Expressive\Helper\UrlHelper;
@@ -42,9 +42,9 @@ class LoginActionFactory implements FactoryInterface
         $sessionContainer = new Container('SessionContainer', $sessionManager);
 
         $authManager = $container->get(OpenIDAuthManager::class);
-        $googleClient = $container->get('OpenIDAuthClient');
+        $webClient = $container->get(Web::class);
         $urlHelper = $container->get(UrlHelper::class);
 
-        return new LoginAction($sessionContainer, $authManager, $googleClient, $urlHelper);
+        return new LoginAction($sessionContainer, $authManager, $webClient, $urlHelper);
     }
 }

@@ -7,20 +7,10 @@
  */
 
 use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
-use rollun\permission\Api\Google\Client\Factory\OpenIDClientAbstractFactory;
 use rollun\permission\DataStore\Factory\MemoryDSFromConfigFactory;
 use Zend\Permissions\Acl\Acl;
 
 return [
-
-    OpenIDClientAbstractFactory::GOOGLE_API_CLIENTS_SERVICES_KEY => [
-        'OpenIDAuthClient' => [
-            OpenIDClientAbstractFactory::SCOPES => [
-                'openid'
-            ]
-        ]
-    ],
-
     'dataStore' => [
         'rulesDS' => [
             MemoryDSFromConfigFactory::KEY_CONFIG => 'aclRules',
@@ -120,10 +110,11 @@ return [
                 \rollun\permission\Auth\Middleware\Factory\AuthErrorHandlerFactory::class,
 
             \Zend\Session\SessionManager::class => \Zend\Session\Service\SessionManagerFactory::class,
+
+            \rollun\api\Api\Google\Client\Web::class => \rollun\api\Api\Google\Client\Factory\WebFactory::class,
         ],
 
         'abstract_factories' => [
-            \rollun\permission\Api\Google\Client\Factory\OpenIDClientAbstractFactory::class,
             \rollun\permission\DataStore\Factory\MemoryDSFromConfigFactory::class,
         ]
     ],

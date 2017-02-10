@@ -31,8 +31,8 @@ class PrivilegeResolver implements MiddlewareInterface
         $privilege = $request->getMethod();
         $request = $request->withAttribute(static::KEY_PRIVILEGE_ATTRIBUTE, $privilege);
 
-        if ($out) {
-            $out($request, $response);
+        if (isset($out)) {
+            return $out($request, $response);
         }
 
         return $response;

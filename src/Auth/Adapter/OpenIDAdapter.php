@@ -8,10 +8,9 @@
 
 namespace rollun\permission\Auth\Adapter;
 
-use rollun\api\Api\Google\ClientAbstract;
+use rollun\api\Api\Google\Client\Web;
 use rollun\datastore\DataStore\DataStoreAbstract;
 use rollun\datastore\Rql\RqlQuery;
-use rollun\permission\Api\Google\Client\OpenID;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Result;
 
@@ -21,20 +20,20 @@ class OpenIDAdapter implements AdapterInterface
     /** @var  DataStoreAbstract */
     protected $userDataStore;
 
-    /** @var  OpenID */
-    protected $openIDGoogleClient;
+    /** @var  Web */
+    protected $webClient;
 
     /** @var  string */
     protected $code;
 
     /**
      * OpenIDAdapter constructor.
-     * @param OpenID $googleClient
+     * @param Web $webClient
      * @param DataStoreAbstract $dataStore
      */
-    public function __construct(OpenID $googleClient, DataStoreAbstract $dataStore)
+    public function __construct(Web $webClient, DataStoreAbstract $dataStore)
     {
-        $this->openIDGoogleClient = $googleClient;
+        $this->webClient = $webClient;
         $this->userDataStore = $dataStore;
     }
 
@@ -55,13 +54,14 @@ class OpenIDAdapter implements AdapterInterface
     public function authenticate()
     {
         try {
-            if ($this->openIDGoogleClient->trySetCredential()) {
-                $userId = $this->openIDGoogleClient->getUniqueId();
+            if ($this->webClient->authByCredential()) {
+                $userId = $this->webClient->getUniqueId();
                 $user = $this->userDataStore->read($userId);
                 if (!empty($user)) {
+                    //unset($user['pass'])
                     return new Result(
                         Result::SUCCESS,
-                        ['id' => $userId, 'role' => $user['role']],//$userId
+                        $user,
                         ['Fail credential']
                     );
                 }

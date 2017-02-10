@@ -32,11 +32,19 @@ return [
         // defined in multiple configuration files/locations. This file defines
         // some conventional keys for middleware to execute early, routing
         // middleware, and error middleware.
+
+        /*'baseAuth' => [
+            'middleware' => [
+                \rollun\permission\Auth\Middleware\BaseAuth::class
+            ],
+            'path' => '/api/',
+            'priority' => 9001,
+        ],*/
         'acl' => [
             'middleware' => [
-                //'aclPipes'
+                'aclPipes'
             ],
-            'priority' => 9999,
+            'priority' => 9000,
         ],
         'always' => [
             'middleware' => [

@@ -10,6 +10,7 @@ namespace rollun\permission\Auth\Adapter;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use rollun\api\Api\Google\Client\Web;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
@@ -31,8 +32,8 @@ class OpenIDAdapterFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $googleClient = $container->get('OpenIDAuthClient');
+        $webClient = $container->get(Web::class);
         $dataStore = $container->get('userDS');
-        return new OpenIDAdapter($googleClient, $dataStore);
+        return new OpenIDAdapter($webClient, $dataStore);
     }
 }
