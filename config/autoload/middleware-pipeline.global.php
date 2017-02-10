@@ -33,13 +33,13 @@ return [
         // some conventional keys for middleware to execute early, routing
         // middleware, and error middleware.
 
-        /*'baseAuth' => [
+        'baseAuth' => [
             'middleware' => [
                 \rollun\permission\Auth\Middleware\BaseAuth::class
             ],
             'path' => '/api/',
             'priority' => 9001,
-        ],*/
+        ],
         'acl' => [
             'middleware' => [
                 'aclPipes'
