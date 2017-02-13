@@ -89,7 +89,7 @@ class LoginAction implements MiddlewareInterface
     {
         $this->webClient->initByRequest($request);
         if (($code = $this->webClient->getAuthCode()) !== null) {
-            $state = $this->webClient->getState();
+            $state = $this->webClient->getRequestState();
             $result = $this->authManager->login($code, $state);
             if ($result->getCode() === Result::SUCCESS) {
                 $identity = $result->getIdentity();

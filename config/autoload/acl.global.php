@@ -87,7 +87,7 @@ return [
 
     'dependencies' => [
         'invokables' => [
-
+            \rollun\permission\Auth\Middleware\CredentialErrorHandlerMiddleware::class => \rollun\permission\Auth\Middleware\CredentialErrorHandlerMiddleware::class
         ],
 
         'factories' => [
@@ -106,12 +106,14 @@ return [
             \rollun\permission\Auth\OpenIDAuthManager::class =>
                 \rollun\permission\Auth\Factory\OpenIDAuthManagerFactory::class,
 
-            \rollun\permission\Auth\Middleware\AuthErrorHandlerMiddleware::class =>
-                \rollun\permission\Auth\Middleware\Factory\AuthErrorHandlerFactory::class,
+            \rollun\permission\Auth\Middleware\AccessForbiddenHandlerMiddleware::class =>
+                \rollun\permission\Auth\Middleware\Factory\AccessForbiddenHandlerFactory::class,
 
             \Zend\Session\SessionManager::class => \Zend\Session\Service\SessionManagerFactory::class,
 
             \rollun\api\Api\Google\Client\Web::class => \rollun\api\Api\Google\Client\Factory\WebFactory::class,
+
+            \rollun\permission\Auth\Middleware\AlreadyLogginHandler::class => \rollun\permission\Auth\Middleware\Factory\AlreadyLogginHandlerFactory::class
         ],
 
         'abstract_factories' => [

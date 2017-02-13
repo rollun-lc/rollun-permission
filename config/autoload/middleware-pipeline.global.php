@@ -75,7 +75,9 @@ return [
         'error' => [
             'middleware' => [
                 // Add error middleware here.
-                \rollun\permission\Auth\Middleware\AuthErrorHandlerMiddleware::class
+                \rollun\permission\Auth\Middleware\AccessForbiddenHandlerMiddleware::class,
+                \rollun\permission\Auth\Middleware\AlreadyLogginHandler::class,
+                \rollun\permission\Auth\Middleware\CredentialErrorHandlerMiddleware::class,
             ],
             'error'    => true,
             'priority' => -10000,

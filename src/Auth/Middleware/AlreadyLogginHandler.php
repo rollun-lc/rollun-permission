@@ -2,26 +2,33 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 02.02.17
- * Time: 17:48
+ * Date: 13.02.17
+ * Time: 17:33
  */
 
 namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use rollun\permission\Acl\AccessForbiddenException;
-use rollun\permission\Auth\CredentialInvalidException;
-use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Expressive\Helper\UrlHelper;
 
-class CredentialErrorHandlerMiddleware
+
+class AlreadyLogginHandler
 {
+
+    /** @var  UrlHelper */
+    protected $urlHelper;
+
+    public function __construct(UrlHelper $urlHelper)
+    {
+        $this->urlHelper = $urlHelper;
+    }
+
     public function __invoke($error, Request $request, Response $response, callable $next) {
-        if ($error instanceof CredentialInvalidException) {
-            $response = new HtmlResponse("Invalid credentials!", 401);
-            return $response;
+        if ($error instanceof AlreadyLogginException) {
+            $url = $this->urlHelper->generate('home-page');
+            $response = new RedirectResponse($url);
         }
 
         if (isset($next)) {

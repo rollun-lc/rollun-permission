@@ -26,6 +26,9 @@ class OpenIDAdapter implements AdapterInterface
     /** @var  string */
     protected $code;
 
+    /** @var string */
+    protected $state;
+
     /**
      * OpenIDAdapter constructor.
      * @param Web $webClient
@@ -45,6 +48,11 @@ class OpenIDAdapter implements AdapterInterface
         $this->code = $code;
     }
 
+    public function setState($state)
+    {
+        $this->state = $state;
+    }
+
     /**
      * Performs an authentication attempt
      *
@@ -54,8 +62,15 @@ class OpenIDAdapter implements AdapterInterface
     public function authenticate()
     {
         try {
+            if($this->webClient->getResponseState() !== $this->state) {
+                return new Result(
+                    Result::FAILURE,
+                    null,
+                    ["State not equalse."]
+                );
+            }
             if ($this->webClient->authByCredential()) {
-                $userId = $this->webClient->getUniqueId();
+                $userId = $this->webClient->getUserId();
                 $user = $this->userDataStore->read($userId);
                 if (!empty($user)) {
                     //unset($user['pass'])

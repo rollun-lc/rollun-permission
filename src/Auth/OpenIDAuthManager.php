@@ -2,7 +2,9 @@
 
 namespace rollun\permission\Auth;
 
+use rollun\api\Api\Google\Client\Web;
 use rollun\permission\Auth\Adapter\OpenIDAdapter;
+use rollun\permission\Auth\Middleware\AlreadyLogginException;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Session\AbstractManager;
@@ -45,17 +47,13 @@ class OpenIDAuthManager
     public function login($code, $state)
     {
         if ($this->authService->hasIdentity()) {
-            throw new \Exception("Already logged in.");
+            throw new AlreadyLogginException("Already logged in.");
         }
 
-        if (isset($this->sessionContainer->{static::KEY_STATE}) &&
-            strcmp($this->sessionContainer->{static::KEY_STATE}, $state) === 0
-        ) {
-            $this->openIDAdapter->setCode($code);
-            $result = $this->authService->authenticate();
-        } else {
-            throw new \InvalidArgumentException("Invalid state parameter!");
-        }
+        $this->openIDAdapter->setCode($code);
+        $this->openIDAdapter->setState($state);
+        $result = $this->authService->authenticate();
+
         return $result;
     }
 

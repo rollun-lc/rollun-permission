@@ -2177,12 +2177,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/rollun-com/rollun-api.git",
-                "reference": "10c23c5ad9fd15606577615d89f9998c81f6fa30"
+                "reference": "d78f9909624610dd4ead71e9f35acf78d62c65d4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rollun-com/rollun-api/zipball/10c23c5ad9fd15606577615d89f9998c81f6fa30",
-                "reference": "10c23c5ad9fd15606577615d89f9998c81f6fa30",
+                "url": "https://api.github.com/repos/rollun-com/rollun-api/zipball/d78f9909624610dd4ead71e9f35acf78d62c65d4",
+                "reference": "d78f9909624610dd4ead71e9f35acf78d62c65d4",
                 "shasum": ""
             },
             "require": {
@@ -2228,20 +2228,20 @@
                 "php",
                 "rest"
             ],
-            "time": "2017-02-10 13:09:59"
+            "time": "2017-02-13 15:14:06"
         },
         {
             "name": "rollun-com/rollun-datastore",
-            "version": "2.1.3",
+            "version": "2.1.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/rollun-com/rollun-datastore.git",
-                "reference": "b2756d3df032e88d2f88ae8e5bae26a3c023f27f"
+                "reference": "344197d0d96c78e93de019d4836e9dba7d7e7af2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/rollun-com/rollun-datastore/zipball/b2756d3df032e88d2f88ae8e5bae26a3c023f27f",
-                "reference": "b2756d3df032e88d2f88ae8e5bae26a3c023f27f",
+                "url": "https://api.github.com/repos/rollun-com/rollun-datastore/zipball/344197d0d96c78e93de019d4836e9dba7d7e7af2",
+                "reference": "344197d0d96c78e93de019d4836e9dba7d7e7af2",
                 "shasum": ""
             },
             "require": {
@@ -2292,7 +2292,7 @@
                 }
             ],
             "description": "Datastore",
-            "time": "2017-02-08 17:00:51"
+            "time": "2017-02-10 15:32:45"
         },
         {
             "name": "rollun-com/rollun-dic",

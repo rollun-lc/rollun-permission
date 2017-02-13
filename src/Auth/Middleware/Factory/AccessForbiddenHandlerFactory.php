@@ -10,13 +10,13 @@ namespace rollun\permission\Auth\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
-use rollun\permission\Auth\Middleware\AuthErrorHandlerMiddleware;
+use rollun\permission\Auth\Middleware\AccessForbiddenHandlerMiddleware;
 use Zend\Expressive\Helper\UrlHelper;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AuthErrorHandlerFactory implements FactoryInterface
+class AccessForbiddenHandlerFactory implements FactoryInterface
 {
 
     /**
@@ -34,6 +34,6 @@ class AuthErrorHandlerFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $urlHelper = $container->get(UrlHelper::class);
-        return new AuthErrorHandlerMiddleware($urlHelper);
+        return new AccessForbiddenHandlerMiddleware($urlHelper);
     }
 }
