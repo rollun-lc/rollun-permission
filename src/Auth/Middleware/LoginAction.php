@@ -13,7 +13,7 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\api\Api\Google\Client\Web;
 use rollun\permission\Acl\AccessForbiddenException;
 use rollun\permission\Auth\CredentialInvalidException;
-use rollun\permission\Auth\OpenIDAuthManager;
+use rollun\permission\Auth\Manager\OpenIDAuth;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Authentication\Result;
 use Zend\Diactoros\Response\RedirectResponse;
@@ -24,15 +24,8 @@ use Zend\Stratigility\MiddlewareInterface;
 
 class LoginAction implements MiddlewareInterface
 {
-
-    /** @var  AuthenticationServiceInterface */
-    protected $authService;
-
-    /** @var  OpenIDAuthManager */
+    /** @var  OpenIDAuth */
     protected $authManager;
-
-    /** @var  Container */
-    protected $sessionContainer;
 
     /** @var  Web */
     protected $webClient;
@@ -42,19 +35,16 @@ class LoginAction implements MiddlewareInterface
 
     /**
      * LoginAction constructor.
-     * @param Container $sessionContainer
-     * @param OpenIDAuthManager $authManager
+     * @param OpenIDAuth $authManager
      * @param Web $webClient
      * @param UrlHelper $urlHelper
      */
     public function __construct(
-        Container $sessionContainer,
-        OpenIDAuthManager $authManager,
+        OpenIDAuth $authManager,
         Web $webClient,
         UrlHelper $urlHelper){
         $this->authManager = $authManager;
         $this->webClient = $webClient;
-        $this->sessionContainer = $sessionContainer;
         $this->urlHelper = $urlHelper;
     }
 
@@ -87,9 +77,12 @@ class LoginAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $this->webClient->initByRequest($request);
-        if (($code = $this->webClient->getAuthCode()) !== null) {
-            $state = $this->webClient->getRequestState();
+        //$urlHelper = $request->getAttribute(UrlHelper::class);
+
+        $query = $request->getQueryParams();
+        $code = isset($query['code'])? $query['code'] : null;
+        if (isset($code)) {
+            $state = isset($query['state']) ? $query['state'] : "";
             $result = $this->authManager->login($code, $state);
             if ($result->getCode() === Result::SUCCESS) {
                 $identity = $result->getIdentity();
@@ -103,9 +96,10 @@ class LoginAction implements MiddlewareInterface
             $response = $this->webClient->getAuthCodeRedirect($state);
         }
         $request = $request->withAttribute(Response::class, $response);
-        /*if (isset($out)) {
+
+        if (isset($out)) {
             return $out($request, $response);
-        }*/
+        }
 
         return $response;
     }

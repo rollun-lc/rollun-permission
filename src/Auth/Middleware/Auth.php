@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 10.02.17
- * Time: 18:45
+ * Date: 15.02.17
+ * Time: 17:32
  */
 
 namespace rollun\permission\Auth\Middleware;
@@ -12,7 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Zend\Stratigility\MiddlewareInterface;
 
-class ServiceAuth implements MiddlewareInterface
+class Auth implements MiddlewareInterface
 {
 
     /**

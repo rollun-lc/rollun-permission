@@ -2,27 +2,36 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 13.02.17
- * Time: 17:36
+ * Date: 15.02.17
+ * Time: 12:49
  */
 
 namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Zend\Session\Container;
+use rollun\datastore\DataStore\DataStoreAbstract;
+use rollun\datastore\Rql\RqlQuery;
+use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Stratigility\MiddlewareInterface;
 
-class RequestCuter implements MiddlewareInterface
+class IdentifyAction implements MiddlewareInterface
 {
+    const KEY_USER = 'user';
 
-    protected $sessionContainer;
+    const KEY_ROLE = 'role';
 
-    public function __construct(Container $sessionContainer)
+    /** @var  AuthenticationServiceInterface */
+    protected $authService;
+
+    /** @var  DataStoreAbstract */
+    protected $userRolesDS;
+
+    public function __construct(AuthenticationServiceInterface $authenticationService, DataStoreAbstract $userRolesDS)
     {
-        $this->sessionContainer = $sessionContainer;
+        $this->authService = $authenticationService;
+        $this->userRolesDS = $userRolesDS;
     }
-
     /**
      * Process an incoming request and/or response.
      *
@@ -50,6 +59,22 @@ class RequestCuter implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $queryParams = $request->getQueryParams();
+        $identity = $this->authService->hasIdentity() ? $this->authService->getIdentity() : null;
+
+        if (isset($identity)) {
+            $roles = [];
+            $result = $this->userRolesDS->query(new RqlQuery("eq(user_id,{$identity['id']})"));
+            foreach ($result as $item) {
+                $roles[] = $item[static::KEY_ROLE];
+            }
+            $user['roles'] = $roles;
+            $request = $request->withAttribute(static::KEY_USER, $user);
+        }
+
+        if (isset($out)) {
+            return $out($request,$response);
+        }
+
+        return $response;
     }
 }

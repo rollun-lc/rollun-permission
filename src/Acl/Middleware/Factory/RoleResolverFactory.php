@@ -33,7 +33,6 @@ class RoleResolverFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $authService = $container->get(AuthenticationService::class);
-        return new RoleResolver($authService);
+        return new RoleResolver();
     }
 }

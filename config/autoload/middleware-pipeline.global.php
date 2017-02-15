@@ -37,12 +37,12 @@ return [
             'middleware' => [
                 \rollun\permission\Auth\Middleware\BaseAuth::class
             ],
-            'path' => '/api/',
+            'path' => '/',
             'priority' => 9001,
         ],
         'acl' => [
             'middleware' => [
-                'aclPipes'
+                //'aclPipes'
             ],
             'priority' => 9000,
         ],

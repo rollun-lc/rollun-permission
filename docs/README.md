@@ -24,9 +24,9 @@
 * allow_flag - флаг указывающий на запрет или разрешение правила
 
 ###AclFromDataStoreFactory::KEY_DS_ROLE_SERVICE - ролей 
-* id - id
-* name - имя роли
-* parent_id - id родительской роли
+* id - id  
+* name - имя роли  
+* parent_id - id родительской роли  
 
 ###AclFromDataStoreFactory::KEY_DS_RESOURCE_SERVICE - ресурсов   
 * id - id  

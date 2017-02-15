@@ -6,12 +6,12 @@
  * Time: 17:52
  */
 
-namespace rollun\permission\Auth\Middleware\Factory;
+namespace rollun\permission\Auth\Middleware\ErrorHandler\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
-use rollun\permission\Auth\Middleware\AccessForbiddenHandlerMiddleware;
-use rollun\permission\Auth\Middleware\AlreadyLogginHandler;
+
+use rollun\permission\Auth\Middleware\ErrorHandler\AlreadyLogginHandler;
 use Zend\Expressive\Helper\UrlHelper;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;

@@ -2,82 +2,64 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 30.01.17
- * Time: 13:37
+ * Date: 15.02.17
+ * Time: 17:14
  */
 
-namespace rollun\permission\Auth\Adapter;
+namespace rollun\permission\Auth\Adapter\Resolver;
 
 use rollun\api\Api\Google\Client\Web;
 use rollun\datastore\DataStore\DataStoreAbstract;
-use rollun\datastore\Rql\RqlQuery;
-use Zend\Authentication\Adapter\AdapterInterface;
+use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Zend\Authentication\Result;
 
-class OpenIDAdapter implements AdapterInterface
+class OpenID implements ResolverInterface
 {
-
     /** @var  DataStoreAbstract */
     protected $userDataStore;
 
-    /** @var  Web */
+    /** @var Web  */
     protected $webClient;
 
-    /** @var  string */
-    protected $code;
-
-    /** @var string */
-    protected $state;
-
     /**
-     * OpenIDAdapter constructor.
+     * OpenID constructor.
      * @param Web $webClient
-     * @param DataStoreAbstract $dataStore
+     * @param DataStoreAbstract $userDataStore
      */
-    public function __construct(Web $webClient, DataStoreAbstract $dataStore)
+    public function __construct(Web $webClient, DataStoreAbstract $userDataStore)
     {
         $this->webClient = $webClient;
-        $this->userDataStore = $dataStore;
+        $this->userDataStore = $userDataStore;
     }
 
     /**
-     * @param $code
-     */
-    public function setCode($code)
-    {
-        $this->code = $code;
-    }
-
-    public function setState($state)
-    {
-        $this->state = $state;
-    }
-
-    /**
-     * Performs an authentication attempt
+     * Resolve username/realm to password/hash/etc.
      *
-     * @return \Zend\Authentication\Result
-     * @throws \Zend\Authentication\Adapter\Exception\ExceptionInterface If authentication cannot be performed
+     * @param  string $state Username
+     * @param  string $realm Authentication Realm
+     * @param  string $code Password (optional)
+     * @return string|array|false User's shared secret as string if found in realm, or User's identity as array
+     *         if resolved, false otherwise.
      */
-    public function authenticate()
+    public function resolve($state, $realm, $code = null)
     {
         try {
-            if($this->webClient->getResponseState() !== $this->state) {
+            if($this->webClient->getResponseState() !== $state) {
                 return new Result(
                     Result::FAILURE,
                     null,
                     ["State not equalse."]
                 );
             }
-            if ($this->webClient->authByCode($this->code)) {
+            if ($this->webClient->authByCode($code)) {
                 $userId = $this->webClient->getUserId();
                 $user = $this->userDataStore->read($userId);
                 if (!empty($user)) {
                     //unset($user['pass'])
                     return new Result(
                         Result::SUCCESS,
-                        $user,
-                        ['Fail credential']
+                        $user[$this->userDataStore->getIdentifier()],
+                        ['Success credential']
                     );
                 }
             }

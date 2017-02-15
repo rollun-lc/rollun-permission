@@ -10,7 +10,6 @@ namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use rollun\permission\Auth\OpenIDAuthManager;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
@@ -55,10 +54,11 @@ class LogoutAction implements MiddlewareInterface
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
         $this->authManager->logout();
-        $response = new HtmlResponse("Logout complete!");
-       /* if (isset($out)) {
+        $request = $request->withAttribute('requestData', ['text' => 'Logout complete!']);
+
+        if (isset($out)) {
             return ($out($request, $response));
-        }*/
+        }
         return $response;
     }
 }

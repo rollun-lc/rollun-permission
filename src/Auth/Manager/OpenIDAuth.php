@@ -1,10 +1,10 @@
 <?php
 
-namespace rollun\permission\Auth;
+namespace rollun\permission\Auth\Manager;
 
 use rollun\api\Api\Google\Client\Web;
 use rollun\permission\Auth\Adapter\OpenIDAdapter;
-use rollun\permission\Auth\Middleware\AlreadyLogginException;
+use rollun\permission\Auth\AlreadyLogginException;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Session\AbstractManager;
@@ -17,7 +17,7 @@ use Zend\Session\SessionManager;
  * Date: 30.01.17
  * Time: 14:24
  */
-class OpenIDAuthManager
+class OpenIDAuth
 {
 
     const KEY_ASSESS_TOKEN = 'assess_token';
@@ -62,6 +62,7 @@ class OpenIDAuthManager
         if (!$this->authService->hasIdentity()) {
             throw new \Exception("You not logged in.");
         }
+        $this->
         $this->sessionManger->expireSessionCookie();
         $this->authService->clearIdentity();
     }

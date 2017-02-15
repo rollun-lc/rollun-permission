@@ -6,7 +6,7 @@
  * Time: 17:32
  */
 
-namespace rollun\permission\Auth\Middleware;
+namespace rollun\permission\Auth;
 
 
 class AlreadyLogginException extends \Exception
