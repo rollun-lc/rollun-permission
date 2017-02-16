@@ -103,7 +103,7 @@ return [
     'dependencies' => [
         'invokables' => [
             \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class =>
-            \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class,
+                \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class,
         ],
 
         'factories' => [
@@ -173,13 +173,13 @@ return [
         'authPathSwitch' => [
             LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE => '',
             LazyLoadSwitchAbstractFactory::KEY_MIDDLEWARES_SERVICE => [
-                
+                '' => ''
             ]
         ],
         'authTypeSwitch' => [
             LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE => '',
             LazyLoadSwitchAbstractFactory::KEY_MIDDLEWARES_SERVICE => [
-                ''
+                '' => ''
             ]
         ]
 
