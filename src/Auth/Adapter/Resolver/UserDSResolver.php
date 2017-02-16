@@ -14,7 +14,7 @@ use rollun\datastore\Rql\RqlQuery;
 use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Zend\Authentication\Result;
 
-class UserDataStore implements ResolverInterface
+class UserDSResolver implements ResolverInterface
 {
 
     const KEY_NAME = 'name';
@@ -62,13 +62,14 @@ class UserDataStore implements ResolverInterface
             throw new InvalidArgumentException('Password is required');
         }
 
+        $queryString = "and(eq(" . static::KEY_NAME . ",$username),eq(" . static::KEY_PASSWORD . ",$password))";
         $result = $this->userDataStore->query(
-            new RqlQuery("and(eq(" . static::KEY_NAME . ",$username),eq(" . static::KEY_PASSWORD . ",$password)")
+            new RqlQuery($queryString)
         );
         if(empty($result)) {
             return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, ['Username not found in provided htpasswd file']);
         }
         //todo identity
-        return new Result(Result::SUCCESS, $username);
+        return new Result(Result::SUCCESS, $result[0][$this->userDataStore->getIdentifier()]);
     }
 }

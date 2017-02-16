@@ -27,6 +27,18 @@ class UserResolver implements MiddlewareInterface
     /** @var  DataStoreAbstract */
     protected $userRolesDS;
 
+
+    /**
+     * UserResolver constructor.
+     * @param DataStoreAbstract $userDS
+     * @param DataStoreAbstract $userRolesDS
+     */
+    public function __construct(DataStoreAbstract $userDS, DataStoreAbstract $userRolesDS)
+    {
+        $this->userDS = $userDS;
+        $this->userRolesDS = $userRolesDS;
+    }
+
     /**
      * @param Request $request
      * @param Response $response
@@ -35,13 +47,22 @@ class UserResolver implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        // TODO: Implement __invoke() method.
+        $identity = $request->getAttribute(IdentifyAction::KEY_IDENTITY);
+        $user = $this->getUser($identity);
+
+        $request = $request->withAttribute(static::KEY_USER, $user);
+
+        if (isset($out)) {
+            return $out($request,$response);
+        }
+
+        return $response;
     }
 
     /**
      * return user array (with roles)
      * @param string $userId
-     * @return BaseAuth
+     * @return AuthenticationAction
      */
     protected function getUser($userId)
     {

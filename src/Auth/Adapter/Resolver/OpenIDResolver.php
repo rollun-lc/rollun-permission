@@ -13,7 +13,7 @@ use rollun\datastore\DataStore\DataStoreAbstract;
 use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Zend\Authentication\Result;
 
-class OpenID implements ResolverInterface
+class OpenIDResolver implements ResolverInterface
 {
     /** @var  DataStoreAbstract */
     protected $userDataStore;

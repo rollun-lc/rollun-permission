@@ -1,26 +1,30 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 15.02.17
- * Time: 16:19
+ * Date: 02.02.17
+ * Time: 15:47
  */
 
-namespace rollun\permission\Auth\Adapter\Resolver;
+namespace rollun\permission\Auth\Adapter\Resolver\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use rollun\api\Api\Google\Client\Web;
+use rollun\permission\Auth\Adapter\OpenIDAdapter;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class UserDataStoreFactoryAbstract implements AbstractFactoryInterface
+class OpenIDResolverAbstractFactory implements AbstractFactoryInterface
 {
-    const KEY_USER_DS_RESOLVER = 'userDataStoreResolver';
 
-    const KEY_DS_SERVICE = 'dataStoreService';
+    const KEY_RESOLVER = 'openIdResolver';
+
+    const KEY_USER_DS_SERVICE = 'userDataStoreService';
+
+    const KEY_WEB_SERVICE = 'webService';
 
     /**
      * Create an object
@@ -36,15 +40,21 @@ class UserDataStoreFactoryAbstract implements AbstractFactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-
         $config = $container->get('config');
-        $resolverConfig = $config[static::KEY_USER_DS_RESOLVER][$requestedName];
-        if($container->has($resolverConfig[static::KEY_DS_SERVICE]))
-        {
-            $dataStore = $container->get($resolverConfig[static::KEY_DS_SERVICE]);
-            return new UserDataStore($dataStore);
+        $resolverConfig = $config[static::KEY_RESOLVER][$requestedName];
+
+        if (!isset($resolverConfig[static::KEY_USER_DS_SERVICE])
+            || $container->get($resolverConfig[static::KEY_USER_DS_SERVICE])
+        ) {
+            return new ServiceNotFoundException(
+                $resolverConfig[static::KEY_USER_DS_SERVICE] . " not found."
+            );
         }
-        throw new ServiceNotFoundException($resolverConfig[static::KEY_DS_SERVICE] . " not found.");
+        $webService = isset($resolverConfig[static::KEY_WEB_SERVICE]) ?
+            $resolverConfig[static::KEY_WEB_SERVICE] : Web::class;
+        $webClient = $container->get($webService);
+        $dataStore = $container->get($resolverConfig[static::KEY_USER_DS_SERVICE]);
+        return new OpenIDAdapter($webClient, $dataStore);
     }
 
     /**
@@ -57,6 +67,6 @@ class UserDataStoreFactoryAbstract implements AbstractFactoryInterface
     public function canCreate(ContainerInterface $container, $requestedName)
     {
         $config = $container->get('config');
-        return isset($config[static::KEY_USER_DS_RESOLVER][$requestedName][static::KEY_DS_SERVICE]);
+        return isset($config[static::KEY_RESOLVER][$requestedName]);
     }
 }

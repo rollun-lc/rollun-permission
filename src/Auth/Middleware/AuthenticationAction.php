@@ -10,32 +10,35 @@ namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use rollun\datastore\DataStore\DataStoreAbstract;
-use rollun\datastore\Rql\RqlQuery;
 use rollun\permission\Auth\CredentialInvalidException;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Adapter\Http;
+use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Authentication\Result;
 use Zend\Psr7Bridge\Psr7Response;
 use Zend\Psr7Bridge\Psr7ServerRequest;
 use Zend\Stratigility\MiddlewareInterface;
-use \rollun\permission\Auth\Manager\BaseAuth as BaseAuthManager;
 
-class BaseAuth implements MiddlewareInterface
+class AuthenticationAction implements MiddlewareInterface
 {
     const KEY_IDENTITY = 'identity';
 
     /** @var  Http */
-    protected $httpAdapter;
+    protected $adapter;
+
+    /** @var  AuthenticationService */
+    protected $authenticationService;
 
     /**
      * BaseAuth constructor.
      * @param AdapterInterface $adapter
+     * @param AuthenticationServiceInterface $authenticationService
      */
-    public function __construct(AdapterInterface $adapter)
+    public function __construct(AdapterInterface $adapter, AuthenticationServiceInterface $authenticationService)
     {
-        $this->httpAdapter = $adapter;
+        $this->adapter = $adapter;
+        $this->authenticationService = $authenticationService;
     }
 
     /**
@@ -47,12 +50,18 @@ class BaseAuth implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $this->httpAdapter->setRequest(Psr7ServerRequest::toZend($request));
-        $this->httpAdapter->setResponse(Psr7Response::toZend($response));
-        $result = $this->httpAdapter->authenticate();
+        $zendRequest = Psr7ServerRequest::toZend($request);
+        $zendResponse = Psr7Response::toZend($response);
+        $this->adapter->setRequest($zendRequest);
+        $this->adapter->setResponse($zendResponse);
+        $result = $this->authenticationService->authenticate($this->adapter);
         if ($result->isValid()) {
             $identity = $result->getIdentity();
             $request = $request->withAttribute(static::KEY_IDENTITY, $identity);
+        } else if ($result->getCode() === Result::FAILURE_CREDENTIAL_INVALID) {
+            $response = Psr7Response::fromZend($zendResponse);
+            $request->withAttribute('responseData', ['data' => $zendResponse->getBody()]);
+            $request = $request->withAttribute(Response::class, $response);
         } else {
             throw new CredentialInvalidException("Auth credential error.");
         }

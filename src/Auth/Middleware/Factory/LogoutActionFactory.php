@@ -33,7 +33,6 @@ class LogoutActionFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $authManager = $container->get(OpenIDAuthManager::class);
-        return new LogoutAction($authManager);
+        return new LogoutAction();
     }
 }

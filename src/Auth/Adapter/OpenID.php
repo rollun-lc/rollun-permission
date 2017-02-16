@@ -18,7 +18,7 @@ use Zend\Authentication\Adapter\ValidatableAdapterInterface;
 use Zend\Authentication\Result;
 use Zend\Http\Request as HTTPRequest;
 use Zend\Http\Response as HTTPResponse;
-use \rollun\permission\Auth\Adapter\Resolver\OpenID as OpenIDResolver;
+use \rollun\permission\Auth\Adapter\Resolver\OpenIDResolver as OpenIDResolver;
 
 class OpenID implements AdapterInterface
 {

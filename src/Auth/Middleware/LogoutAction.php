@@ -18,12 +18,9 @@ use Zend\Stratigility\MiddlewareInterface;
 class LogoutAction implements MiddlewareInterface
 {
 
-    /** @var  OpenIDAuthManager */
-    protected $authManager;
-
-    public function __construct(OpenIDAuthManager $authManager)
+    public function __construct()
     {
-        $this->authManager = $authManager;
+
     }
 
     /**
@@ -53,7 +50,6 @@ class LogoutAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $this->authManager->logout();
         $request = $request->withAttribute('requestData', ['text' => 'Logout complete!']);
 
         if (isset($out)) {

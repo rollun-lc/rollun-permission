@@ -35,7 +35,7 @@ return [
 
         'baseAuth' => [
             'middleware' => [
-                \rollun\permission\Auth\Middleware\BaseAuth::class
+                \rollun\permission\Auth\Middleware\AuthenticationAction::class
             ],
             'path' => '/',
             'priority' => 9001,
@@ -75,9 +75,9 @@ return [
         'error' => [
             'middleware' => [
                 // Add error middleware here.
-                \rollun\permission\Auth\Middleware\AccessForbiddenHandlerMiddleware::class,
-                \rollun\permission\Auth\Middleware\AlreadyLogginHandler::class,
-                \rollun\permission\Auth\Middleware\CredentialErrorHandlerMiddleware::class,
+                //\rollun\permission\Auth\Middleware\AccessForbiddenHandlerMiddleware::class,
+                //\rollun\permission\Auth\Middleware\AlreadyLogginHandler::class,
+                //\rollun\permission\Auth\Middleware\CredentialErrorHandlerMiddleware::class,
             ],
             'error'    => true,
             'priority' => -10000,

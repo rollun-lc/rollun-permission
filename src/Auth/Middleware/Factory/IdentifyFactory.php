@@ -17,13 +17,16 @@ use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
+use Zend\Authentication\Storage\Session as SessionStorage;
+use Zend\Session\Service\SessionManagerFactory;
+use Zend\Session\SessionManager;
 
 class IdentifyFactory implements FactoryInterface
 {
 
     const KEY_IDENTIFY = 'identify';
 
-    const KEY_USER_ROLES_DS_SERVICE = 'userRoleDataStoreService';
+    const KEY_AUTHENTICATION_SERVICE = 'authenticationService';
 
     /** @var  AuthenticationServiceInterface */
     protected $authService;
@@ -41,11 +44,18 @@ class IdentifyFactory implements FactoryInterface
     {
         $config = $container->get('config');
 
-        if(isset($config[static::KEY_IDENTIFY][static::KEY_USER_ROLES_DS_SERVICE]) ){
+        if (isset($config[static::KEY_AUTHENTICATION_SERVICE]) &&
+            $container->has($config[static::KEY_AUTHENTICATION_SERVICE])
+        ) {
+            $authService = $container->get($config[static::KEY_AUTHENTICATION_SERVICE]);
+        } else if ($container->has(AuthenticationService::class)) {
             $authService = $container->get(AuthenticationService::class);
-            $userRolesDS = $container->get($config[static::KEY_IDENTIFY][static::KEY_USER_ROLES_DS_SERVICE]);
-            return new IdentifyAction($authService, $userRolesDS);
+        } else {
+            $sessionFactory = new SessionManagerFactory();
+            $sessionManager = $sessionFactory($container, SessionManager::class);
+            $authStorage = new SessionStorage('ZendAuth', 'session', $sessionManager);
+            $authService = new AuthenticationService($authStorage);
         }
-        throw new \Exception("'userRoleDataStore' not set.");
+        return new IdentifyAction($authService);
     }
 }

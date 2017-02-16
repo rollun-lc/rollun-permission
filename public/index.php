@@ -25,3 +25,4 @@ $container = require 'config/container.php';
 /** @var \Zend\Expressive\Application $app */
 $app = $container->get(\Zend\Expressive\Application::class);
 $app->run();
+//file_put_contents(realpath('data/log'), "", FILE_APPEND);

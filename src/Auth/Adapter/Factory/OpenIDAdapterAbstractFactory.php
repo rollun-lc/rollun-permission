@@ -15,18 +15,13 @@ use rollun\permission\Auth\Adapter\OpenID;
 use rollun\permission\Auth\Adapter\OpenIDAdapter;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class OpenIDAdapterFactory implements FactoryInterface
+class OpenIDAdapterAbstractFactory extends AdapterAbstractFactoryAbstract
 {
 
-    const KEY_OPENID_ADAPTER = 'openIdAdapter';
-
-    const KEY_ADAPTER_CONFIG = 'config';
-
-    const KEY_AC_REALM = 'realm';
-
-    const DEFAULT_REALM = 'RollunService';
+    const KEY_ADAPTER = 'openIdAdapter';
 
     const KEY_RESOLVER = 'resolver';
 
@@ -44,10 +39,10 @@ class OpenIDAdapterFactory implements FactoryInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $adapterConfig = [];
         $config = $container->get('config');
-        $adapterConfig = isset($config[static::KEY_OPENID_ADAPTER][static::KEY_ADAPTER_CONFIG]) ?
-            $config[static::KEY_OPENID_ADAPTER][static::KEY_ADAPTER_CONFIG] :
+        $factoryConfig = $config[static::KEY_ADAPTER][$requestedName];
+        $adapterConfig = isset($factoryConfig[static::KEY_ADAPTER_CONFIG]) ?
+            $factoryConfig[static::KEY_ADAPTER_CONFIG] :
             [static::KEY_AC_REALM => static::DEFAULT_REALM];
 
         $openIdAdapter = new OpenID($adapterConfig);
@@ -61,5 +56,6 @@ class OpenIDAdapterFactory implements FactoryInterface
             $basicResolver = $container->get($factoryConfig[static::KEY_RESOLVER]);
             $openIdAdapter->setResolver($basicResolver);
         }
+        return $openIdAdapter;
     }
 }
