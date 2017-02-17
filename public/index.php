@@ -14,7 +14,7 @@ require_once 'config/env_configurator.php';
 
 // Define application environment - 'dev' or 'prop'
 if (constant('APP_ENV') === 'dev') {
-    error_reporting(E_ALL);
+    error_reporting(E_ALL &(~E_WARNING));
     ini_set('display_errors', 1);
 }
 //todo:: add remove error
@@ -26,3 +26,9 @@ $container = require 'config/container.php';
 $app = $container->get(\Zend\Expressive\Application::class);
 $app->run();
 //file_put_contents(realpath('data/log'), "", FILE_APPEND);
+//file_put_contents(realpath('data/log'), "query: $queryString\n", FILE_APPEND);
+/*try{
+
+} catch(\Exception $e) {
+    file_put_contents(realpath('data/log'), "error" . $e->getMessage() . "\n", FILE_APPEND);
+}*/

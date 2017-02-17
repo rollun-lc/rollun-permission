@@ -28,7 +28,8 @@ class AccessForbiddenHandlerMiddleware
 
     public function __invoke($error, Request $request, Response $response, callable $next) {
         if ($error instanceof AccessForbiddenException) {
-            if ($request->getAttribute('role') === RoleResolver::DEFAULT_ROLE) {
+            $roles = $request->getAttribute(RoleResolver::KEY_ROLE_ATTRIBUTE);
+            if (empty(array_diff($roles, [RoleResolver::DEFAULT_ROLE]))) {
                 $url = $this->urlHelper->generate('login');
                 $response = new RedirectResponse($url, 302, ['Location' => filter_var($url, FILTER_SANITIZE_URL)]);
             } else {

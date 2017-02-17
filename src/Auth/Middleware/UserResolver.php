@@ -19,24 +19,32 @@ class UserResolver implements MiddlewareInterface
 
     const KEY_USER = 'user';
 
-    const KEY_ROLE = 'role';
+    const KEY_ROLE_ID = 'role_id';
+
+    const KEY_ROLE_NAME = 'name';
 
     /** @var  DataStoreAbstract */
     protected $userDS;
 
     /** @var  DataStoreAbstract */
     protected $userRolesDS;
+    /**
+     * @var DataStoreAbstract
+     */
+    private $rolesDS;
 
 
     /**
      * UserResolver constructor.
      * @param DataStoreAbstract $userDS
+     * @param DataStoreAbstract $rolesDS
      * @param DataStoreAbstract $userRolesDS
      */
-    public function __construct(DataStoreAbstract $userDS, DataStoreAbstract $userRolesDS)
+    public function __construct(DataStoreAbstract $userDS, DataStoreAbstract $rolesDS, DataStoreAbstract $userRolesDS)
     {
         $this->userDS = $userDS;
         $this->userRolesDS = $userRolesDS;
+        $this->rolesDS = $rolesDS;
     }
 
     /**
@@ -81,9 +89,12 @@ class UserResolver implements MiddlewareInterface
     protected function getRoles($userId)
     {
         $roles = [];
-        $result = $this->userRolesDS->query(new RqlQuery("eq(user_id, $userId)"));
+        $result = $this->userRolesDS->query(new RqlQuery("eq(user_id,$userId)"));
         foreach ($result as $item) {
-            $roles[] = $item[static::KEY_ROLE];
+            $role = $this->rolesDS->read($item[static::KEY_ROLE_ID]);
+            if (isset($role[static::KEY_ROLE_NAME])) {
+                $roles[] = $role[static::KEY_ROLE_NAME];
+            }
         }
         return $roles;
     }

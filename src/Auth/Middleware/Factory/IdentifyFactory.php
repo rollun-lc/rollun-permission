@@ -6,7 +6,7 @@
  * Time: 17:38
  */
 
-namespace rollun\permission\Acl\Middleware\Factory;
+namespace rollun\permission\Auth\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
@@ -45,6 +45,7 @@ class IdentifyFactory implements FactoryInterface
         $config = $container->get('config');
 
         if (isset($config[static::KEY_AUTHENTICATION_SERVICE]) &&
+            !empty($config[static::KEY_AUTHENTICATION_SERVICE]) &&
             $container->has($config[static::KEY_AUTHENTICATION_SERVICE])
         ) {
             $authService = $container->get($config[static::KEY_AUTHENTICATION_SERVICE]);

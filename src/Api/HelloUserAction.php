@@ -2,29 +2,22 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 27.01.17
- * Time: 14:56
+ * Date: 16.01.17
+ * Time: 12:26
  */
 
-namespace rollun\permission\Acl\Middleware;
+namespace rollun\permission\Api;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use rollun\permission\Acl\AccessForbiddenException;
-use Zend\Permissions\Acl\Acl;
-use Zend\Permissions\Acl\AclInterface;
+use rollun\permission\Auth\Middleware\UserResolver;
+use Zend\Diactoros\Response\HtmlResponse;
+use Zend\Diactoros\Response\JsonResponse;
+use Zend\Expressive\Template\TemplateRendererInterface;
 use Zend\Stratigility\MiddlewareInterface;
 
-class AclMiddleware implements MiddlewareInterface
+class HelloUserAction implements MiddlewareInterface
 {
-
-    /** @var  AclInterface */
-    protected $acl;
-
-    public function __construct(AclInterface $acl)
-    {
-        $this->acl = $acl;
-    }
 
     /**
      * Process an incoming request and/or response.
@@ -50,34 +43,24 @@ class AclMiddleware implements MiddlewareInterface
      * @param Response $response
      * @param null|callable $out
      * @return null|Response
-     * @throws AccessForbiddenException
+     * @throws \Exception
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $roles = $request->getAttribute(RoleResolver::KEY_ROLE_ATTRIBUTE);
-        $resource = $request->getAttribute(ResourceResolver::KEY_RESOURCE_ATTRIBUTE);
-        $privilege = $request->getAttribute(PrivilegeResolver::KEY_PRIVILEGE_ATTRIBUTE);
-        $isAllowed = false;
+        $data = [];
+        $name = $request->getAttribute('name');
+        $user = $request->getAttribute(UserResolver::KEY_USER);
+        $data['user'] = $user;
+        $data['str'] = "[" . constant('APP_ENV') . "] Hello $name!";
 
-        if($this->acl->hasResource($resource)) {
-            foreach ($roles as $role) {
-                if ($this->acl->isAllowed($role, $resource, $privilege)) {
-                    $isAllowed = true;
-                    break;
-                }
-            }
+        if ($name === "error") {
+            throw new \Exception("Exception by string: ".  $data['str']);
         }
-
-        if (!$isAllowed) {
-            throw new AccessForbiddenException(
-                "Access forbidden for 'roles:[" . implode($roles) . "];resource: $resource;method: {$request->getMethod()}'"
-            );
-        }
+        $request = $request->withAttribute('responseData', $data);
 
         if (isset($out)) {
             return $out($request, $response);
         }
-
         return $response;
     }
 }

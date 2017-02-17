@@ -11,6 +11,7 @@ namespace rollun\permission\Acl\Middleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\permission\Auth\Middleware\IdentifyAction;
+use rollun\permission\Auth\Middleware\UserResolver;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Stratigility\MiddlewareInterface;
 
@@ -31,8 +32,8 @@ class RoleResolver implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $user = $request->getAttribute(IdentifyAction::KEY_USER);
-        $roles = isset($user[static::KEY_ROLE_ATTRIBUTE]) ? $user[static::KEY_ROLE_ATTRIBUTE] : static::DEFAULT_ROLE;
+        $user = $request->getAttribute(UserResolver::KEY_USER);
+        $roles = isset($user[static::KEY_ROLE_ATTRIBUTE]) ? $user[static::KEY_ROLE_ATTRIBUTE] : [static::DEFAULT_ROLE];
         $request = $request->withAttribute(static::KEY_ROLE_ATTRIBUTE, $roles);
 
         if (isset($out)) {

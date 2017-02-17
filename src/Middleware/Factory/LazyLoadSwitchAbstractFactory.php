@@ -54,14 +54,19 @@ class LazyLoadSwitchAbstractFactory implements AbstractFactoryInterface
         $config = $container->get('config');
         $factoryConfig = $config[static::LAZY_LOAD_SWITCH][$requestedName];
         $lazyLoadFactory =
-            function (Request $request, Response $response, callable $out = null) use ($factoryConfig, $container) {
+            function (Request $request, Response $response, callable $out = null) use ($factoryConfig, $container, $requestedName) {
                 $comparator = $container->get($factoryConfig[static::KEY_COMPARATOR_SERVICE]);
-                foreach ($factoryConfig[static::KEY_MIDDLEWARES_SERVICE] as $pattern => $middleware) {
-                    if($comparator($request, $pattern)) {
-                        return $middleware($request, $response, $out);
+                foreach ($factoryConfig[static::KEY_MIDDLEWARES_SERVICE] as $pattern => $middlewareService) {
+                    if ($comparator($request, $pattern)) {
+                        if ($container->has($middlewareService)) {
+                            $middleware = $container->get($middlewareService);
+                            return $middleware($request, $response, $out);
+                        } else {
+                            throw new ServiceNotFoundException("Not found $middlewareService for $pattern pattern");
+                        }
                     }
                 }
-                throw new \Exception("Not found middleware for request");
+                throw new ServiceNotCreatedException("Not found middleware for request");
             };
         return $lazyLoadFactory;
     }

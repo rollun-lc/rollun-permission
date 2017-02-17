@@ -6,7 +6,7 @@
  * Time: 12:43
  */
 
-namespace rollun\permission\Acl\Middleware\Factory;
+namespace rollun\permission\Auth\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
@@ -21,6 +21,8 @@ class UserResolverFactory implements FactoryInterface
     const KEY_USER_RESOLVER = 'userResolver';
 
     const KEY_USER_ROLES_DS_SERVICE = 'userRolesDataStoreService';
+
+    const KEY_ROLES_DS_SERVICE = 'rolesDataStoreService';
 
     const KEY_USER_DS_SERVICE = 'usersDataStoreService';
 
@@ -51,9 +53,15 @@ class UserResolverFactory implements FactoryInterface
             ) {
                 throw new ServiceNotFoundException('UserRoles DataStore Service not found.');
             }
+            if (!isset($factoryConfig[static::KEY_ROLES_DS_SERVICE]) ||
+                !$container->has($factoryConfig[static::KEY_ROLES_DS_SERVICE])
+            ) {
+                throw new ServiceNotFoundException('UserRoles DataStore Service not found.');
+            }
             $userDS = $container->get($factoryConfig[static::KEY_USER_DS_SERVICE]);
+            $rolesDS = $container->get($factoryConfig[static::KEY_ROLES_DS_SERVICE]);
             $userRolesDS = $container->get($factoryConfig[static::KEY_USER_ROLES_DS_SERVICE]);
-            $userResolver = new UserResolver($userDS, $userRolesDS);
+            $userResolver = new UserResolver($userDS, $rolesDS, $userRolesDS);
             return $userResolver;
         }
         throw new ServiceNotFoundException('Config not found.');

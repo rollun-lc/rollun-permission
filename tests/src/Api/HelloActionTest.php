@@ -9,7 +9,7 @@
 namespace rollun\test\permission\Api;
 
 use PHPUnit_Framework_TestCase;
-use rollun\permission\Api\HelloAction;
+use rollun\permission\Api\HelloUserAction;
 use Zend\Http\Client;
 
 class HelloActionTest extends HelloActionTestProvider

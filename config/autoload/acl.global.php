@@ -6,13 +6,18 @@
  * Time: 17:26
  */
 
+use rollun\actionrender\Factory\ActionRenderAbstractFactory;
 use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
+use rollun\api\Api\Google\Client\Factory\WebAbstractFactory;
+use rollun\datastore\AbstractFactoryAbstract;
 use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
 use rollun\permission\Auth\Adapter\Factory\HttpAdapterAbstractFactory;
 use rollun\permission\Auth\Adapter\Factory\OpenIDAdapterAbstractFactory;
 use rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory;
 use rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory;
 use rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory;
+use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
+use rollun\permission\Comparator\Factory\AttributeRequestComparatorAbstractFactory;
 use rollun\permission\DataStore\Factory\MemoryDSFromConfigFactory;
 use rollun\permission\Middleware\Factory\LazyLoadSwitchAbstractFactory;
 use Zend\Permissions\Acl\Acl;
@@ -39,6 +44,10 @@ return [
             MemoryDSFromConfigFactory::KEY_CONFIG => 'aclUser',
             MemoryDSFromConfigFactory::KEY_CLASS => \rollun\permission\DataStore\MemoryConfig::class,
         ],
+        'aclUserRolesDS' => [
+            MemoryDSFromConfigFactory::KEY_CONFIG => 'aclUserRoles',
+            MemoryDSFromConfigFactory::KEY_CLASS => \rollun\permission\DataStore\MemoryConfig::class,
+        ],
     ],
 
     'acl' => [
@@ -58,24 +67,6 @@ return [
         ['id' => 0, 'role_id' => 2, 'user_id' => '108787658858627228573'],
         ['id' => 1, 'role_id' => 3, 'user_id' => '1'],
         ['id' => 3, 'role_id' => 1, 'user_id' => '0'],
-    ],
-
-    'aclRules' => [
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 1, 'allow_flag' => 1],
-        ['id' => 2, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 2, 'allow_flag' => 1],
-        ['id' => 3, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 3, 'allow_flag' => 1],
-        ['id' => 4, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 4, 'allow_flag' => 1],
-
-        ['id' => 5, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 1, 'allow_flag' => 1],
-        ['id' => 6, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 2, 'allow_flag' => 1],
-        ['id' => 7, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 3, 'allow_flag' => 1],
-        ['id' => 8, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 4, 'allow_flag' => 1],
-
-        ['id' => 9, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 1, 'allow_flag' => 1],
-        ['id' => 10, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 2, 'allow_flag' => 1],
-        ['id' => 11, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 3, 'allow_flag' => 1],
-        ['id' => 12, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 4, 'allow_flag' => 1],
-
     ],
 
     'aclRoles' => [
@@ -100,10 +91,35 @@ return [
         ['id' => 4, 'name' => 'DELETE'],
     ],
 
+    'aclRules' => [
+        ['id' => 1, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 2, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 2, 'allow_flag' => 1],
+        ['id' => 3, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 3, 'allow_flag' => 1],
+        ['id' => 4, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 4, 'allow_flag' => 1],
+
+        ['id' => 5, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 6, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 3, 'allow_flag' => 1],
+
+        ['id' => 7, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 8, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 2, 'allow_flag' => 1],
+        ['id' => 9, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 3, 'allow_flag' => 1],
+        ['id' => 10, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 4, 'allow_flag' => 1],
+
+    ],
+
     'dependencies' => [
         'invokables' => [
             \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class =>
                 \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class,
+            \rollun\permission\Comparator\PathRequestComparator::class =>
+                \rollun\permission\Comparator\PathRequestComparator::class,
+            \rollun\actionrender\ReturnMiddleware::class => \rollun\actionrender\ReturnMiddleware::class,
+
+            ##### Error Handler Start #####
+            \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class =>
+                \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class,
+            ##### Error Handler End   #####
+
         ],
 
         'factories' => [
@@ -115,25 +131,43 @@ return [
 
             \Zend\Session\SessionManager::class => \Zend\Session\Service\SessionManagerFactory::class,
 
-            \rollun\api\Api\Google\Client\Web::class => \rollun\api\Api\Google\Client\Factory\WebFactory::class,
+            \rollun\permission\Auth\Middleware\AuthenticationAction::class =>
+                \rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory::class,
 
-            \rollun\permission\Auth\Middleware\AuthenticationAction::class => \rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory::class,
-            \Zend\Authentication\Adapter\Http::class => \rollun\permission\Auth\Adapter\Factory\HttpAdapterAbstractFactory::class,
-            \rollun\permission\Auth\Adapter\OpenIDAdapter::class => \rollun\permission\Auth\Adapter\Factory\OpenIDAdapterAbstractFactory::class,
+            \rollun\permission\Auth\Middleware\IdentifyAction::class =>
+                \rollun\permission\Auth\Middleware\Factory\IdentifyFactory::class,
+
+            rollun\permission\Auth\Middleware\UserResolver::class =>
+                \rollun\permission\Auth\Middleware\Factory\UserResolverFactory::class,
+
+            ##### Error Handler Start #####
+
+            \rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenHandlerMiddleware::class =>
+                \rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenHandlerFactory::class,
+
+            \rollun\permission\Auth\Middleware\ErrorHandler\AlreadyLogginHandler::class =>
+                \rollun\permission\Auth\Middleware\ErrorHandler\Factory\AlreadyLogginHandlerFactory::class,
+
+            ##### Error Handler End   #####
 
         ],
 
         'abstract_factories' => [
+            \rollun\api\Api\Google\Client\Factory\WebAbstractFactory::class,
             \rollun\permission\DataStore\Factory\MemoryDSFromConfigFactory::class,
             \rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory::class,
             \rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory::class,
             \rollun\permission\Auth\Adapter\Factory\OpenIDAdapterAbstractFactory::class,
             \rollun\permission\Auth\Adapter\Factory\HttpAdapterAbstractFactory::class,
+            \rollun\permission\Middleware\Factory\LazyLoadSwitchAbstractFactory::class,
+            \rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory::class,
+            \rollun\actionrender\Factory\ActionRenderAbstractFactory::class,
+            \rollun\permission\Comparator\Factory\AttributeRequestComparatorAbstractFactory::class,
         ]
     ],
 
-    AuthenticationAbstractFactory::KEY_AUTH => [
-        AuthenticationAbstractFactory::KEY_ADAPTER => \rollun\permission\Auth\Adapter\OpenIDAdapter::class
+    AuthenticationAbstractFactory::KEY_AUTHENTICATION => [
+        AuthenticationAbstractFactory::KEY_ADAPTER => \rollun\permission\Auth\Adapter\OpenID::class
     ],
 
     HttpAdapterAbstractFactory::KEY_ADAPTER => [
@@ -161,37 +195,81 @@ return [
     ],
 
     MiddlewarePipeAbstractFactory::KEY_AMP => [
-        'authPipe' => [
+        'identityPipe' => [
             'middlewares' => [
                 \rollun\permission\Auth\Middleware\IdentifyAction::class,
                 'authPathSwitch',
+            ]
+        ],
+        'authPipe' => [
+            'middlewares' => [
+                'authTypeSwitch',
+                'authReturnSwitch'
             ]
         ]
     ],
 
     LazyLoadSwitchAbstractFactory::LAZY_LOAD_SWITCH => [
         'authPathSwitch' => [
-            LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE => '',
+            LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE =>
+                \rollun\permission\Comparator\PathRequestComparator::class,
             LazyLoadSwitchAbstractFactory::KEY_MIDDLEWARES_SERVICE => [
-                '' => ''
+                '/\/base/' => 'authPipe',
+                '/\//' => \rollun\permission\Auth\Middleware\UserResolver::class,
             ]
         ],
         'authTypeSwitch' => [
-            LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE => '',
+            LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE =>
+                \rollun\permission\Comparator\PathRequestComparator::class,
             LazyLoadSwitchAbstractFactory::KEY_MIDDLEWARES_SERVICE => [
-                '' => ''
+                '/\/base/' => 'baseAuth',
+                '/\//' => 'openId',
+            ]
+        ],
+        'authReturnSwitch' => [
+            LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE => 'returnResultAttributeRequestComparator',
+            LazyLoadSwitchAbstractFactory::KEY_MIDDLEWARES_SERVICE => [
+                '/^true$/' => \rollun\actionrender\ReturnMiddleware::class,
+                '/^false$/' => \rollun\permission\Auth\Middleware\UserResolver::class,
             ]
         ]
-
     ],
 
-    AuthenticationAbstractFactory::KEY_AUTHENTICATION_SERVICE => [
+    AuthenticationAbstractFactory::KEY_AUTHENTICATION => [
         'baseAuth' => [
             AuthenticationAbstractFactory::KEY_ADAPTER => 'basicHttpAdapter'
         ],
         'openId' => [
             AuthenticationAbstractFactory::KEY_ADAPTER => 'openIdAdapter'
         ],
+    ],
+
+    ActionRenderAbstractFactory::KEY_AR_SERVICE => [
+        'base-service' => [
+            ActionRenderAbstractFactory::KEY_AR_MIDDLEWARE => [
+                ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE =>
+                    \rollun\actionrender\Example\Api\HelloAction::class,
+                ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRenderer'
+            ]
+        ],
+    ],
+
+    AttributeRequestComparatorAbstractFactory::KEY_COMPARATOR => [
+        'returnResultAttributeRequestComparator' => [
+            AttributeRequestComparatorAbstractFactory::KEY_ATTRIBUTE_KEY => 'returnResult'
+        ]
+    ],
+
+    UserResolverFactory::KEY_USER_RESOLVER => [
+        UserResolverFactory::KEY_USER_DS_SERVICE => 'userDS',
+        UserResolverFactory::KEY_ROLES_DS_SERVICE => 'rolesDS',
+        UserResolverFactory::KEY_USER_ROLES_DS_SERVICE => 'aclUserRolesDS',
+    ],
+
+    WebAbstractFactory::KEY_GOOGLE_API_CLIENTS => [
+        \rollun\api\Api\Google\Client\Web::class => [
+            WebAbstractFactory::KEY_CLASS => \rollun\api\Api\Google\Client\Web::class, //optionaly
+        ]
     ]
 
 ];

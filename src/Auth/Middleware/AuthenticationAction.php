@@ -58,10 +58,12 @@ class AuthenticationAction implements MiddlewareInterface
         if ($result->isValid()) {
             $identity = $result->getIdentity();
             $request = $request->withAttribute(static::KEY_IDENTITY, $identity);
+            $request = $request->withAttribute('returnResult', 'false');
         } else if ($result->getCode() === Result::FAILURE_CREDENTIAL_INVALID) {
             $response = Psr7Response::fromZend($zendResponse);
             $request->withAttribute('responseData', ['data' => $zendResponse->getBody()]);
             $request = $request->withAttribute(Response::class, $response);
+            $request = $request->withAttribute('returnResult', 'true');
         } else {
             throw new CredentialInvalidException("Auth credential error.");
         }

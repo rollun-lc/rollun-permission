@@ -24,7 +24,7 @@ use Zend\Session\SessionManager;
 
 class AuthenticationAbstractFactory implements AbstractFactoryInterface
 {
-    const KEY_AUTH = 'authentication';
+    const KEY_AUTHENTICATION = 'authentication';
 
     const KEY_ADAPTER = 'adapter';
 
@@ -45,7 +45,7 @@ class AuthenticationAbstractFactory implements AbstractFactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('config');
-        $factoryConfig = $config[static::KEY_AUTH][$requestedName];
+        $factoryConfig = $config[static::KEY_AUTHENTICATION][$requestedName];
         if (isset($factoryConfig[static::KEY_ADAPTER]) &&
             $container->has($factoryConfig[static::KEY_ADAPTER])
         ) {
@@ -78,6 +78,7 @@ class AuthenticationAbstractFactory implements AbstractFactoryInterface
      */
     public function canCreate(ContainerInterface $container, $requestedName)
     {
-        return isset($config[static::KEY_AUTH][$requestedName]);
+        $config = $container->get('config');
+        return isset($config[static::KEY_AUTHENTICATION][$requestedName]);
     }
 }

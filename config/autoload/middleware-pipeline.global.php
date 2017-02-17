@@ -8,6 +8,9 @@ return [
             Helper\ServerUrlMiddleware::class => Helper\ServerUrlMiddlewareFactory::class,
             Helper\UrlHelperMiddleware::class => Helper\UrlHelperMiddlewareFactory::class,
         ],
+        'invokables' => [
+
+        ],
     ],
     // This can be used to seed pre- and/or post-routing middleware
     'middleware_pipeline' => [
@@ -35,14 +38,14 @@ return [
 
         'baseAuth' => [
             'middleware' => [
-                \rollun\permission\Auth\Middleware\AuthenticationAction::class
+                'identityPipe'
             ],
             'path' => '/',
             'priority' => 9001,
         ],
         'acl' => [
             'middleware' => [
-                //'aclPipes'
+                'aclPipes'
             ],
             'priority' => 9000,
         ],
@@ -75,11 +78,11 @@ return [
         'error' => [
             'middleware' => [
                 // Add error middleware here.
-                //\rollun\permission\Auth\Middleware\AccessForbiddenHandlerMiddleware::class,
-                //\rollun\permission\Auth\Middleware\AlreadyLogginHandler::class,
-                //\rollun\permission\Auth\Middleware\CredentialErrorHandlerMiddleware::class,
+                \rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenHandlerMiddleware::class,
+                \rollun\permission\Auth\Middleware\ErrorHandler\AlreadyLogginHandler::class,
+                \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class,
             ],
-            'error'    => true,
+            'error' => true,
             'priority' => -10000,
         ],
     ],

@@ -25,7 +25,7 @@ class AttributeRequestComparator
 
     public function __invoke(Request $request, $pattern)
     {
-        $path = $request->getAttribute($this->attributeKey);
-        return preg_match($pattern, $path);
+        $attribute = $request->getAttribute($this->attributeKey);
+        return preg_match($pattern, $attribute);
     }
 }
