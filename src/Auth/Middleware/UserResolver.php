@@ -89,7 +89,7 @@ class UserResolver implements MiddlewareInterface
     protected function getRoles($userId)
     {
         $roles = [];
-        $result = $this->userRolesDS->query(new RqlQuery("like(user_id,$userId)"));
+        $result = $this->userRolesDS->query(new RqlQuery("eq(user_id,string:$userId)"));
         foreach ($result as $item) {
             $role = $this->rolesDS->read($item[static::KEY_ROLE_ID]);
             if (isset($role[static::KEY_ROLE_NAME])) {
