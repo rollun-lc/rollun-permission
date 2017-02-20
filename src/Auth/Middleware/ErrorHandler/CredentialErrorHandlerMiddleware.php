@@ -22,10 +22,14 @@ class CredentialErrorHandlerMiddleware
         if ($error instanceof CredentialInvalidException) {
             $response = new HtmlResponse("Invalid credentials!", 401);
             return $response;
+
         }
 
+//        $request = $request->withAttribute(Response::class, $response);
+
+
         if (isset($next)) {
-            return $next($request, $response);
+            return $next($error, $request, $response);
         }
 
         return $response;

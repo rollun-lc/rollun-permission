@@ -34,13 +34,15 @@ class AccessForbiddenHandlerMiddleware
                 $url = $this->urlHelper->generate('login');
                 $response = new RedirectResponse($url, 302, ['Location' => filter_var($url, FILTER_SANITIZE_URL)]);
             } else {
-                $response = new HtmlResponse("Access not granted.");
+                $request = $request->withAttribute('responseData', ["error" => "Access not granted."]);
+                $response = new HtmlResponse('', 403);
             }
+            $request = $request->withAttribute(Response::class, $response);
             return $response;
         }
 
         if (isset($next)) {
-            return $next($request, $response);
+            return $next($error, $request, $response);
         }
 
         return $response;

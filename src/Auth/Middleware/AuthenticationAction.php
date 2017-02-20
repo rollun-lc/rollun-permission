@@ -50,24 +50,25 @@ class AuthenticationAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $zendRequest = Psr7ServerRequest::toZend($request);
-        $zendResponse = Psr7Response::toZend($response);
-        $this->adapter->setRequest($zendRequest);
-        $this->adapter->setResponse($zendResponse);
-        $result = $this->authenticationService->authenticate($this->adapter);
-        if ($result->isValid()) {
-            $identity = $result->getIdentity();
-            $request = $request->withAttribute(static::KEY_IDENTITY, $identity);
-            $request = $request->withAttribute('returnResult', 'false');
-        } else if ($result->getCode() === Result::FAILURE_CREDENTIAL_INVALID) {
-            $response = Psr7Response::fromZend($zendResponse);
-            $request->withAttribute('responseData', ['data' => $zendResponse->getBody()]);
-            $request = $request->withAttribute(Response::class, $response);
-            $request = $request->withAttribute('returnResult', 'true');
-        } else {
-            throw new CredentialInvalidException("Auth credential error.");
+        if(!$this->authenticationService->hasIdentity()) {
+            $zendRequest = Psr7ServerRequest::toZend($request);
+            $zendResponse = Psr7Response::toZend($response);
+            $this->adapter->setRequest($zendRequest);
+            $this->adapter->setResponse($zendResponse);
+            $result = $this->authenticationService->authenticate($this->adapter);
+            if ($result->isValid()) {
+                $identity = $result->getIdentity();
+                $request = $request->withAttribute(static::KEY_IDENTITY, $identity);
+                $request = $request->withAttribute('returnResult', 'false');
+            } else if ($result->getCode() === Result::FAILURE_CREDENTIAL_INVALID) {
+                $response = Psr7Response::fromZend($zendResponse);
+                $request->withAttribute('responseData', ['data' => $zendResponse->getBody()]);
+                $request = $request->withAttribute(Response::class, $response);
+                $request = $request->withAttribute('returnResult', 'true');
+            } else {
+                throw new CredentialInvalidException("Auth credential error.");
+            }
         }
-
         if (isset($out)) {
             return $out($request, $response);
         }

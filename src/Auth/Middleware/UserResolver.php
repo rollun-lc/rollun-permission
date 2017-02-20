@@ -11,6 +11,7 @@ namespace rollun\permission\Auth\Middleware;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\datastore\DataStore\DataStoreAbstract;
+use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\datastore\Rql\RqlQuery;
 use Zend\Stratigility\MiddlewareInterface;
 
@@ -40,7 +41,7 @@ class UserResolver implements MiddlewareInterface
      * @param DataStoreAbstract $rolesDS
      * @param DataStoreAbstract $userRolesDS
      */
-    public function __construct(DataStoreAbstract $userDS, DataStoreAbstract $rolesDS, DataStoreAbstract $userRolesDS)
+    public function __construct(DataStoresInterface $userDS, DataStoresInterface $rolesDS, DataStoresInterface $userRolesDS)
     {
         $this->userDS = $userDS;
         $this->userRolesDS = $userRolesDS;

@@ -30,10 +30,11 @@ class AlreadyLogginHandler
         if ($error instanceof AlreadyLogginException) {
             $url = $this->urlHelper->generate('home-page');
             $response = new RedirectResponse($url);
+            return $response;
         }
 
         if (isset($next)) {
-            return $next($request, $response);
+            return $next($error, $request, $response);
         }
 
         return $response;

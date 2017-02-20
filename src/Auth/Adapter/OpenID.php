@@ -20,7 +20,7 @@ use Zend\Http\Request as HTTPRequest;
 use Zend\Http\Response as HTTPResponse;
 use \rollun\permission\Auth\Adapter\Resolver\OpenIDResolver as OpenIDResolver;
 
-class OpenID implements AdapterInterface
+class OpenID implements AdapterInterface, LogOutInterface
 {
 
     /** @var  HTTPRequest */
@@ -31,12 +31,6 @@ class OpenID implements AdapterInterface
 
     /** @var  ResolverInterface */
     protected $resolver;
-
-    /** @var  string */
-    protected $code;
-
-    /** @var string */
-    protected $state;
 
     /** @var string */
     protected $realm;
@@ -160,5 +154,14 @@ class OpenID implements AdapterInterface
     public function getRequest()
     {
         return $this->request;
+    }
+
+    /**
+     * Erase user data.
+     * @return void
+     */
+    public function logout()
+    {
+        $this->webClient->revokeToken();
     }
 }

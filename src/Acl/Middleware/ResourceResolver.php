@@ -12,6 +12,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\UriInterface;
 use rollun\datastore\DataStore\DataStoreAbstract;
+use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use Zend\Stratigility\MiddlewareInterface;
 
 class ResourceResolver implements MiddlewareInterface
@@ -22,9 +23,9 @@ class ResourceResolver implements MiddlewareInterface
     /** @var  DataStoreAbstract */
     protected $resourceDataStore;
 
-    public function __construct(DataStoreAbstract $dataStore)
+    public function __construct(DataStoresInterface $resourceDataStore)
     {
-        $this->resourceDataStore = $dataStore;
+        $this->resourceDataStore = $resourceDataStore;
     }
 
     /**

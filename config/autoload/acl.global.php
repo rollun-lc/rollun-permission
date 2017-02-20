@@ -10,6 +10,8 @@ use rollun\actionrender\Factory\ActionRenderAbstractFactory;
 use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
 use rollun\api\Api\Google\Client\Factory\WebAbstractFactory;
 use rollun\datastore\AbstractFactoryAbstract;
+use rollun\datastore\DataStore\Factory\CacheableAbstractFactory;
+use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
 use rollun\permission\Auth\Adapter\Factory\HttpAdapterAbstractFactory;
 use rollun\permission\Auth\Adapter\Factory\OpenIDAdapterAbstractFactory;
@@ -18,35 +20,43 @@ use rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactor
 use rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory;
 use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
 use rollun\permission\Comparator\Factory\AttributeRequestComparatorAbstractFactory;
-use rollun\permission\DataStore\Factory\MemoryDSFromConfigFactory;
 use rollun\permission\Middleware\Factory\LazyLoadSwitchAbstractFactory;
 use Zend\Permissions\Acl\Acl;
 
 return [
+
+    'dataSource' => [
+        'aclRules' => [],
+        'aclRoles' => [],
+        'aclResource' => [],
+        'aclPrivilege' => [],
+        'aclUser' => [],
+        'aclUserRoles' => [],
+    ],
     'dataStore' => [
         'rulesDS' => [
-            MemoryDSFromConfigFactory::KEY_CONFIG => 'aclRules',
-            MemoryDSFromConfigFactory::KEY_CLASS => \rollun\permission\DataStore\MemoryConfig::class,
+            CacheableAbstractFactory::KEY_DATASOURCE => 'aclRules',
+            CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
         ],
         'rolesDS' => [
-            MemoryDSFromConfigFactory::KEY_CONFIG => 'aclRoles',
-            MemoryDSFromConfigFactory::KEY_CLASS => \rollun\permission\DataStore\MemoryConfig::class,
+            CacheableAbstractFactory::KEY_DATASOURCE => 'aclRoles',
+            CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
         ],
         'resourceDS' => [
-            MemoryDSFromConfigFactory::KEY_CONFIG => 'aclResource',
-            MemoryDSFromConfigFactory::KEY_CLASS => \rollun\permission\DataStore\MemoryConfig::class,
+            CacheableAbstractFactory::KEY_DATASOURCE => 'aclResource',
+            CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
         ],
         'privilegeDS' => [
-            MemoryDSFromConfigFactory::KEY_CONFIG => 'aclPrivilege',
-            MemoryDSFromConfigFactory::KEY_CLASS => \rollun\permission\DataStore\MemoryConfig::class,
+            CacheableAbstractFactory::KEY_DATASOURCE => 'aclPrivilege',
+            CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
         ],
         'userDS' => [
-            MemoryDSFromConfigFactory::KEY_CONFIG => 'aclUser',
-            MemoryDSFromConfigFactory::KEY_CLASS => \rollun\permission\DataStore\MemoryConfig::class,
+            CacheableAbstractFactory::KEY_DATASOURCE => 'aclUser',
+            CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
         ],
         'aclUserRolesDS' => [
-            MemoryDSFromConfigFactory::KEY_CONFIG => 'aclUserRoles',
-            MemoryDSFromConfigFactory::KEY_CLASS => \rollun\permission\DataStore\MemoryConfig::class,
+            CacheableAbstractFactory::KEY_DATASOURCE => 'aclUserRoles',
+            CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
         ],
     ],
 
@@ -77,6 +87,7 @@ return [
 
     'aclResource' => [
         ['id' => 1, 'name' => 'root', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/$/', 'parent_id' => null],
+        ['id' => 7, 'name' => 'user', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/user$/', 'parent_id' => null],
         ['id' => 2, 'name' => 'login', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/login/', 'parent_id' => null],
         ['id' => 3, 'name' => 'logout', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/logout$/', 'parent_id' => null],
         ['id' => 4, 'name' => 'interrupt', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/interrupt/', 'parent_id' => null],
@@ -92,13 +103,16 @@ return [
     ],
 
     'aclRules' => [
-        ['id' => 1, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 1, 'allow_flag' => 1],
-        ['id' => 2, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 2, 'allow_flag' => 1],
-        ['id' => 3, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 3, 'allow_flag' => 1],
-        ['id' => 4, 'role_id' => 2, 'resource_id' => 1, 'privilege_id' => 4, 'allow_flag' => 1],
+        ['id' => 1, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 2, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 2, 'allow_flag' => 1],
+        ['id' => 3, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 3, 'allow_flag' => 1],
+        ['id' => 4, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 4, 'allow_flag' => 1],
 
         ['id' => 5, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 1, 'allow_flag' => 1],
         ['id' => 6, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 3, 'allow_flag' => 1],
+
+        ['id' => 5, 'role_id' => 1, 'resource_id' => 1, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 6, 'role_id' => 1, 'resource_id' => 1, 'privilege_id' => 3, 'allow_flag' => 1],
 
         ['id' => 7, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 1, 'allow_flag' => 1],
         ['id' => 8, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 2, 'allow_flag' => 1],
@@ -153,8 +167,8 @@ return [
         ],
 
         'abstract_factories' => [
+            \rollun\permission\Acl\DataSource\Factory\ConfigDataSourceAbstractFactory::class,
             \rollun\api\Api\Google\Client\Factory\WebAbstractFactory::class,
-            \rollun\permission\DataStore\Factory\MemoryDSFromConfigFactory::class,
             \rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory::class,
             \rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory::class,
             \rollun\permission\Auth\Adapter\Factory\OpenIDAdapterAbstractFactory::class,
@@ -206,7 +220,7 @@ return [
                 'authTypeSwitch',
                 'authReturnSwitch'
             ]
-        ]
+        ],
     ],
 
     LazyLoadSwitchAbstractFactory::LAZY_LOAD_SWITCH => [

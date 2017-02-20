@@ -11,6 +11,7 @@ namespace rollun\permission\Acl\Factory;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use rollun\datastore\DataStore\DataStoreAbstract;
+use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\datastore\Rql\RqlQuery;
 use Zend\Permissions\Acl\Acl;
 use Zend\Permissions\Acl\Role\GenericRole;
@@ -97,7 +98,12 @@ class AclFromDataStoreFactory implements FactoryInterface
         return $acl;
     }
 
-    private function aclAdd(DataStoreAbstract $dataStore, Acl $acl, $addType)
+    /**
+     * @param DataStoresInterface $dataStore
+     * @param Acl $acl
+     * @param $addType
+     */
+    private function aclAdd(DataStoresInterface $dataStore, Acl $acl, $addType)
     {
         $iterator = $dataStore->getIterator();
         foreach ($iterator as $role) {

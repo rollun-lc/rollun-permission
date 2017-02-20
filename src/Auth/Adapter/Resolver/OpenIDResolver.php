@@ -10,6 +10,7 @@ namespace rollun\permission\Auth\Adapter\Resolver;
 
 use rollun\api\Api\Google\Client\Web;
 use rollun\datastore\DataStore\DataStoreAbstract;
+use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Zend\Authentication\Result;
 
@@ -26,7 +27,7 @@ class OpenIDResolver implements ResolverInterface
      * @param Web $webClient
      * @param DataStoreAbstract $userDataStore
      */
-    public function __construct(Web $webClient, DataStoreAbstract $userDataStore)
+    public function __construct(Web $webClient, DataStoresInterface $userDataStore)
     {
         $this->webClient = $webClient;
         $this->userDataStore = $userDataStore;
