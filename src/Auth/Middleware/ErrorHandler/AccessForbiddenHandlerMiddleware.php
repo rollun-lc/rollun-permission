@@ -12,6 +12,8 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\permission\Acl\AccessForbiddenException;
 use rollun\permission\Acl\Middleware\RoleResolver;
+use rollun\permission\Auth\AlreadyLogginException;
+use rollun\permission\Auth\CredentialInvalidException;
 use rollun\permission\Auth\Middleware\UserResolver;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\RedirectResponse;
@@ -27,7 +29,8 @@ class AccessForbiddenHandlerMiddleware
         $this->urlHelper = $urlHelper;
     }
 
-    public function __invoke($error, Request $request, Response $response, callable $next) {
+    public function __invoke($error, Request $request, Response $response, callable $next)
+    {
         if ($error instanceof AccessForbiddenException) {
             $user = $request->getAttribute(UserResolver::KEY_USER);
             if (empty(array_diff([RoleResolver::DEFAULT_ROLE], $user['roles']))) {
@@ -37,12 +40,19 @@ class AccessForbiddenHandlerMiddleware
                 $request = $request->withAttribute('responseData', ["error" => "Access not granted."]);
                 $response = new HtmlResponse('', 403);
             }
-            $request = $request->withAttribute(Response::class, $response);
             return $response;
+        } else if ($error instanceof AlreadyLogginException) {
+            $url = $this->urlHelper->generate('home-page');
+            $response = new RedirectResponse($url);
+            return $response;
+        } else if ($error instanceof CredentialInvalidException) {
+            $response = new HtmlResponse("Invalid credentials!", 401);
+            return $response;
+
         }
 
         if (isset($next)) {
-            return $next($error, $request, $response);
+            return $next($request, $response);
         }
 
         return $response;

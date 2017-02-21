@@ -27,6 +27,7 @@ class AlreadyLogginHandler
     }
 
     public function __invoke($error, Request $request, Response $response, callable $next) {
+
         if ($error instanceof AlreadyLogginException) {
             $url = $this->urlHelper->generate('home-page');
             $response = new RedirectResponse($url);
@@ -34,7 +35,7 @@ class AlreadyLogginHandler
         }
 
         if (isset($next)) {
-            return $next($error, $request, $response);
+            return $next($request, $response);
         }
 
         return $response;

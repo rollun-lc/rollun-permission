@@ -29,7 +29,7 @@ class CredentialErrorHandlerMiddleware
 
 
         if (isset($next)) {
-            return $next($error, $request, $response);
+            return $next($request, $response);
         }
 
         return $response;

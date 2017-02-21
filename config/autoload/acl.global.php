@@ -37,26 +37,32 @@ return [
         'rulesDS' => [
             CacheableAbstractFactory::KEY_DATASOURCE => 'aclRules',
             CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
+            CacheableAbstractFactory::KEY_IS_REFRESH => true,
         ],
         'rolesDS' => [
             CacheableAbstractFactory::KEY_DATASOURCE => 'aclRoles',
             CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
+            CacheableAbstractFactory::KEY_IS_REFRESH => true,
         ],
         'resourceDS' => [
             CacheableAbstractFactory::KEY_DATASOURCE => 'aclResource',
             CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
+            CacheableAbstractFactory::KEY_IS_REFRESH => true,
         ],
         'privilegeDS' => [
             CacheableAbstractFactory::KEY_DATASOURCE => 'aclPrivilege',
             CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
+            CacheableAbstractFactory::KEY_IS_REFRESH => true,
         ],
         'userDS' => [
             CacheableAbstractFactory::KEY_DATASOURCE => 'aclUser',
             CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
+            CacheableAbstractFactory::KEY_IS_REFRESH => true,
         ],
         'aclUserRolesDS' => [
             CacheableAbstractFactory::KEY_DATASOURCE => 'aclUserRoles',
             CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
+            CacheableAbstractFactory::KEY_IS_REFRESH => true,
         ],
     ],
 
@@ -104,15 +110,13 @@ return [
 
     'aclRules' => [
         ['id' => 1, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 1, 'allow_flag' => 1],
-        ['id' => 2, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 2, 'allow_flag' => 1],
         ['id' => 3, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 3, 'allow_flag' => 1],
-        ['id' => 4, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 4, 'allow_flag' => 1],
 
         ['id' => 5, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 1, 'allow_flag' => 1],
         ['id' => 6, 'role_id' => 1, 'resource_id' => 2, 'privilege_id' => 3, 'allow_flag' => 1],
 
-        ['id' => 5, 'role_id' => 1, 'resource_id' => 1, 'privilege_id' => 1, 'allow_flag' => 1],
-        ['id' => 6, 'role_id' => 1, 'resource_id' => 1, 'privilege_id' => 3, 'allow_flag' => 1],
+        ['id' => 11, 'role_id' => 1, 'resource_id' => 1, 'privilege_id' => 1, 'allow_flag' => 1],
+        ['id' => 12, 'role_id' => 1, 'resource_id' => 1, 'privilege_id' => 3, 'allow_flag' => 1],
 
         ['id' => 7, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 1, 'allow_flag' => 1],
         ['id' => 8, 'role_id' => 2, 'resource_id' => 3, 'privilege_id' => 2, 'allow_flag' => 1],
@@ -168,7 +172,7 @@ return [
 
         'abstract_factories' => [
             \rollun\permission\Acl\DataSource\Factory\ConfigDataSourceAbstractFactory::class,
-            \rollun\api\Api\Google\Client\Factory\WebAbstractFactory::class,
+            \rollun\api\Api\Google\Client\Factory\AbstractFactory::class,
             \rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory::class,
             \rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory::class,
             \rollun\permission\Auth\Adapter\Factory\OpenIDAdapterAbstractFactory::class,
@@ -279,11 +283,5 @@ return [
         UserResolverFactory::KEY_ROLES_DS_SERVICE => 'rolesDS',
         UserResolverFactory::KEY_USER_ROLES_DS_SERVICE => 'aclUserRolesDS',
     ],
-
-    WebAbstractFactory::KEY_GOOGLE_API_CLIENTS => [
-        \rollun\api\Api\Google\Client\Web::class => [
-            WebAbstractFactory::KEY_CLASS => \rollun\api\Api\Google\Client\Web::class, //optionaly
-        ]
-    ]
 
 ];

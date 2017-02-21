@@ -10,6 +10,7 @@ namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use rollun\permission\Auth\AlreadyLogginException;
 use rollun\permission\Auth\CredentialInvalidException;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Adapter\Http;
@@ -68,6 +69,8 @@ class AuthenticationAction implements MiddlewareInterface
             } else {
                 throw new CredentialInvalidException("Auth credential error.");
             }
+        } else {
+            throw new AlreadyLogginException();
         }
         if (isset($out)) {
             return $out($request, $response);

@@ -78,7 +78,7 @@ return [
         'error' => [
             'middleware' => [
                 // Add error middleware here.
-
+                \rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenHandlerMiddleware::class,
             ],
             'error' => true,
             'priority' => -10000,
