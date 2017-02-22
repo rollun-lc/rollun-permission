@@ -49,7 +49,7 @@ class HelloUserAction implements MiddlewareInterface
     {
         $data = [];
         $name = $request->getAttribute('name');
-        $user = $request->getAttribute(UserResolver::KEY_USER);
+        $user = $request->getAttribute(UserResolver::KEY_ATTRIBUTE_USER);
         $data['user'] = $user;
         $data['str'] = "[" . constant('APP_ENV') . "] Hello $name!";
 

@@ -8,7 +8,6 @@
 
 use rollun\actionrender\Factory\ActionRenderAbstractFactory;
 use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
-use rollun\api\Api\Google\Client\Factory\WebAbstractFactory;
 use rollun\datastore\AbstractFactoryAbstract;
 use rollun\datastore\DataStore\Factory\CacheableAbstractFactory;
 use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
@@ -59,7 +58,7 @@ return [
             CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
             CacheableAbstractFactory::KEY_IS_REFRESH => true,
         ],
-        'aclUserRolesDS' => [
+        'userRolesDS' => [
             CacheableAbstractFactory::KEY_DATASOURCE => 'aclUserRoles',
             CacheableAbstractFactory::KEY_CLASS => \rollun\datastore\DataStore\Cacheable::class,
             CacheableAbstractFactory::KEY_IS_REFRESH => true,
@@ -76,7 +75,7 @@ return [
     'aclUser' => [
         ['id' => "108787658858627228573", 'name' => 'victor'],
         ['id' => "1", 'name' => 'user', 'password' => '123wqe321'],
-        ['id' => "0", 'name' => 'guest', 'password' => ''],
+        ['id' => "0", 'name' => 'guest'],
     ],
 
     'aclUserRoles' => [
@@ -139,7 +138,6 @@ return [
             ##### Error Handler End   #####
 
         ],
-
         'factories' => [
             \rollun\permission\Auth\Middleware\LogoutAction::class =>
                 \rollun\permission\Auth\Middleware\Factory\LogoutActionFactory::class,
@@ -169,7 +167,6 @@ return [
             ##### Error Handler End   #####
 
         ],
-
         'abstract_factories' => [
             \rollun\permission\Acl\DataSource\Factory\ConfigDataSourceAbstractFactory::class,
             \rollun\api\Api\Google\Client\Factory\AbstractFactory::class,
@@ -182,10 +179,6 @@ return [
             \rollun\actionrender\Factory\ActionRenderAbstractFactory::class,
             \rollun\permission\Comparator\Factory\AttributeRequestComparatorAbstractFactory::class,
         ]
-    ],
-
-    AuthenticationAbstractFactory::KEY_AUTHENTICATION => [
-        AuthenticationAbstractFactory::KEY_ADAPTER => \rollun\permission\Auth\Adapter\OpenID::class
     ],
 
     HttpAdapterAbstractFactory::KEY_ADAPTER => [
@@ -281,7 +274,7 @@ return [
     UserResolverFactory::KEY_USER_RESOLVER => [
         UserResolverFactory::KEY_USER_DS_SERVICE => 'userDS',
         UserResolverFactory::KEY_ROLES_DS_SERVICE => 'rolesDS',
-        UserResolverFactory::KEY_USER_ROLES_DS_SERVICE => 'aclUserRolesDS',
+        UserResolverFactory::KEY_USER_ROLES_DS_SERVICE => 'userRolesDS',
     ],
 
 ];

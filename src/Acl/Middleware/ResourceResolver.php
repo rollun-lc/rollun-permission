@@ -18,7 +18,7 @@ use Zend\Stratigility\MiddlewareInterface;
 class ResourceResolver implements MiddlewareInterface
 {
 
-    const KEY_RESOURCE_ATTRIBUTE = 'resource';
+    const KEY_ATTRIBUTE_RESOURCE = 'resource';
 
     /** @var  DataStoreAbstract */
     protected $resourceDataStore;
@@ -48,7 +48,7 @@ class ResourceResolver implements MiddlewareInterface
                 break;
             }
         }
-        $request = $request->withAttribute(static::KEY_RESOURCE_ATTRIBUTE, $resource);
+        $request = $request->withAttribute(static::KEY_ATTRIBUTE_RESOURCE, $resource);
 
         if (isset($out)) {
             return $out($request, $response);

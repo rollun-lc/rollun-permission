@@ -10,6 +10,7 @@ namespace rollun\permission\Auth\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
 use rollun\permission\Auth\Middleware\UserResolver;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
@@ -25,6 +26,10 @@ class UserResolverFactory implements FactoryInterface
     const KEY_ROLES_DS_SERVICE = 'rolesDataStoreService';
 
     const KEY_USER_DS_SERVICE = 'usersDataStoreService';
+
+    const DEFAULT_USER_DS = 'userDS';
+
+    const DEFAULT_USER_ROLES_DS = 'userRolesDS';
 
     /**
      * Create an object
@@ -42,28 +47,33 @@ class UserResolverFactory implements FactoryInterface
     {
         $config = $container->get('config');
         $factoryConfig = $config[static::KEY_USER_RESOLVER];
-        if (isset($config[static::KEY_USER_RESOLVER])) {
-            if (!isset($factoryConfig[static::KEY_USER_DS_SERVICE]) ||
-                !$container->has($factoryConfig[static::KEY_USER_DS_SERVICE])
-            ) {
-                throw new ServiceNotFoundException('User DataStore Service not found.');
-            }
-            if (!isset($factoryConfig[static::KEY_USER_ROLES_DS_SERVICE]) ||
-                !$container->has($factoryConfig[static::KEY_USER_ROLES_DS_SERVICE])
-            ) {
-                throw new ServiceNotFoundException('UserRoles DataStore Service not found.');
-            }
-            if (!isset($factoryConfig[static::KEY_ROLES_DS_SERVICE]) ||
-                !$container->has($factoryConfig[static::KEY_ROLES_DS_SERVICE])
-            ) {
-                throw new ServiceNotFoundException('UserRoles DataStore Service not found.');
-            }
-            $userDS = $container->get($factoryConfig[static::KEY_USER_DS_SERVICE]);
-            $rolesDS = $container->get($factoryConfig[static::KEY_ROLES_DS_SERVICE]);
-            $userRolesDS = $container->get($factoryConfig[static::KEY_USER_ROLES_DS_SERVICE]);
-            $userResolver = new UserResolver($userDS, $rolesDS, $userRolesDS);
-            return $userResolver;
+
+        $userDS = isset($factoryConfig[static::KEY_USER_DS_SERVICE]) ?
+            isset($factoryConfig[static::KEY_USER_DS_SERVICE]) :
+            static::DEFAULT_USER_DS;
+        $userRolesDS = isset($factoryConfig[static::KEY_USER_ROLES_DS_SERVICE]) ?
+            isset($factoryConfig[static::KEY_USER_ROLES_DS_SERVICE]) :
+            static::DEFAULT_USER_ROLES_DS;
+        $rolesDS = isset($factoryConfig[static::KEY_ROLES_DS_SERVICE]) ?
+            isset($factoryConfig[static::KEY_ROLES_DS_SERVICE]) :
+            AclFromDataStoreFactory::DEFAULT_ROLES_DS;
+
+        if (!$container->has($userDS) ){
+            throw new ServiceNotFoundException('User DataStore Service not found.');
         }
-        throw new ServiceNotFoundException('Config not found.');
+
+        if (!$container->has($userRolesDS)) {
+            throw new ServiceNotFoundException('UserRoles DataStore Service not found.');
+        }
+
+        if (!$container->has($rolesDS)) {
+            throw new ServiceNotFoundException('Roles DataStore Service not found.');
+        }
+
+        $userDS = $container->get($userDS);
+        $rolesDS = $container->get($rolesDS);
+        $userRolesDS = $container->get($userRolesDS);
+        $userResolver = new UserResolver($userDS, $rolesDS, $userRolesDS);
+        return $userResolver;
     }
 }

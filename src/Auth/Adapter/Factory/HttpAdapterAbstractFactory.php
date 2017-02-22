@@ -59,6 +59,5 @@ class HttpAdapterAbstractFactory extends AdapterAbstractFactoryAbstract
             $http->setDigestResolver($digestResolver);
         }
         return $http;
-
     }
 }

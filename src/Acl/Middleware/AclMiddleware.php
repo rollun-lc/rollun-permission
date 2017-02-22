@@ -54,9 +54,9 @@ class AclMiddleware implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $roles = $request->getAttribute(RoleResolver::KEY_ROLE_ATTRIBUTE);
-        $resource = $request->getAttribute(ResourceResolver::KEY_RESOURCE_ATTRIBUTE);
-        $privilege = $request->getAttribute(PrivilegeResolver::KEY_PRIVILEGE_ATTRIBUTE);
+        $roles = $request->getAttribute(RoleResolver::KEY_ATTRIBUTE_ROLE);
+        $resource = $request->getAttribute(ResourceResolver::KEY_ATTRIBUTE_RESOURCE);
+        $privilege = $request->getAttribute(PrivilegeResolver::KEY_ATTRIBUTE_PRIVILEGE);
         $isAllowed = false;
 
         if($this->acl->hasResource($resource)) {

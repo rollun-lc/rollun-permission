@@ -15,9 +15,9 @@ use Zend\Stratigility\MiddlewareInterface;
 class PrivilegeResolver implements MiddlewareInterface
 {
 
-    const KEY_PRIVILEGE_ATTRIBUTE = 'privilege';
+    const KEY_ATTRIBUTE_PRIVILEGE = 'privilege';
     /**
-     * {@inheritdoc}
+     * {@inheritdoc}F
      *
      * add privilege to request attribute
      *
@@ -29,7 +29,7 @@ class PrivilegeResolver implements MiddlewareInterface
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
         $privilege = $request->getMethod();
-        $request = $request->withAttribute(static::KEY_PRIVILEGE_ATTRIBUTE, $privilege);
+        $request = $request->withAttribute(static::KEY_ATTRIBUTE_PRIVILEGE, $privilege);
 
         if (isset($out)) {
             return $out($request, $response);

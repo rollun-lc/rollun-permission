@@ -20,7 +20,7 @@ use Zend\Http\Request as HTTPRequest;
 use Zend\Http\Response as HTTPResponse;
 use \rollun\permission\Auth\Adapter\Resolver\OpenIDResolver as OpenIDResolver;
 
-class OpenID implements AdapterInterface, LogOutInterface
+class OpenID extends AbstractWebAdapter implements  LogOutInterface
 {
 
     /** @var  HTTPRequest */
@@ -41,7 +41,6 @@ class OpenID implements AdapterInterface, LogOutInterface
     /**
      * OpenIDAdapter constructor.
      * @param array $config
-     * @param Web $webClient
      */
     public function __construct(array $config)
     {

@@ -18,7 +18,7 @@ use Zend\Stratigility\MiddlewareInterface;
 class UserResolver implements MiddlewareInterface
 {
 
-    const KEY_USER = 'user';
+    const KEY_ATTRIBUTE_USER = 'user';
 
     const KEY_ROLE_ID = 'role_id';
 
@@ -34,12 +34,11 @@ class UserResolver implements MiddlewareInterface
      */
     private $rolesDS;
 
-
     /**
      * UserResolver constructor.
-     * @param DataStoreAbstract $userDS
-     * @param DataStoreAbstract $rolesDS
-     * @param DataStoreAbstract $userRolesDS
+     * @param DataStoreAbstract|DataStoresInterface $userDS
+     * @param DataStoreAbstract|DataStoresInterface $rolesDS
+     * @param DataStoreAbstract|DataStoresInterface $userRolesDS
      */
     public function __construct(DataStoresInterface $userDS, DataStoresInterface $rolesDS, DataStoresInterface $userRolesDS)
     {
@@ -56,10 +55,10 @@ class UserResolver implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $identity = $request->getAttribute(IdentifyAction::KEY_IDENTITY);
+        $identity = $request->getAttribute(IdentifyAction::KEY_ATTRIBUTE_IDENTITY);
         $user = $this->getUser($identity);
 
-        $request = $request->withAttribute(static::KEY_USER, $user);
+        $request = $request->withAttribute(static::KEY_ATTRIBUTE_USER, $user);
 
         if (isset($out)) {
             return $out($request,$response);

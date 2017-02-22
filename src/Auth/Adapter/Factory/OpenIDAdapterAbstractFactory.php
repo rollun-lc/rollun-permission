@@ -25,6 +25,10 @@ class OpenIDAdapterAbstractFactory extends AdapterAbstractFactoryAbstract
 
     const KEY_RESOLVER = 'resolver';
 
+    const KEY_WEB_CLIENT = 'webClient';
+
+    const DEFAULT_WEB_CLIENT = Web::class;
+
     /**
      * Create an object
      *
@@ -47,7 +51,14 @@ class OpenIDAdapterAbstractFactory extends AdapterAbstractFactoryAbstract
 
         $openIdAdapter = new OpenID($adapterConfig);
 
-        $webClient = $container->get(Web::class);
+        if(isset($adapterConfig[static::KEY_WEB_CLIENT])) {
+            if(!$container->has($adapterConfig[static::KEY_WEB_CLIENT])) {
+                throw new ServiceNotFoundException($adapterConfig[static::KEY_WEB_CLIENT] . " service not found.");
+            }
+            $webClient = $container->get($adapterConfig[static::KEY_WEB_CLIENT]);
+        } else {
+            $webClient = $container->get(static::DEFAULT_WEB_CLIENT);
+        }
         $openIdAdapter->setWebClient($webClient);
 
         if (isset($factoryConfig[static::KEY_RESOLVER]) &&

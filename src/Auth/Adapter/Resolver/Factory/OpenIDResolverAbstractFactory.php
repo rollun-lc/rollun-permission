@@ -25,7 +25,9 @@ class OpenIDResolverAbstractFactory implements AbstractFactoryInterface
 
     const KEY_USER_DS_SERVICE = 'userDataStoreService';
 
-    const KEY_WEB_SERVICE = 'webService';
+    const KEY_WEB_CLIENT = 'webClient';
+
+    const DEFAULT_WEB_CLIENT = Web::class;
 
     /**
      * Create an object
@@ -51,8 +53,13 @@ class OpenIDResolverAbstractFactory implements AbstractFactoryInterface
                 $resolverConfig[static::KEY_USER_DS_SERVICE] . " not found."
             );
         }
-        $webService = isset($resolverConfig[static::KEY_WEB_SERVICE]) ?
-            $resolverConfig[static::KEY_WEB_SERVICE] : Web::class;
+        $webService = isset($resolverConfig[static::KEY_WEB_CLIENT]) ?
+            $resolverConfig[static::KEY_WEB_CLIENT] : static::DEFAULT_WEB_CLIENT;
+        if (!$container->has($webService)) {
+            throw new ServiceNotFoundException(
+                "$webService service not found."
+            );
+        }
         $webClient = $container->get($webService);
         $dataStore = $container->get($resolverConfig[static::KEY_USER_DS_SERVICE]);
         return new OpenIDResolver($webClient, $dataStore);

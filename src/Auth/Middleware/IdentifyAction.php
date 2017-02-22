@@ -20,7 +20,7 @@ class IdentifyAction implements MiddlewareInterface
 
     const DEFAULT_IDENTITY = '0';
 
-    const KEY_IDENTITY = 'identity';
+    const KEY_ATTRIBUTE_IDENTITY = 'identity';
 
     /** @var  AuthenticationServiceInterface */
     protected $authService;
@@ -39,7 +39,7 @@ class IdentifyAction implements MiddlewareInterface
     {
         $identity = $this->authService->hasIdentity() ? $this->authService->getIdentity() : static::DEFAULT_IDENTITY;
 
-        $request = $request->withAttribute(static::KEY_IDENTITY, $identity);
+        $request = $request->withAttribute(static::KEY_ATTRIBUTE_IDENTITY, $identity);
 
         if (isset($out)) {
             return $out($request,$response);

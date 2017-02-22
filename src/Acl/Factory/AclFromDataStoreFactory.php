@@ -40,6 +40,14 @@ class AclFromDataStoreFactory implements FactoryInterface
 
     const KEY_DS_PRIVILEGE = 'privileges_id';
 
+    const DEFAULT_RULES_DS = 'rulesDS';
+
+    const DEFAULT_ROLES_DS = 'rolesDS';
+
+    const DEFAULT_RESOURCE_DS = 'resourceDS';
+
+    const DEFAULT_PRIVILEGE_DS = 'privilegeDS';
+
     /**
      * Create an object
      *
@@ -55,29 +63,31 @@ class AclFromDataStoreFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('config');
-        if (!isset($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]) ||
-            !isset($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]) ||
-            !isset($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]) ||
-            !isset($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE])
-        ) {
-            throw new ServiceNotCreatedException('Not set acl config');
-        }
-        if (!$container->has($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]) ||
-            !$container->has($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]) ||
-            !$container->has($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]) ||
-            !$container->has($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE])
+        $rulesDS = isset($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]) ?
+            $config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE] : static::DEFAULT_RULES_DS;
+        $rolesDS = isset($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]) ?
+            $config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE] : static::DEFAULT_ROLES_DS;
+        $resourceDS = isset($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]) ?
+            $config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE] : static::DEFAULT_RESOURCE_DS;
+        $privilegeDS = isset($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE]) ?
+            $config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE] : static::DEFAULT_PRIVILEGE_DS;
+
+        if (!$container->has($rulesDS) ||
+            !$container->has($rolesDS) ||
+            !$container->has($resourceDS) ||
+            !$container->has($privilegeDS)
         ) {
             throw new ServiceNotCreatedException('Not found dataStore service');
         }
 
         /** @var DataStoreAbstract $dataStoreRule */
-        $dataStoreRule = $container->get($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]);
+        $dataStoreRule = $container->get($rulesDS);
         /** @var DataStoreAbstract $dataStoreRole */
-        $dataStoreRole = $container->get($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]);
+        $dataStoreRole = $container->get($rolesDS);
         /** @var DataStoreAbstract $dataStorePrivilege */
-        $dataStorePrivilege = $container->get($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]);
+        $dataStorePrivilege = $container->get($resourceDS);
         /** @var DataStoreAbstract $dataStoreResource */
-        $dataStoreResource = $container->get($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE]);
+        $dataStoreResource = $container->get($privilegeDS);
 
         $acl = new Acl();
 

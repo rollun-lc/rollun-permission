@@ -19,7 +19,7 @@ class RoleResolver implements MiddlewareInterface
 {
     const DEFAULT_ROLE = 'guest';
 
-    const KEY_ROLE_ATTRIBUTE = 'roles';
+    const KEY_ATTRIBUTE_ROLE = 'roles';
 
     /**
      *
@@ -32,9 +32,9 @@ class RoleResolver implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $user = $request->getAttribute(UserResolver::KEY_USER);
-        $roles = isset($user[static::KEY_ROLE_ATTRIBUTE]) ? $user[static::KEY_ROLE_ATTRIBUTE] : [static::DEFAULT_ROLE];
-        $request = $request->withAttribute(static::KEY_ROLE_ATTRIBUTE, $roles);
+        $user = $request->getAttribute(UserResolver::KEY_ATTRIBUTE_USER);
+        $roles = isset($user[static::KEY_ATTRIBUTE_ROLE]) ? $user[static::KEY_ATTRIBUTE_ROLE] : [static::DEFAULT_ROLE];
+        $request = $request->withAttribute(static::KEY_ATTRIBUTE_ROLE, $roles);
 
         if (isset($out)) {
             return $out($request, $response);
