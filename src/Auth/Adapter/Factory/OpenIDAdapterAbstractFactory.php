@@ -13,6 +13,8 @@ use Interop\Container\Exception\ContainerException;
 use rollun\api\Api\Google\Client\Web;
 use rollun\permission\Auth\Adapter\OpenID;
 use rollun\permission\Auth\Adapter\OpenIDAdapter;
+use rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory;
+use rollun\permission\Auth\Adapter\Resolver\OpenIDResolver;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
@@ -28,6 +30,9 @@ class OpenIDAdapterAbstractFactory extends AdapterAbstractFactoryAbstract
     const KEY_WEB_CLIENT = 'webClient';
 
     const DEFAULT_WEB_CLIENT = Web::class;
+
+    const DEFAULT_RESOLVER = OpenIDResolver::class;
+
 
     /**
      * Create an object
@@ -61,12 +66,22 @@ class OpenIDAdapterAbstractFactory extends AdapterAbstractFactoryAbstract
         }
         $openIdAdapter->setWebClient($webClient);
 
-        if (isset($factoryConfig[static::KEY_RESOLVER]) &&
-            $container->has($factoryConfig[static::KEY_RESOLVER])
-        ) {
-            $basicResolver = $container->get($factoryConfig[static::KEY_RESOLVER]);
-            $openIdAdapter->setResolver($basicResolver);
+        if(isset($factoryConfig[static::KEY_RESOLVER])) {
+            if ($container->has($factoryConfig[static::KEY_RESOLVER])) {
+                $resolver = $container->get($factoryConfig[static::KEY_RESOLVER]);
+            } else {
+                throw new ServiceNotFoundException($factoryConfig[static::KEY_RESOLVER] . " service not found.");
+            }
+        } else {
+            if ($container->has(static::DEFAULT_RESOLVER)) {
+                $resolver = $container->get(static::DEFAULT_RESOLVER);
+            } else {
+                $resolverFactory = new OpenIDResolverAbstractFactory();
+                $resolver = $resolverFactory($container, static::DEFAULT_RESOLVER);
+            }
         }
+        $openIdAdapter->setResolver($resolver);
+
         return $openIdAdapter;
     }
 }

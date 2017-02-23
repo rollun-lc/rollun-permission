@@ -12,6 +12,7 @@ namespace rollun\permission\Auth\Adapter\Resolver\Factory;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use rollun\permission\Auth\Adapter\Resolver\UserDSResolver;
+use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
@@ -40,12 +41,14 @@ class UserDSResolverAbstractFactory implements AbstractFactoryInterface
 
         $config = $container->get('config');
         $resolverConfig = $config[static::KEY_RESOLVER][$requestedName];
-        if($container->has($resolverConfig[static::KEY_DS_SERVICE]))
+        $dsService = isset($resolverConfig[static::KEY_DS_SERVICE]) ?
+            $resolverConfig[static::KEY_DS_SERVICE] : UserResolverFactory::DEFAULT_USER_DS;
+        if($container->has($dsService))
         {
-            $dataStore = $container->get($resolverConfig[static::KEY_DS_SERVICE]);
+            $dataStore = $container->get($dsService);
             return new UserDSResolver($dataStore);
         }
-        throw new ServiceNotFoundException($resolverConfig[static::KEY_DS_SERVICE] . " not found.");
+        throw new ServiceNotFoundException("$dsService service not found.");
     }
 
     /**

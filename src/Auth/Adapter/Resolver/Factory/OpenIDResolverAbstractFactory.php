@@ -13,6 +13,8 @@ use Interop\Container\Exception\ContainerException;
 use rollun\api\Api\Google\Client\Web;
 use rollun\permission\Auth\Adapter\OpenIDAdapter;
 use rollun\permission\Auth\Adapter\Resolver\OpenIDResolver;
+use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
+use rollun\permission\Auth\Middleware\UserResolver;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
@@ -46,9 +48,9 @@ class OpenIDResolverAbstractFactory implements AbstractFactoryInterface
         $config = $container->get('config');
         $resolverConfig = $config[static::KEY_RESOLVER][$requestedName];
 
-        if (!isset($resolverConfig[static::KEY_USER_DS_SERVICE])
-            || !$container->has($resolverConfig[static::KEY_USER_DS_SERVICE])
-        ) {
+        $dataStoreService = isset($resolverConfig[static::KEY_USER_DS_SERVICE]) ?
+            $resolverConfig[static::KEY_USER_DS_SERVICE] : UserResolverFactory::DEFAULT_USER_DS;
+        if (!$container->has($dataStoreService)){
             throw new ServiceNotFoundException(
                 $resolverConfig[static::KEY_USER_DS_SERVICE] . " not found."
             );

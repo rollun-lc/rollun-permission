@@ -10,6 +10,8 @@ namespace rollun\permission\Auth\Adapter\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory;
+use rollun\permission\Auth\Adapter\Resolver\UserDSResolver;
 use Zend\Authentication\Adapter\Http;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
@@ -23,6 +25,8 @@ class HttpAdapterAbstractFactory extends AdapterAbstractFactoryAbstract
     const KEY_BASIC_RESOLVER = 'basicResolver';
 
     const KEY_DIGEST_RESOLVER = 'digestResolver';
+
+    const DEFAULT_RESOLVER = UserDSResolver::class;
 
     /**
      * Create an object
@@ -46,12 +50,27 @@ class HttpAdapterAbstractFactory extends AdapterAbstractFactoryAbstract
                 'nonce_timeout' => 3600,
             ];
         $http = new Http($adapterConfig);
-        if (isset($factoryConfig[static::KEY_BASIC_RESOLVER]) &&
-            $container->has($factoryConfig[static::KEY_BASIC_RESOLVER])
-        ) {
-            $basicResolver = $container->get($factoryConfig[static::KEY_BASIC_RESOLVER]);
-            $http->setBasicResolver($basicResolver);
+
+        if (isset($factoryConfig[static::KEY_BASIC_RESOLVER])) {
+            if ($container->has($factoryConfig[static::KEY_BASIC_RESOLVER])) {
+                $basicResolver = $container->get($factoryConfig[static::KEY_BASIC_RESOLVER]);
+                $http->setBasicResolver($basicResolver);
+            } else {
+                throw new ServiceNotFoundException($factoryConfig[static::KEY_BASIC_RESOLVER] . " service not found.");
+            }
+        } else {
+            if ($container->has(static::DEFAULT_RESOLVER)) {
+                $basicResolver = $container->get($factoryConfig[static::KEY_BASIC_RESOLVER]);
+                $http->setBasicResolver($basicResolver);
+            } else {
+                $basicResolverFactory = new UserDSResolverAbstractFactory();
+                /** @var Http\ResolverInterface $basicResolverFactory */
+                $basicResolver = $basicResolverFactory($container, static::DEFAULT_RESOLVER);
+                $http->setBasicResolver($basicResolver);
+            }
         }
+
+
         if (isset($factoryConfig[static::KEY_DIGEST_RESOLVER]) &&
             $container->has($factoryConfig[static::KEY_DIGEST_RESOLVER])
         ) {
