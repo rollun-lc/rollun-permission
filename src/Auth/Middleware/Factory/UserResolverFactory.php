@@ -49,13 +49,13 @@ class UserResolverFactory implements FactoryInterface
         $factoryConfig = $config[static::KEY_USER_RESOLVER];
 
         $userDS = isset($factoryConfig[static::KEY_USER_DS_SERVICE]) ?
-            isset($factoryConfig[static::KEY_USER_DS_SERVICE]) :
+            $factoryConfig[static::KEY_USER_DS_SERVICE] :
             static::DEFAULT_USER_DS;
         $userRolesDS = isset($factoryConfig[static::KEY_USER_ROLES_DS_SERVICE]) ?
-            isset($factoryConfig[static::KEY_USER_ROLES_DS_SERVICE]) :
+            $factoryConfig[static::KEY_USER_ROLES_DS_SERVICE] :
             static::DEFAULT_USER_ROLES_DS;
         $rolesDS = isset($factoryConfig[static::KEY_ROLES_DS_SERVICE]) ?
-            isset($factoryConfig[static::KEY_ROLES_DS_SERVICE]) :
+            $factoryConfig[static::KEY_ROLES_DS_SERVICE] :
             AclFromDataStoreFactory::DEFAULT_ROLES_DS;
 
         if (!$container->has($userDS) ){
