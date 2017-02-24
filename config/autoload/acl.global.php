@@ -12,8 +12,8 @@ use rollun\datastore\AbstractFactoryAbstract;
 use rollun\datastore\DataStore\Factory\CacheableAbstractFactory;
 use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
-use rollun\permission\Auth\Adapter\Factory\HttpAdapterAbstractFactory;
-use rollun\permission\Auth\Adapter\Factory\OpenIDAdapterAbstractFactory;
+use rollun\permission\Auth\Adapter\Factory\HttpAdapterFactory;
+use rollun\permission\Auth\Adapter\Factory\OpenIDAdapterFactory;
 use rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory;
 use rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory;
 use rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory;
@@ -128,8 +128,6 @@ return [
         'invokables' => [
             \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class =>
                 \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class,
-            \rollun\permission\Comparator\PathRequestComparator::class =>
-                \rollun\permission\Comparator\PathRequestComparator::class,
             \rollun\actionrender\ReturnMiddleware::class => \rollun\actionrender\ReturnMiddleware::class,
 
             ##### Error Handler Start #####
@@ -147,7 +145,7 @@ return [
 
             \Zend\Session\SessionManager::class => \Zend\Session\Service\SessionManagerFactory::class,
 
-            \rollun\permission\Auth\Middleware\AuthenticationAction::class =>
+            \rollun\permission\Auth\Middleware\LazyAuthenticationAction::class =>
                 \rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory::class,
 
             \rollun\permission\Auth\Middleware\IdentifyAction::class =>
@@ -172,24 +170,8 @@ return [
             \rollun\api\Api\Google\Client\Factory\AbstractFactory::class,
             \rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory::class,
             \rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory::class,
-            \rollun\permission\Auth\Adapter\Factory\OpenIDAdapterAbstractFactory::class,
-            \rollun\permission\Auth\Adapter\Factory\HttpAdapterAbstractFactory::class,
-            \rollun\permission\Middleware\Factory\LazyLoadSwitchAbstractFactory::class,
             \rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory::class,
             \rollun\actionrender\Factory\ActionRenderAbstractFactory::class,
-            \rollun\permission\Comparator\Factory\AttributeRequestComparatorAbstractFactory::class,
-        ]
-    ],
-
-    HttpAdapterAbstractFactory::KEY_ADAPTER => [
-        'basicHttpAdapter' => [
-            HttpAdapterAbstractFactory::KEY_BASIC_RESOLVER => 'httpBasicResolver',
-        ]
-    ],
-
-    OpenIDAdapterAbstractFactory::KEY_ADAPTER => [
-        'openIdAdapter' => [
-            OpenIDAdapterAbstractFactory::KEY_RESOLVER => 'openIdResolver',
         ]
     ],
 
@@ -220,31 +202,6 @@ return [
         ],
     ],
 
-    LazyLoadSwitchAbstractFactory::LAZY_LOAD_SWITCH => [
-        'authPathSwitch' => [
-            LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE =>
-                \rollun\permission\Comparator\PathRequestComparator::class,
-            LazyLoadSwitchAbstractFactory::KEY_MIDDLEWARES_SERVICE => [
-                '/\/base/' => 'authPipe',
-                '/\//' => \rollun\permission\Auth\Middleware\UserResolver::class,
-            ]
-        ],
-        'authTypeSwitch' => [
-            LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE =>
-                \rollun\permission\Comparator\PathRequestComparator::class,
-            LazyLoadSwitchAbstractFactory::KEY_MIDDLEWARES_SERVICE => [
-                '/\/base/' => 'baseAuth',
-                '/\//' => 'openId',
-            ]
-        ],
-        'authReturnSwitch' => [
-            LazyLoadSwitchAbstractFactory::KEY_COMPARATOR_SERVICE => 'returnResultAttributeRequestComparator',
-            LazyLoadSwitchAbstractFactory::KEY_MIDDLEWARES_SERVICE => [
-                '/^true$/' => \rollun\actionrender\ReturnMiddleware::class,
-                '/^false$/' => \rollun\permission\Auth\Middleware\UserResolver::class,
-            ]
-        ]
-    ],
 
     AuthenticationAbstractFactory::KEY_AUTHENTICATION => [
         'baseAuth' => [
@@ -265,11 +222,7 @@ return [
         ],
     ],
 
-    AttributeRequestComparatorAbstractFactory::KEY_COMPARATOR => [
-        'returnResultAttributeRequestComparator' => [
-            AttributeRequestComparatorAbstractFactory::KEY_ATTRIBUTE_KEY => 'returnResult'
-        ]
-    ],
+
 
     UserResolverFactory::KEY_USER_RESOLVER => [
         UserResolverFactory::KEY_USER_DS_SERVICE => 'userDS',

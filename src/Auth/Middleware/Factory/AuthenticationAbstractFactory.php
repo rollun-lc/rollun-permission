@@ -10,8 +10,8 @@ namespace rollun\permission\Auth\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
-use rollun\permission\Auth\Adapter\Factory\HttpAdapterAbstractFactory;
-use rollun\permission\Auth\Middleware\AuthenticationAction;
+use rollun\permission\Auth\Adapter\Factory\HttpAdapterFactory;
+use rollun\permission\Auth\Middleware\LazyAuthenticationAction;
 use Zend\Authentication\Adapter\Http;
 use Zend\Authentication\AuthenticationService;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
@@ -51,7 +51,7 @@ class AuthenticationAbstractFactory implements AbstractFactoryInterface
         ) {
             $adapter = $container->get($factoryConfig[static::KEY_ADAPTER]);
         } else {
-            $adapterFactory = new HttpAdapterAbstractFactory();
+            $adapterFactory = new HttpAdapterFactory();
             $adapter = $adapterFactory($container, Http::class);
         }
         if (isset($factoryConfig[static::KEY_AUTHENTICATION_SERVICE]) &&
@@ -66,7 +66,7 @@ class AuthenticationAbstractFactory implements AbstractFactoryInterface
             $authStorage = new SessionStorage('ZendAuth', 'session', $sessionManager);
             $authService = new AuthenticationService($authStorage);
         }
-        return new AuthenticationAction($adapter, $authService);
+        return new LazyAuthenticationAction($adapter, $authService);
     }
 
     /**

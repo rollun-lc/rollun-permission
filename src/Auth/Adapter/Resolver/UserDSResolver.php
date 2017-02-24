@@ -10,7 +10,10 @@ namespace rollun\permission\Auth\Adapter\Resolver;
 
 use InvalidArgumentException;
 use rollun\datastore\DataStore\DataStoreAbstract;
+use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\datastore\Rql\RqlQuery;
+use rollun\dic\InsideConstruct;
+use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
 use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Zend\Authentication\Result;
 
@@ -28,9 +31,13 @@ class UserDSResolver implements ResolverInterface
      * DataStore constructor.
      * @param $userDataStore
      */
-    public function __construct($userDataStore)
+    public function __construct(DataStoresInterface $userDataStore = null)
     {
         $this->userDataStore = $userDataStore;
+        InsideConstruct::setConstructParams(['userDataStore' => UserResolverFactory::DEFAULT_USER_DS]);
+        if(!isset($this->userDataStore)) {
+            throw new \RuntimeException("userDataStore not set");
+        }
     }
 
     /**

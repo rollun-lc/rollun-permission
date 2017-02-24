@@ -70,7 +70,7 @@ class UserResolver implements MiddlewareInterface
     /**
      * return user array (with roles)
      * @param string $userId
-     * @return AuthenticationAction
+     * @return LazyAuthenticationAction
      */
     protected function getUser($userId)
     {

@@ -11,6 +11,8 @@ namespace rollun\permission\Auth\Adapter\Resolver;
 use rollun\api\Api\Google\Client\Web;
 use rollun\datastore\DataStore\DataStoreAbstract;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
+use rollun\dic\InsideConstruct;
+use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
 use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Zend\Authentication\Result;
 
@@ -25,12 +27,17 @@ class OpenIDResolver implements ResolverInterface
     /**
      * OpenID constructor.
      * @param Web $webClient
-     * @param DataStoreAbstract $userDataStore
+     * @param DataStoreAbstract|DataStoresInterface $userDataStore
      */
-    public function __construct(Web $webClient, DataStoresInterface $userDataStore)
+    public function __construct(Web $webClient = null, DataStoresInterface $userDataStore = null)
     {
-        $this->webClient = $webClient;
-        $this->userDataStore = $userDataStore;
+        InsideConstruct::setConstructParams(['userDataStore' => UserResolverFactory::DEFAULT_USER_DS, 'webClient' => Web::class]);
+        if(!isset($this->userDataStore)) {
+            throw new \RuntimeException("userDataStore not set");
+        }
+        if(!isset($this->webClient)) {
+            throw new \RuntimeException("webClient not set");
+        }
     }
 
     /**
