@@ -11,6 +11,7 @@ namespace rollun\permission\Auth\Middleware\Factory;
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use rollun\permission\Auth\Adapter\Factory\HttpAdapterFactory;
+use rollun\permission\Auth\Middleware\AbstractAuthenticationAction;
 use rollun\permission\Auth\Middleware\LazyAuthenticationAction;
 use Zend\Authentication\Adapter\Http;
 use Zend\Authentication\AuthenticationService;
@@ -29,6 +30,10 @@ class AuthenticationAbstractFactory implements AbstractFactoryInterface
     const KEY_ADAPTER = 'adapter';
 
     const KEY_AUTHENTICATION_SERVICE = 'authenticationService';
+
+    const KEY_CLASS = 'class';
+
+    const EXTENDED_CLASS = AbstractAuthenticationAction::class;
 
     /**
      * Create an object
@@ -51,9 +56,10 @@ class AuthenticationAbstractFactory implements AbstractFactoryInterface
         ) {
             $adapter = $container->get($factoryConfig[static::KEY_ADAPTER]);
         } else {
-            $adapterFactory = new HttpAdapterFactory();
-            $adapter = $adapterFactory($container, Http::class);
+            throw new ServiceNotFoundException($factoryConfig[static::KEY_ADAPTER] . " service not found.");
         }
+
+
         if (isset($factoryConfig[static::KEY_AUTHENTICATION_SERVICE]) &&
             $container->has($factoryConfig[static::KEY_AUTHENTICATION_SERVICE])
         ) {
@@ -66,7 +72,8 @@ class AuthenticationAbstractFactory implements AbstractFactoryInterface
             $authStorage = new SessionStorage('ZendAuth', 'session', $sessionManager);
             $authService = new AuthenticationService($authStorage);
         }
-        return new LazyAuthenticationAction($adapter, $authService);
+        $class = $factoryConfig[static::KEY_CLASS];
+        return new $class($adapter, $authService);
     }
 
     /**
@@ -79,6 +86,8 @@ class AuthenticationAbstractFactory implements AbstractFactoryInterface
     public function canCreate(ContainerInterface $container, $requestedName)
     {
         $config = $container->get('config');
-        return isset($config[static::KEY_AUTHENTICATION][$requestedName]);
+        return isset($config[static::KEY_AUTHENTICATION][$requestedName]) &&
+            isset($config[static::KEY_AUTHENTICATION][$requestedName][static::KEY_CLASS]) &&
+            is_a($config[static::KEY_AUTHENTICATION][$requestedName][static::KEY_CLASS], static::EXTENDED_CLASS);
     }
 }

@@ -10,7 +10,7 @@ namespace rollun\permission\Auth\Adapter;
 
 
 use InvalidArgumentException;
-use rollun\permission\Comparator\AllowAuthResolver;
+use rollun\permission\Comparator\AllowAuth;
 use rollun\utils\Json\Serializer;
 use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Zend\Authentication\Result;
@@ -19,7 +19,7 @@ use Psr\Http\Message\ResponseInterface as Response;
 
 class NullAdapter extends AbstractWebAdapter
 {
-    /** @var  AllowAuthResolver */
+    /** @var  AllowAuth */
     protected $allowAuthResolver;
 
 

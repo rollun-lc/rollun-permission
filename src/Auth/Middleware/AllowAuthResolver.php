@@ -10,10 +10,29 @@ namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use rollun\actionrender\Factory\LazyLoadSwitchAbstractFactory;
+use rollun\dic\InsideConstruct;
+use rollun\permission\Comparator\AllowAuth;
 use Zend\Stratigility\MiddlewareInterface;
 
 class AllowAuthResolver implements MiddlewareInterface
 {
+
+    const DEFAULT_ALLOW_AUTH = AllowAuth::class;
+
+    const SELECTED_AUTH = 'selectedAuth';
+
+    /** @var  AllowAuth */
+    protected $allowAuth;
+
+    /**
+     * AllowAuthResolver constructor.
+     * @param AllowAuth $allowAuth
+     */
+    public function __construct(AllowAuth $allowAuth)
+    {
+        InsideConstruct::setConstructParams(['allowAuth' => static::DEFAULT_ALLOW_AUTH]);
+    }
 
     /**
      * Process an incoming request and/or response.
@@ -42,6 +61,17 @@ class AllowAuthResolver implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
+        $allowAuth = $this->allowAuth->getAllowAuth($request);
 
+        $query = $request->getQueryParams();
+        $selectedAuth = isset($query[static::SELECTED_AUTH]) ? $query[static::SELECTED_AUTH] : "null";
+
+        $request = $request->withAttribute(LazyLoadSwitchAbstractFactory::DEFAULT_ATTRIBUTE_NAME, $allowAuth);
+
+        if(isset($out)) {
+            return $out($request, $response);
+        }
+
+        return $response;
     }
 }

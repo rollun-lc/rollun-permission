@@ -10,7 +10,7 @@ namespace rollun\permission\Comparator;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 
-class AllowAuthResolver
+class AllowAuth
 {
     protected $configs;
 
@@ -38,10 +38,10 @@ class AllowAuthResolver
     {
         $actualPath = $request->getUri()->getPath();
         foreach ($this->configs as $expectedPathPattern => $typeList) {
-            if(preg_match($expectedPathPattern, $actualPath)) {
+            if (preg_match($expectedPathPattern, $actualPath)) {
                 return $typeList;
             }
         }
         return [static::DEFAULT_TYPE];
-     }
+    }
 }

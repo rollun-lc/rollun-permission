@@ -67,7 +67,15 @@ Authentication - модуль который позволяет идентифи
     
     конфиг
 
-И так после того как пользователь попал в quick-Auth, его попытаюсться авторезировать. Данное событие может завершиться двумя способами
+Давайте теперь рассмотрим pipeLine quick-Auth
+ 
+* quickAuthPipe
+    * AllowAdapterResolver - получаем доступный/выбраный адаптер
+    * AuthAdapterSwitch  - получаем QuickAuthenticationAction с выбраным адаптером.
+        * QuickAuthenticationAction - производим быструю аутентификацию
+
+И так после того как пользователь попал в quick-Auth, его попытаюсться авторезировать. 
+Данное событие может завершиться двумя способами
 
 #### Аутентификация пройдена
 
@@ -106,15 +114,15 @@ Authentication - модуль который позволяет идентифи
 Так как он зависит от того была ли аутентификация полностью провалена, или требуеться вернуть управление пользователю для получение дополнительных данных.
  
 Давайте теперь рассмотрим pipeLine lazy-auth
-
-* Identity
-* AuthActionRender
-    * loginPipe
-        * AllowAdapterResolver
-        * AuthAdapterSwitch
-    * RenderMiddleware
-    * ReturnerMiddleware
-* ErrorHandler
+ 
+* AuthActionRender 
+    * loginPipe 
+        * AllowAdapterResolver - получаем доступный/выбраный адаптер
+        * AuthAdapterSwitch - получаем LazyAuthenticationAction с выбраным адаптером.
+            * LazyAuthenticationAction - производим аутентификацию 
+    * RenderMiddleware - рендерим ответ(если этого нужно) 
+    * ReturnerMiddleware - возвращаем ответ
+* ErrorHandler - обработка ошибок
 
 ## Протокол аутентификациии
 

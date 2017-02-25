@@ -13,6 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use rollun\permission\Auth\Middleware\LazyAuthenticationAction;
+use rollun\permission\Auth\Middleware\QuickAuthenticationAction;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\Result;
 use Zend\Diactoros\Request;
@@ -21,7 +22,7 @@ use Zend\Diactoros\ServerRequest;
 use Zend\Psr7Bridge\Psr7ServerRequest;
 
 
-class LazyAuthenticationActionTest extends \PHPUnit_Framework_TestCase
+class QuickAuthenticationActionTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -48,7 +49,7 @@ class LazyAuthenticationActionTest extends \PHPUnit_Framework_TestCase
         $authService->method('hasIdentity')->will($this->returnValue(false));
         $authService->method('authenticate')->will($this->returnValue($result));
 
-        $this->object = new LazyAuthenticationAction($webAdapter, $authService);
+        $this->object = new QuickAuthenticationAction($webAdapter, $authService);
 
         $request =  new ServerRequest();
         $response = new Response();
@@ -76,7 +77,7 @@ class LazyAuthenticationActionTest extends \PHPUnit_Framework_TestCase
 
         $authService->method('hasIdentity')->will($this->returnValue(false));
         $authService->method('authenticate')->will($this->returnValue($result));
-        $this->object = new LazyAuthenticationAction($webAdapter, $authService);
+        $this->object = new QuickAuthenticationAction($webAdapter, $authService);
 
         $request =  new ServerRequest();
         $response = new Response();
@@ -84,45 +85,5 @@ class LazyAuthenticationActionTest extends \PHPUnit_Framework_TestCase
             $identity = $request->getAttribute(LazyAuthenticationAction::KEY_IDENTITY);
             $this->assertEquals(null, $identity);
         });
-    }
-
-    /**
-     * @expectedException \rollun\permission\Auth\CredentialInvalidException
-     * @expectedExceptionMessage Auth credential error.
-     */
-    public function testLazyAuthenticationActionException()
-    {
-        $webAdapter = $this->getMockBuilder(AbstractWebAdapter::class)->disableOriginalConstructor()->getMock();
-        $authService = $this->getMock(AuthenticationService::class);
-
-        $result = new Result(
-            Result::FAILURE_IDENTITY_AMBIGUOUS,
-            null,
-            ['Invalid or absent credentials; challenging client']
-        );
-
-        $authService->method('hasIdentity')->will($this->returnValue(false));
-        $authService->method('authenticate')->will($this->returnValue($result));
-        $this->object = new LazyAuthenticationAction($webAdapter, $authService);
-
-        $request =  new ServerRequest();
-        $response = new Response();
-        $this->object->__invoke($request, $response);
-    }
-
-    /**
-     * @expectedException \rollun\permission\Auth\AlreadyLogginException
-     */
-    public function testAlreadyLogginException()
-    {
-        $webAdapter = $this->getMockBuilder(AbstractWebAdapter::class)->disableOriginalConstructor()->getMock();
-        $authService = $this->getMock(AuthenticationService::class);
-
-        $authService->method('hasIdentity')->will($this->returnValue(true));
-        $this->object = new LazyAuthenticationAction($webAdapter, $authService);
-
-        $request =  new ServerRequest();
-        $response = new Response();
-        $this->object->__invoke($request, $response);
     }
 }
