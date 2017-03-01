@@ -2,21 +2,26 @@
 /**
  * Created by PhpStorm.
  * User: root
- * Date: 10.02.17
- * Time: 13:06
+ * Date: 01.03.17
+ * Time: 18:40
  */
 
 namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use rollun\permission\Auth\Adapter\AbstractWebAdapter;
+use rollun\permission\Auth\Adapter\Interfaces\AuthenticatePrepareAdapterInterface;
 use rollun\permission\Auth\AlreadyLogginException;
 use rollun\permission\Auth\CredentialInvalidException;
+use Zend\Authentication\AuthenticationService;
+use Zend\Authentication\AuthenticationServiceInterface;
+use Zend\Authentication\Result;
 
-class QuickAuthenticationAction extends AbstractAuthenticationAction
+class AuthenticationPrepareAction extends AbstractAuthentication
 {
     /**
-     * Quick authentication user
+     * Authentication user
      * @param Request $request
      * @param Response $response
      * @param null|callable $out
@@ -26,15 +31,16 @@ class QuickAuthenticationAction extends AbstractAuthenticationAction
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        if (!$this->authenticationService->hasIdentity()) {
-            $this->adapter->setRequest($request);
-            $this->adapter->setResponse($response);
-            $result = $this->authenticationService->authenticate($this->adapter);
-            if ($result->isValid()) {
-                $identity = $result->getIdentity();
-                $request = $request->withAttribute(static::KEY_IDENTITY, $identity);
-            }
+        $this->adapter->setRequest($request);
+        $this->adapter->setResponse($response);
+
+        $result = $this->adapter->prepare();
+
+        if ($result->isValid()) {
+            $response = $this->adapter->getResponse();
+            $request = $this->adapter->getRequest()->withAttribute(Response::class, $response);
         }
+
         if (isset($out)) {
             return $out($request, $response);
         }

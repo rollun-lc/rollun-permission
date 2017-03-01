@@ -6,6 +6,8 @@
  * Time: 18:45
  */
 
+use rollun\datastore\DataStore\Factory\CacheableAbstractFactory;
+
 return [
     'dataSource' => [
         'aclRules' => [],

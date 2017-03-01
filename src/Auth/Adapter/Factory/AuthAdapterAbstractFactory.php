@@ -17,6 +17,10 @@ use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
 class AuthAdapterAbstractFactory implements AbstractFactoryInterface
 {
+    const KEY_ADAPTER = 'authAdapter';
+
+    const KEY_ADAPTER_CONFIG = 'config';
+
     const KEY_AC_REALM = 'realm';
 
     const KEY_CLASS = 'class';
@@ -24,12 +28,6 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
     const EXTENDED_CLASS = AbstractWebAdapter::class;
 
     const DEFAULT_REALM = 'RollunService';
-
-    const KEY_ADAPTER = 'authAdapter';
-
-    const KEY_RESOLVER = 'resolver';
-
-    const KEY_ADAPTER_CONFIG = 'config';
 
     /**
      * Can the factory create an instance for the service?
@@ -73,15 +71,6 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
 
         /** @var AbstractWebAdapter $adapter */
         $adapter = new $class($adapterConfig);
-
-        if(isset($factoryConfig[static::KEY_RESOLVER])) {
-            if($container->has($factoryConfig[static::KEY_RESOLVER])) {
-                $resolver = $container->get($factoryConfig[static::KEY_RESOLVER]);
-                $adapter->setResolver($resolver);
-            } else {
-                throw new ServiceNotFoundException($factoryConfig[static::KEY_RESOLVER] . " service not found.");
-            }
-        }
 
         return $adapter;
     }

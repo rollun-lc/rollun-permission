@@ -14,16 +14,13 @@ use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseInterface as Response;
 
-abstract class AbstractWebAdapter implements AdapterInterface
+abstract class AbstractWebAdapter
 {
     /** @var  Request */
     protected $request;
 
     /** @var  Response */
     protected $response;
-
-    /** @var  ResolverInterface */
-    protected $resolver;
 
     /** @var string */
     protected $realm;
@@ -38,10 +35,6 @@ abstract class AbstractWebAdapter implements AdapterInterface
         $this->response = $response;
     }
 
-    public function setResolver(ResolverInterface $resolver)
-    {
-        $this->resolver = $resolver;
-    }
     /**
      * OpenIDAdapter constructor.
      * @param array $config

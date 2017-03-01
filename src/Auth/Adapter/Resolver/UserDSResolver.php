@@ -29,14 +29,14 @@ class UserDSResolver implements ResolverInterface
 
     /**
      * DataStore constructor.
-     * @param $userDataStore
+     * @param $userDS
      */
-    public function __construct(DataStoresInterface $userDataStore = null)
+    public function __construct(DataStoresInterface $userDS = null)
     {
-        $this->userDataStore = $userDataStore;
-        InsideConstruct::setConstructParams(['userDataStore' => UserResolverFactory::DEFAULT_USER_DS]);
+        $this->userDataStore = $userDS;
+        InsideConstruct::setConstructParams(['userDS' => UserResolverFactory::DEFAULT_USER_DS]);
         if(!isset($this->userDataStore)) {
-            throw new \RuntimeException("userDataStore not set");
+            throw new \RuntimeException("userDS not set");
         }
     }
 
@@ -74,9 +74,8 @@ class UserDSResolver implements ResolverInterface
             new RqlQuery($queryString)
         );
         if(empty($result)) {
-            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, ['Username not found in provided htpasswd file']);
+            return new Result(Result::FAILURE_IDENTITY_NOT_FOUND, null, ['Username not found in provided UserDS.']);
         }
-        //todo identity
         return new Result(Result::SUCCESS, $result[0][$this->userDataStore->getIdentifier()]);
     }
 }

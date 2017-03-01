@@ -1,61 +1,69 @@
 <?php
 /**
  * Created by PhpStorm.
- * User: victorsecuring
- * Date: 24.02.17
- * Time: 4:43 PM
+ * User: root
+ * Date: 01.03.17
+ * Time: 17:09
  */
 
 namespace rollun\permission\Auth\Adapter;
 
-
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\dic\InsideConstruct;
+use rollun\permission\Auth\Adapter\Factory\AuthAdapterAbstractFactory;
+use rollun\permission\Auth\Adapter\Interfaces\IdentityAdapterInterface;
 use rollun\permission\Auth\Adapter\Resolver\UserDSResolver;
+use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
+use rollun\permission\Auth\RuntimeException;
 use Zend\Authentication\Adapter\Http;
-use Zend\Authentication\Adapter\Http\ResolverInterface;
+use Zend\Authentication\Result;
 use Zend\Psr7Bridge\Psr7Response;
 use Zend\Psr7Bridge\Psr7ServerRequest;
-use Zend\Http\Response as HTTPResponse;
-use Zend\Http\Request as HTTPRequest;
 
-class BaseAuth extends AbstractWebAdapter
+class BaseAuth extends AbstractWebAdapter implements IdentityAdapterInterface
 {
-    /** @var  Http */
+
+    /** @var  DataStoresInterface */
+    protected $userDS;
+
     protected $http;
 
-    public function __construct(array $config, Http $http = null)
+    protected $defaultConfig = [
+        'accept_schemes' => 'basic',
+        AuthAdapterAbstractFactory::KEY_AC_REALM => AuthAdapterAbstractFactory::DEFAULT_REALM,
+        'nonce_timeout' => 3600
+    ];
+
+    //TODO: make more universal. With comparable Http.
+    /**
+     * BaseAuth constructor.
+     * @param array $config
+     * @param DataStoresInterface|null $userDS
+     * @throws RuntimeException
+     */
+    public function __construct(array $config, DataStoresInterface $userDS = null)
     {
+        InsideConstruct::setConstructParams(['userDS' => UserResolverFactory::DEFAULT_USER_DS]);
+        if (!isset($this->userDataStore)) {
+            throw new RuntimeException("UserDS not set.");
+        }
+        $this->http = new Http(array_merge($this->defaultConfig, $config));
+        $this->http->setBasicResolver(new UserDSResolver($this->userDS));
         parent::__construct($config);
-        InsideConstruct::setConstructParams(['http' => Http::class]);
-        if(!isset($this->http)) {
-            $this->http = new Http($config);
-        }
-        if(isset($this->resolver)) {
-            $this->resolver = new UserDSResolver();
-        }
     }
 
     /**
-     * Performs an authentication attempt
-     * @return \Zend\Authentication\Result
-     * @throws \Zend\Authentication\Adapter\Exception\ExceptionInterface If authentication cannot be performed
+     * @return Result
      */
-    public function authenticate()
+    public function identify()
     {
         $httpRequest = Psr7ServerRequest::toZend($this->request);
         $httpResponse = Psr7Response::toZend($this->response);
 
         $this->http->setRequest($httpRequest);
         $this->http->setResponse($httpResponse);
-        $this->http->setBasicResolver($this->resolver);
 
         $result = $this->http->authenticate();
-
-        $response = Psr7Response::fromZend($httpResponse);
-        $this->request = $this->request->withAttribute('responseData', ['data' => $httpResponse->getBody()])
-            ->withAttribute(Response::class, $response);
         return $result;
     }
 }

@@ -12,14 +12,7 @@ use rollun\datastore\AbstractFactoryAbstract;
 use rollun\datastore\DataStore\Factory\CacheableAbstractFactory;
 use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
-use rollun\permission\Auth\Adapter\Factory\HttpAdapterFactory;
-use rollun\permission\Auth\Adapter\Factory\OpenIDAdapterFactory;
-use rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory;
-use rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory;
-use rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory;
 use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
-use rollun\permission\Comparator\Factory\AttributeRequestComparatorAbstractFactory;
-use rollun\permission\Middleware\Factory\LazyLoadSwitchAbstractFactory;
 use Zend\Permissions\Acl\Acl;
 
 return [
@@ -126,103 +119,20 @@ return [
 
     'dependencies' => [
         'invokables' => [
-            \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class =>
-                \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class,
-            \rollun\actionrender\ReturnMiddleware::class => \rollun\actionrender\ReturnMiddleware::class,
-
-            ##### Error Handler Start #####
-            \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class =>
-                \rollun\permission\Auth\Middleware\ErrorHandler\CredentialErrorHandlerMiddleware::class,
-            ##### Error Handler End   #####
 
         ],
         'factories' => [
-            \rollun\permission\Auth\Middleware\LogoutAction::class =>
-                \rollun\permission\Auth\Middleware\Factory\LogoutActionFactory::class,
-
-            \Zend\Authentication\AuthenticationService::class =>
-                \rollun\permission\Auth\Factory\AuthServiceFactory::class,
-
             \Zend\Session\SessionManager::class => \Zend\Session\Service\SessionManagerFactory::class,
 
-            \rollun\permission\Auth\Middleware\LazyAuthenticationAction::class =>
-                \rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory::class,
-
-            \rollun\permission\Auth\Middleware\IdentifyAction::class =>
-                \rollun\permission\Auth\Middleware\Factory\IdentifyFactory::class,
-
-            rollun\permission\Auth\Middleware\UserResolver::class =>
-                \rollun\permission\Auth\Middleware\Factory\UserResolverFactory::class,
-
             ##### Error Handler Start #####
-
-            \rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenHandlerMiddleware::class =>
-                \rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenHandlerFactory::class,
-
-            \rollun\permission\Auth\Middleware\ErrorHandler\AlreadyLogginHandler::class =>
-                \rollun\permission\Auth\Middleware\ErrorHandler\Factory\AlreadyLogginHandlerFactory::class,
 
             ##### Error Handler End   #####
 
         ],
         'abstract_factories' => [
             \rollun\permission\Acl\DataSource\Factory\ConfigDataSourceAbstractFactory::class,
-            \rollun\api\Api\Google\Client\Factory\AbstractFactory::class,
-            \rollun\permission\Auth\Adapter\Resolver\Factory\UserDSResolverAbstractFactory::class,
-            \rollun\permission\Auth\Adapter\Resolver\Factory\OpenIDResolverAbstractFactory::class,
-            \rollun\permission\Auth\Middleware\Factory\AuthenticationAbstractFactory::class,
-            \rollun\actionrender\Factory\ActionRenderAbstractFactory::class,
         ]
     ],
-
-    UserDSResolverAbstractFactory::KEY_RESOLVER => [
-        'httpBasicResolver' => [
-            UserDSResolverAbstractFactory::KEY_DS_SERVICE => 'userDS',
-        ],
-    ],
-
-    OpenIDResolverAbstractFactory::KEY_RESOLVER => [
-        'openIdResolver' => [
-            OpenIDResolverAbstractFactory::KEY_USER_DS_SERVICE => 'userDS',
-        ]
-    ],
-
-    MiddlewarePipeAbstractFactory::KEY_AMP => [
-        'identityPipe' => [
-            'middlewares' => [
-                \rollun\permission\Auth\Middleware\IdentifyAction::class,
-                'authPathSwitch',
-            ]
-        ],
-        'authPipe' => [
-            'middlewares' => [
-                'authTypeSwitch',
-                'authReturnSwitch'
-            ]
-        ],
-    ],
-
-
-    AuthenticationAbstractFactory::KEY_AUTHENTICATION => [
-        'baseAuth' => [
-            AuthenticationAbstractFactory::KEY_ADAPTER => 'basicHttpAdapter'
-        ],
-        'openId' => [
-            AuthenticationAbstractFactory::KEY_ADAPTER => 'openIdAdapter'
-        ],
-    ],
-
-    ActionRenderAbstractFactory::KEY_AR_SERVICE => [
-        'base-service' => [
-            ActionRenderAbstractFactory::KEY_AR_MIDDLEWARE => [
-                ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE =>
-                    \rollun\actionrender\Example\Api\HelloAction::class,
-                ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRenderer'
-            ]
-        ],
-    ],
-
-
 
     UserResolverFactory::KEY_USER_RESOLVER => [
         UserResolverFactory::KEY_USER_DS_SERVICE => 'userDS',

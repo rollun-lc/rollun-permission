@@ -6,7 +6,7 @@
  * Time: 12:26
  */
 
-namespace rollun\permission\Api;
+namespace rollun\permission\Api\Example;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;

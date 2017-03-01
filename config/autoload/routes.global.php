@@ -14,21 +14,27 @@ return [
 
     'routes' => [
         [
-            'name' => 'login',
+            'name' => 'login-page',
             'path' => '/login',
-            'middleware' => 'authPipe',
+            'middleware' => 'loginPageAR',
+            'allowed_methods' => ['GET', 'POST'],
+        ],
+        [
+            'name' => 'login-service',
+            'path' => '/login/{adapterName}',
+            'middleware' => 'loginService',
+            'allowed_methods' => ['GET', 'POST'],
+        ],
+        [
+            'name' => 'login-prepare-service',
+            'path' => '/login_prepare/{adapterName}',
+            'middleware' => 'loginPrepareService',
             'allowed_methods' => ['GET', 'POST'],
         ],
         [
             'name' => 'logout',
             'path' => '/logout',
-            'middleware' => \rollun\permission\Auth\Middleware\LogoutAction::class,
-            'allowed_methods' => ['GET', 'POST'],
-        ],
-        [
-            'name' => 'base-test-page',
-            'path' => '/base/test-page/[{name}]',
-            'middleware' => 'base-service',
+            'middleware' => 'logoutAR',
             'allowed_methods' => ['GET', 'POST'],
         ],
         [
