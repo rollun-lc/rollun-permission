@@ -41,8 +41,8 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
         $config = $container->get('config');
 
         return isset($config[static::KEY_ADAPTER][$requestedName]) &&
-            isset($factoryConfig[static::KEY_CLASS]) &&
-            is_a($factoryConfig[static::KEY_CLASS], static::EXTENDED_CLASS, true);
+            isset($config[static::KEY_ADAPTER][$requestedName][static::KEY_CLASS]) &&
+            is_a($config[static::KEY_ADAPTER][$requestedName][static::KEY_CLASS], static::EXTENDED_CLASS, true);
     }
 
     /**
@@ -67,7 +67,7 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
         if (!isset($factoryConfig[static::KEY_CLASS])) {
             throw new ServiceNotCreatedException("Config not set");
         }
-        $adapterConfig = $factoryConfig[static::KEY_CLASS];
+        $adapterConfig = isset($factoryConfig[static::KEY_ADAPTER_CONFIG]) ? $factoryConfig[static::KEY_ADAPTER_CONFIG] : [];
 
         /** @var AbstractWebAdapter $adapter */
         $adapter = new $class($adapterConfig);

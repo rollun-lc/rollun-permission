@@ -34,11 +34,11 @@ class AccessForbiddenHandlerMiddleware
         if ($error instanceof AccessForbiddenException) {
             $user = $request->getAttribute(UserResolver::KEY_ATTRIBUTE_USER);
             if (empty(array_diff([RoleResolver::DEFAULT_ROLE], $user['roles']))) {
-                $url = $this->urlHelper->generate('login');
+                $url = $this->urlHelper->generate('login-page');
                 $response = new RedirectResponse($url, 302, ['Location' => filter_var($url, FILTER_SANITIZE_URL)]);
             } else {
                 $request = $request->withAttribute('responseData', ["error" => "Access not granted."]);
-                $response = new HtmlResponse('', 403);
+                $response = new HtmlResponse('Access not granted.', 403);
             }
             return $response;
         } else if ($error instanceof AlreadyLogginException) {

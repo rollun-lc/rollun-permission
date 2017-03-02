@@ -109,7 +109,8 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         foreach ($this->response->getHeaders() as $headerName => $headerValue) {
             $response = $response->withHeader($headerName, $headerValue);
         }
-        $this->request->withAttribute(Response::class, $response);
+        $this->response = $response;
+        $this->request = $this->request->withAttribute(Response::class, $response);
 
         return new Result(
             Result::SUCCESS,

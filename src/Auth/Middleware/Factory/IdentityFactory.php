@@ -48,7 +48,7 @@ class IdentityFactory implements FactoryInterface
             if (!$container->has($adapterService)) {
                 throw new ServiceNotFoundException($adapterService . " not found service.");
             }
-            $adapter = $container->has($adapterService);
+            $adapter = $container->get($adapterService);
             if (!is_a($adapter, AbstractWebAdapter::class, true) ||
                 !is_a($adapter, IdentityAdapterInterface::class, true)
             ) {

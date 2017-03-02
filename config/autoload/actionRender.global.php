@@ -45,12 +45,12 @@ return [
             ]
         ]
     ],
-    ActionRenderAbstractFactory::KEY_AR_SERVICE => [
-        /*'home' => [
+    ActionRenderAbstractFactory::KEY_AR => [
+        'home-page' => [
             ActionRenderAbstractFactory::KEY_AR_MIDDLEWARE => [
-                ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE => '',
+                ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE => \rollun\actionrender\Example\Api\HelloAction::class,
                 ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRenderer'
             ]
-        ],*/
+        ],
     ]
 ];

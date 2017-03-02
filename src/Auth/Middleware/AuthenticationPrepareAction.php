@@ -37,8 +37,8 @@ class AuthenticationPrepareAction extends AbstractAuthentication
         $result = $this->adapter->prepare();
 
         if ($result->isValid()) {
+            $request = $this->adapter->getRequest();
             $response = $this->adapter->getResponse();
-            $request = $this->adapter->getRequest()->withAttribute(Response::class, $response);
         }
 
         if (isset($out)) {

@@ -7,6 +7,8 @@ return [
         'factories' => [
             Helper\ServerUrlMiddleware::class => Helper\ServerUrlMiddlewareFactory::class,
             Helper\UrlHelperMiddleware::class => Helper\UrlHelperMiddlewareFactory::class,
+            \rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenHandlerMiddleware::class =>
+                \rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenHandlerFactory::class
         ],
         'invokables' => [
 
@@ -38,7 +40,7 @@ return [
 
         'baseAuth' => [
             'middleware' => [
-                'identityPipe'
+                'identifyPipe'
             ],
             'path' => '/',
             'priority' => 9001,

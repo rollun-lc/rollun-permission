@@ -18,7 +18,7 @@ use Zend\Stratigility\MiddlewareInterface;
 
 class IdentityAction implements MiddlewareInterface
 {
-    const KEY_IDENTITY = 'identity';
+    const KEY_ATTRIBUTE_IDENTITY = 'identity';
 
     const DEFAULT_IDENTITY = '0';
 
@@ -49,7 +49,7 @@ class IdentityAction implements MiddlewareInterface
             }
         }
         $identity = isset($identity) ? $identity : static::DEFAULT_IDENTITY;
-        $request = $request->withAttribute(static::KEY_IDENTITY, $identity);
+        $request = $request->withAttribute(static::KEY_ATTRIBUTE_IDENTITY, $identity);
         if (isset($out)) {
             return $out($request, $response);
         }

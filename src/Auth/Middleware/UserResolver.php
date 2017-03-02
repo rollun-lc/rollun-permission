@@ -55,7 +55,7 @@ class UserResolver implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $identity = $request->getAttribute(IdentifyAction::KEY_ATTRIBUTE_IDENTITY);
+        $identity = $request->getAttribute(IdentityAction::KEY_ATTRIBUTE_IDENTITY);
         $user = $this->getUser($identity);
 
         $request = $request->withAttribute(static::KEY_ATTRIBUTE_USER, $user);

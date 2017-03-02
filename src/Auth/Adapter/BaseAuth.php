@@ -41,10 +41,10 @@ class BaseAuth extends AbstractWebAdapter implements IdentityAdapterInterface
      * @param DataStoresInterface|null $userDS
      * @throws RuntimeException
      */
-    public function __construct(array $config, DataStoresInterface $userDS = null)
+    public function __construct(array $config = [], DataStoresInterface $userDS = null)
     {
         InsideConstruct::setConstructParams(['userDS' => UserResolverFactory::DEFAULT_USER_DS]);
-        if (!isset($this->userDataStore)) {
+        if (!isset($this->userDS)) {
             throw new RuntimeException("UserDS not set.");
         }
         $this->http = new Http(array_merge($this->defaultConfig, $config));

@@ -17,7 +17,7 @@ use Zend\Authentication\Storage\Session as SessionStorage;
 
 class Session extends AbstractWebAdapter implements IdentityAdapterInterface
 {
-    const DEFAULT_SESSION_NAMESPACE = 'Auth/Adapter/Session';
+    const DEFAULT_SESSION_NAMESPACE = 'Auth\Adapter\Session';
 
     const DEFAULT_SESSION_MEMBER = 'identity';
 

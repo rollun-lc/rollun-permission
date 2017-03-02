@@ -18,7 +18,7 @@ use Zend\Stratigility\MiddlewareInterface;
 
 abstract class AbstractAuthentication implements MiddlewareInterface
 {
-    const KEY_IDENTITY = IdentityAction::KEY_IDENTITY;
+    const KEY_IDENTITY = IdentityAction::KEY_ATTRIBUTE_IDENTITY;
 
     const DEFAULT_IDENTITY = IdentityAction::DEFAULT_IDENTITY;
 

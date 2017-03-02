@@ -21,14 +21,14 @@ return [
         ],
         [
             'name' => 'login-service',
-            'path' => '/login/{adapterName}',
-            'middleware' => 'loginService',
+            'path' => '/login/{resourceName}',
+            'middleware' => 'loginServiceAR',
             'allowed_methods' => ['GET', 'POST'],
         ],
         [
             'name' => 'login-prepare-service',
-            'path' => '/login_prepare/{adapterName}',
-            'middleware' => 'loginPrepareService',
+            'path' => '/login_prepare/{resourceName}',
+            'middleware' => 'loginPrepareServiceAR',
             'allowed_methods' => ['GET', 'POST'],
         ],
         [
@@ -38,9 +38,15 @@ return [
             'allowed_methods' => ['GET', 'POST'],
         ],
         [
+            'name' => 'user-page',
+            'path' => '/user',
+            'middleware' => 'user-page',
+            'allowed_methods' => ['GET'],
+        ],
+        [
             'name' => 'home-page',
             'path' => '/[{name}]',
-            'middleware' => 'home-service',
+            'middleware' => 'home-page',
             'allowed_methods' => ['GET'],
         ],
     ],

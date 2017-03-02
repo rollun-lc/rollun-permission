@@ -17,20 +17,8 @@ use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
 use Zend\Stratigility\MiddlewareInterface;
 
-class LogoutAction implements MiddlewareInterface
+class LoginAction implements MiddlewareInterface
 {
-    /** @var AuthenticationServiceInterface  */
-    protected $authenticationService;
-
-    /**
-     * LogoutAction constructor.
-     * @param AuthenticationServiceInterface $authenticationService
-     */
-    public function __construct(AuthenticationServiceInterface $authenticationService)
-    {
-        $this->authenticationService = $authenticationService;
-    }
-
     /**
      * @param Request $request
      * @param Response $response
@@ -39,14 +27,11 @@ class LogoutAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        if($this->authenticationService->hasIdentity()) {
-            $this->authenticationService->clearIdentity();
-        }
-
-        $request = $request->withAttribute('responseData', ['status' => 'Logout complete!']);
+        $request = $request->withAttribute('responseData', ['text' => 'Login page!']);
         if (isset($out)) {
             return ($out($request, $response));
         }
         return $response;
     }
+
 }

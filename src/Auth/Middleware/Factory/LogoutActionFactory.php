@@ -10,6 +10,7 @@ namespace rollun\permission\Auth\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use rollun\permission\Auth\Adapter\Session;
 use rollun\permission\Auth\Middleware\LogoutAction;
 use Zend\Authentication\Storage\Session as SessionStorage;
 use Zend\Authentication\AuthenticationService;
@@ -49,7 +50,7 @@ class LogoutActionFactory implements FactoryInterface
         } else {
             $sessionFactory = new SessionManagerFactory();
             $sessionManager = $sessionFactory($container, SessionManager::class);
-            $authStorage = new SessionStorage('ZendAuth', 'session', $sessionManager);
+            $authStorage = new SessionStorage(Session::DEFAULT_SESSION_NAMESPACE, Session::DEFAULT_SESSION_MEMBER, $sessionManager);
             $authService = new AuthenticationService($authStorage);
         }
         return new LogoutAction($authService);

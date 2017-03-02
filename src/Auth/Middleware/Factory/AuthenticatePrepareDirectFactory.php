@@ -14,6 +14,7 @@ use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticateAdapterInterface;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticatePrepareAdapterInterface;
 use rollun\permission\Auth\Middleware\AuthenticationAction;
+use rollun\permission\Auth\Middleware\AuthenticationPrepareAction;
 use rollun\permission\Auth\RuntimeException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
@@ -47,15 +48,15 @@ class AuthenticatePrepareDirectFactory implements FactoryInterface
         switch (true) {
             case is_a($resourceObject, AbstractWebAdapter::class, true) &&
                 is_a($resourceObject, AuthenticatePrepareAdapterInterface::class, true):
-                $authenticationMiddleware = new AuthenticationAction($resourceObject);
+                $authenticationMiddleware = new AuthenticationPrepareAction($resourceObject);
                 break;
-            case is_a($resourceObject, AuthenticationAction::class):
+            case is_a($resourceObject, AuthenticationPrepareAction::class):
                 $authenticationMiddleware = $resourceObject;
                 break ;
             default:
                 if (!isset($authenticationMiddleware)) {
                     throw new ServiceNotCreatedException(
-                        'Can\'t make ' . AuthenticationAction::class
+                        'Can\'t make ' . AuthenticationPrepareAction::class
                         . ' for resource: ' . $resourceName
                     );
                 }

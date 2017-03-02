@@ -62,9 +62,11 @@ class AuthenticationAction extends AbstractAuthentication
             if ($result->isValid()) {
                 $identity = $result->getIdentity();
                 $this->sessionStorage->write($identity);
-                $request = $request->withAttribute(static::KEY_IDENTITY, $identity);
+                $request = $request->withAttribute(static::KEY_IDENTITY, $identity)
+                    ->withAttribute('responseData', ['status' => 'login']);
             } else {
-                throw new CredentialInvalidException("Auth credential error.");
+                $request = $request->withAttribute('responseData', ['status' => 'credential error.']);
+                //throw new CredentialInvalidException("Auth credential error.");
             }
         }/* else {
             throw new AlreadyLogginException();

@@ -9,6 +9,7 @@
 namespace rollun\permission\Auth\Adapter;
 
 use InvalidArgumentException;
+use rollun\permission\Auth\Adapter\Factory\AuthAdapterAbstractFactory;
 use Zend\Authentication\Adapter\AdapterInterface;
 use Zend\Authentication\Adapter\Http\ResolverInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -43,8 +44,9 @@ abstract class AbstractWebAdapter
     {
         // Double-quotes are used to delimit the realm string in the HTTP header,
         // and colons are field delimiters in the password file.
-        if (empty($config['realm']) ||
-            !ctype_print($config['realm']) ||
+        if (empty($config['realm'])) {
+            $this->realm = AuthAdapterAbstractFactory::DEFAULT_REALM;
+        } else if (!ctype_print($config['realm']) ||
             strpos($config['realm'], ':') !== false ||
             strpos($config['realm'], '"') !== false
         ) {
