@@ -139,6 +139,16 @@ class AuthInstaller extends InstallerAbstract
                     ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe'
                 ],
             ],
+            'middleware_pipeline' => [
+
+                'baseAuth' => [
+                    'middleware' => [
+                        'identifyPipe'
+                    ],
+                    'path' => '/',
+                    'priority' => 9001,
+                ],
+            ],
             'routes' => [
                 [
                     'name' => 'login-page',

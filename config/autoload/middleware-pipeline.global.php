@@ -38,7 +38,7 @@ return [
         // some conventional keys for middleware to execute early, routing
         // middleware, and error middleware.
 
-        'baseAuth' => [
+        /*'baseAuth' => [
             'middleware' => [
                 'identifyPipe'
             ],
@@ -50,7 +50,7 @@ return [
                 'aclPipes'
             ],
             'priority' => 9000,
-        ],
+        ],*/
         'always' => [
             'middleware' => [
                 // Add more middleware here that you want to execute on
