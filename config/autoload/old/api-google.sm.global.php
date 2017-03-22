@@ -1,7 +1,6 @@
 <?php
 
 use rollun\api\Api\Google\Client\Web;
-use rollun\api\Api\Google\Client\Cli as ApiGoogleClientCli;
 use rollun\api\Api\Google\Client\Factory\AbstractFactory as ApiGoogleClientAbstractFactory;
 use rollun\datastore\AbstractFactoryAbstract;
 

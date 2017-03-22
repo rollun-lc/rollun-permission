@@ -17,7 +17,7 @@ use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
 class AuthAdapterAbstractFactory implements AbstractFactoryInterface
 {
-    const KEY_ADAPTER = 'authAdapter';
+    const KEY = 'authAdapter';
 
     const KEY_ADAPTER_CONFIG = 'config';
 
@@ -40,9 +40,9 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
     {
         $config = $container->get('config');
 
-        return isset($config[static::KEY_ADAPTER][$requestedName]) &&
-            isset($config[static::KEY_ADAPTER][$requestedName][static::KEY_CLASS]) &&
-            is_a($config[static::KEY_ADAPTER][$requestedName][static::KEY_CLASS], static::EXTENDED_CLASS, true);
+        return isset($config[static::KEY][$requestedName]) &&
+            isset($config[static::KEY][$requestedName][static::KEY_CLASS]) &&
+            is_a($config[static::KEY][$requestedName][static::KEY_CLASS], static::EXTENDED_CLASS, true);
     }
 
     /**
@@ -60,7 +60,7 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('config');
-        $factoryConfig = $config[static::KEY_ADAPTER][$requestedName];
+        $factoryConfig = $config[static::KEY][$requestedName];
 
         $class = $factoryConfig[static::KEY_CLASS];
 

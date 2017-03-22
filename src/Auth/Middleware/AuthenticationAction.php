@@ -10,7 +10,9 @@ namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Log\LoggerInterface;
 use rollun\dic\InsideConstruct;
+use rollun\logger\Logger;
 use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use rollun\permission\Auth\Adapter\Session as SessionAuthAdapter;
 use rollun\permission\Auth\AlreadyLogginException;
@@ -29,9 +31,17 @@ class AuthenticationAction extends AbstractAuthentication
     /** @var  SessionStorage */
     protected $sessionStorage;
 
+    /** @var  Logger */
+    protected $logger;
+
     public function __construct(AbstractWebAdapter $adapter, SessionStorage $sessionStorage = null)
     {
-        InsideConstruct::setConstructParams(['sessionStorage' => static::DEFAULT_SESSION_STORAGE_SERVICE]);
+
+        InsideConstruct::setConstructParams(
+            [
+                'sessionStorage' => static::DEFAULT_SESSION_STORAGE_SERVICE,
+                'logger' => Logger::DEFAULT_LOGGER_SERVICE
+            ]);
         if (!isset($this->sessionStorage)) {
             $this->sessionStorage = new SessionStorage(
                 static::DEFAULT_SESSION_NAMESPACE,
@@ -58,19 +68,18 @@ class AuthenticationAction extends AbstractAuthentication
             $this->adapter->setResponse($response);
 
             $result = $this->adapter->authenticate();
-
             if ($result->isValid()) {
                 $identity = $result->getIdentity();
                 $this->sessionStorage->write($identity);
                 $request = $request->withAttribute(static::KEY_IDENTITY, $identity)
                     ->withAttribute('responseData', ['status' => 'login']);
+                $this->logger->debug("credential valid. Loggined $identity user. [". microtime(true) ."]");
             } else {
+                $this->logger->debug("credential error. [". microtime(true) ."]");
                 $request = $request->withAttribute('responseData', ['status' => 'credential error.']);
                 //throw new CredentialInvalidException("Auth credential error.");
             }
-        }/* else {
-            throw new AlreadyLogginException();
-        }*/
+        }
         if (isset($out)) {
             return $out($request, $response);
         }

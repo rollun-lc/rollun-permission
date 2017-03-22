@@ -20,7 +20,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 class IdentityFactory implements FactoryInterface
 {
 
-    const KEY_IDENTITY = 'identity';
+    const KEY = 'identity';
 
     const KEY_ADAPTERS_SERVICE = 'adapters';
 
@@ -39,10 +39,10 @@ class IdentityFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('config');
-        if (!isset($config[static::KEY_IDENTITY][static::KEY_ADAPTERS_SERVICE])) {
+        if (!isset($config[static::KEY][static::KEY_ADAPTERS_SERVICE])) {
             throw new ServiceNotCreatedException("Config not found.");
         }
-        $adaptersService = $config[static::KEY_IDENTITY][static::KEY_ADAPTERS_SERVICE];
+        $adaptersService = $config[static::KEY][static::KEY_ADAPTERS_SERVICE];
         $adapters = [];
         foreach ($adaptersService as $adapterService) {
             if (!$container->has($adapterService)) {

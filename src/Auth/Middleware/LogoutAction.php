@@ -10,6 +10,7 @@ namespace rollun\permission\Auth\Middleware;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use rollun\logger\Logger;
 use rollun\permission\Auth\Adapter\LogOutInterface;
 use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\AuthenticationServiceInterface;
@@ -19,8 +20,11 @@ use Zend\Stratigility\MiddlewareInterface;
 
 class LogoutAction implements MiddlewareInterface
 {
-    /** @var AuthenticationServiceInterface  */
+    /** @var AuthenticationServiceInterface */
     protected $authenticationService;
+
+    /** @var  Logger */
+    protected $logger;
 
     /**
      * LogoutAction constructor.
@@ -28,6 +32,7 @@ class LogoutAction implements MiddlewareInterface
      */
     public function __construct(AuthenticationServiceInterface $authenticationService)
     {
+        $this->logger = new Logger();
         $this->authenticationService = $authenticationService;
     }
 
@@ -39,10 +44,10 @@ class LogoutAction implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        if($this->authenticationService->hasIdentity()) {
+        if ($this->authenticationService->hasIdentity()) {
             $this->authenticationService->clearIdentity();
         }
-
+        $this->logger->debug("In LogoutAction[" . microtime(true) . "]");
         $request = $request->withAttribute('responseData', ['status' => 'Logout complete!']);
         if (isset($out)) {
             return ($out($request, $response));

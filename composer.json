@@ -29,13 +29,12 @@
     "zendframework/zend-authentication": "^2.5",
     "zendframework/zend-permissions-acl": "^2.6",
     "psr/log": "^1.0",
-    "rollun-com/rollun-installer": "^1.0",
-    "mindplay/jsonfreeze": "0.3.3.x-dev",
-    "rollun-com/rollun-actionrender": "^2.0",
+    "rollun-com/rollun-installer": "^2.0",
+    "rollun-com/rollun-actionrender": "^4.0",
     "zendframework/zend-http": "^2.5",
-    "rollun-com/rollun-datastore": "^2.0",
-    "rollun-com/rollun-api": "dev-develop",
-    "rollun-com/rollun-utils": "^1.0",
+    "rollun-com/rollun-datastore": "^3.0",
+    "rollun-com/rollun-api": "^2.0",
+    "rollun-com/rollun-utils": "^2.0",
     "google/apiclient": "^2.0",
     "zendframework/zend-crypt": "^3.2",
     "zendframework/zend-psr7bridge": "^0.2.2"
@@ -57,8 +56,6 @@
   },
   "scripts": {
     "serve": "php -S 127.0.0.1:8080 -t public public/index.php",
-    "lib-install": "rollun\\installer\\Command::install",
-    "lib-uninstall": "rollun\\installer\\Command::uninstall",
-    "lib-reinstall": "rollun\\installer\\Command::reinstall"
+    "lib": "rollun\\installer\\Command::command"
   }
 }

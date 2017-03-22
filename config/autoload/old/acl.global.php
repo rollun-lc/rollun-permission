@@ -27,6 +27,7 @@ return [
         'factories' => [
             \Zend\Session\SessionManager::class => \Zend\Session\Service\SessionManagerFactory::class,
             \Zend\Permissions\Acl\Acl::class => rollun\permission\Acl\Factory\AclFromDataStoreFactory::class,
+
             \rollun\permission\Acl\Middleware\ResourceResolver::class =>
                 \rollun\permission\Acl\Middleware\Factory\ResourceResolverFactory::class,
             \rollun\permission\Acl\Middleware\RoleResolver::class =>
@@ -38,7 +39,7 @@ return [
         ]
     ],
 
-    MiddlewarePipeAbstractFactory::KEY_AMP => [
+    MiddlewarePipeAbstractFactory::KEY => [
         'aclPipes' => [
             'middlewares' => [
                 \rollun\permission\Acl\Middleware\RoleResolver::class,

@@ -19,7 +19,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 class UserResolverFactory implements FactoryInterface
 {
 
-    const KEY_USER_RESOLVER = 'userResolver';
+    const KEY = 'userResolver';
 
     const KEY_USER_ROLES_DS_SERVICE = 'userRolesDataStoreService';
 
@@ -46,7 +46,7 @@ class UserResolverFactory implements FactoryInterface
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('config');
-        $factoryConfig = $config[static::KEY_USER_RESOLVER];
+        $factoryConfig = $config[static::KEY];
 
         $userDS = isset($factoryConfig[static::KEY_USER_DS_SERVICE]) ?
             $factoryConfig[static::KEY_USER_DS_SERVICE] :
