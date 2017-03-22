@@ -26,6 +26,8 @@ use rollun\permission\Auth\Adapter\BaseAuth;
 use rollun\permission\Auth\Adapter\Factory\AuthAdapterAbstractFactory;
 use rollun\permission\Auth\Adapter\GoogleOpenID;
 use rollun\permission\Auth\Adapter\Session;
+use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenHandlerMiddleware;
+use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenHandlerFactory;
 use rollun\permission\Auth\Middleware\Factory\IdentityFactory;
 use rollun\permission\Auth\Middleware\Factory\LogoutActionFactory;
 use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
@@ -59,7 +61,8 @@ class AuthInstaller extends InstallerAbstract
                     SessionManager::class => SessionManagerFactory::class,
                     IdentityAction::class => IdentityFactory::class,
                     LogoutAction::class => LogoutActionFactory::class,
-                    UserResolver::class => UserResolverFactory::class
+                    UserResolver::class => UserResolverFactory::class,
+                    AccessForbiddenHandlerMiddleware::class => AccessForbiddenHandlerFactory::class
                 ],
                 'abstract_factories' => [
                     AuthAdapterAbstractFactory::class,
@@ -140,13 +143,20 @@ class AuthInstaller extends InstallerAbstract
                 ],
             ],
             'middleware_pipeline' => [
-
                 'baseAuth' => [
                     'middleware' => [
                         'identifyPipe'
                     ],
                     'path' => '/',
                     'priority' => 9001,
+                ],
+                'error' => [
+                    'middleware' => [
+                        // Add error middleware here.
+                        AccessForbiddenHandlerMiddleware::class,
+                    ],
+                    'error' => true,
+                    'priority' => -10000,
                 ],
             ],
             'routes' => [
