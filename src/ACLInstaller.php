@@ -21,6 +21,9 @@ use rollun\permission\Acl\Middleware\Factory\RoleResolverFactory;
 use rollun\permission\Acl\Middleware\PrivilegeResolver;
 use rollun\permission\Acl\Middleware\ResourceResolver;
 use rollun\permission\Acl\Middleware\RoleResolver;
+use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenErrorResponseGenerator;
+use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenErrorResponseGeneratorFactory;
+use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLErrorHandlerFactory;
 use Zend\Permissions\Acl\Acl;
 use Zend\Session\Service\SessionManagerFactory;
 use Zend\Session\SessionManager;
@@ -62,14 +65,6 @@ class ACLInstaller extends InstallerAbstract
                         AclMiddleware::class,
                     ]
                 ]
-            ],
-            'middleware_pipeline' => [
-                'acl' => [
-                    'middleware' => [
-                        'aclPipes'
-                    ],
-                    'priority' => 9000,
-                ],
             ],
         ];
     }
@@ -114,8 +109,7 @@ class ACLInstaller extends InstallerAbstract
             isset($config['dependencies']['factories'][ResourceResolver::class ]) &&
             isset($config['dependencies']['factories'][RoleResolver::class]) &&
             isset($config['dependencies']['factories'][AclMiddleware::class]) &&
-            isset($config[MiddlewarePipeAbstractFactory::KEY]['aclPipes']) &&
-            isset($config['middleware_pipeline']['acl'])
+            isset($config[MiddlewarePipeAbstractFactory::KEY]['aclPipes'])
         );
     }
 
