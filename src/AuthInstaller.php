@@ -26,8 +26,9 @@ use rollun\permission\Auth\Adapter\BaseAuth;
 use rollun\permission\Auth\Adapter\Factory\AuthAdapterAbstractFactory;
 use rollun\permission\Auth\Adapter\GoogleOpenID;
 use rollun\permission\Auth\Adapter\Session;
-use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenHandlerMiddleware;
-use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenHandlerFactory;
+use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenErrorResponseGenerator;
+use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenErrorResponseGeneratorFactory;
+use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLErrorHandlerFactory;
 use rollun\permission\Auth\Middleware\Factory\IdentityFactory;
 use rollun\permission\Auth\Middleware\Factory\LogoutActionFactory;
 use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
@@ -62,7 +63,8 @@ class AuthInstaller extends InstallerAbstract
                     IdentityAction::class => IdentityFactory::class,
                     LogoutAction::class => LogoutActionFactory::class,
                     UserResolver::class => UserResolverFactory::class,
-                    AccessForbiddenHandlerMiddleware::class => AccessForbiddenHandlerFactory::class
+                    AccessForbiddenErrorResponseGenerator::class => AccessForbiddenErrorResponseGeneratorFactory::class,
+                    ACLErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER => ACLErrorHandlerFactory::class,
                 ],
                 'abstract_factories' => [
                     AuthAdapterAbstractFactory::class,
@@ -102,6 +104,13 @@ class AuthInstaller extends InstallerAbstract
                 UserResolverFactory::KEY_USER_ROLES_DS_SERVICE => UserResolverFactory::DEFAULT_USER_ROLES_DS,
             ],
             MiddlewarePipeAbstractFactory::KEY => [
+                'permissionPipe' => [
+                    MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
+                        ACLErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER,
+                        'identifyPipe',
+                        'aclPipes'
+                    ]
+                ],
                 'loginServicePipe' => [
                     MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
                         'authenticateLLPipe'
@@ -142,55 +151,8 @@ class AuthInstaller extends InstallerAbstract
                     ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe'
                 ],
             ],
-            'middleware_pipeline' => [
-                'baseAuth' => [
-                    'middleware' => [
-                        'identifyPipe'
-                    ],
-                    'path' => '/',
-                    'priority' => 9001,
-                ],
-                'error' => [
-                    'middleware' => [
-                        // Add error middleware here.
-                        AccessForbiddenHandlerMiddleware::class,
-                    ],
-                    'error' => true,
-                    'priority' => -10000,
-                ],
-            ],
-            'routes' => [
-                [
-                    'name' => 'login-page',
-                    'path' => '/login',
-                    'middleware' => 'loginPageAR',
-                    'allowed_methods' => ['GET', 'POST'],
-                ],
-                [
-                    'name' => 'login-service',
-                    'path' => '/login/{resourceName}',
-                    'middleware' => 'loginServiceAR',
-                    'allowed_methods' => ['GET', 'POST'],
-                ],
-                [
-                    'name' => 'login-prepare-service',
-                    'path' => '/login_prepare/{resourceName}',
-                    'middleware' => 'loginPrepareServiceAR',
-                    'allowed_methods' => ['GET', 'POST'],
-                ],
-                [
-                    'name' => 'logout',
-                    'path' => '/logout',
-                    'middleware' => 'logoutAR',
-                    'allowed_methods' => ['GET', 'POST'],
-                ],
-                [
-                    'name' => 'user-page',
-                    'path' => '/user',
-                    'middleware' => 'user-page',
-                    'allowed_methods' => ['GET'],
-                ],
-            ],
+
+
         ];
         return $config;
     }

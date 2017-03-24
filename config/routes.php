@@ -25,5 +25,35 @@
  *     'contact'
  * );
  */
-
 /*$app->get('/', App\Action\HomePageAction::class, 'home');*/
+
+$app->route(
+    '/login',
+    'loginPageAR' ,
+    ['GET','POST'],
+    'login-page'
+);
+$app->route(
+    '/login/{resourceName}',
+    'loginServiceAR' ,
+    ['GET','POST'],
+    'login-service'
+);
+$app->route(
+    '/login_prepare/{resourceName}',
+    'loginPrepareServiceAR' ,
+    ['GET','POST'],
+    'login-prepare-service'
+);
+$app->route(
+    '/logout',
+    'logoutAR' ,
+    ['GET','POST'],
+    'logout'
+);
+$app->route(
+    '/user',
+    'user-page' ,
+    ['GET','POST'],
+    'user-page'
+);

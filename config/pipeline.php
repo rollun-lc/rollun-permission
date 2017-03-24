@@ -11,10 +11,25 @@ use Zend\Stratigility\Middleware\ErrorHandler;
  * Setup middleware pipeline:
  */
 
+function errorPrint(Exception $e) {
+    static $id;
+    $id++;
+    $message = "[$id]" . $e->getMessage() . "<br>";
+    $message .= "file: [" . $e->getFile() . "]<br>". "line: [" . $e->getLine() . "]<br>";
+    $message .= "<br>";
+    if(!is_null($e->getPrevious())) {
+        $message .= errorPrint($e->getPrevious());
+    }
+    return $message;
+}
+
 // The error handler should be the first (most outer) middleware to catch
 // all Exceptions.
-$app->pipe(ErrorHandler::class);
+$app->pipe(new ErrorHandler(new \Zend\Diactoros\Response\EmptyResponse(), function ($e, $req, $resp) {
+    return new \Zend\Diactoros\Response\HtmlResponse(errorPrint($e));
+}));
 $app->pipe(ServerUrlMiddleware::class);
+
 
 // Pipe more middleware here that you want to execute on every request:
 // - bootstrapping
@@ -32,6 +47,8 @@ $app->pipe(ServerUrlMiddleware::class);
 // - $app->pipe('/api', $apiMiddleware);
 // - $app->pipe('/docs', $apiDocMiddleware);
 // - $app->pipe('/files', $filesMiddleware);
+
+$app->pipe('permissionPipe');
 
 // Register the routing middleware in the middleware pipeline
 $app->pipeRoutingMiddleware();
