@@ -8,9 +8,10 @@
 
 namespace rollun\test\permission\Api;
 
-use PHPUnit_Framework_TestCase;
 
-class HelloActionTestProvider extends PHPUnit_Framework_TestCase
+use PHPUnit\Framework\TestCase;
+
+class HelloActionTestProvider extends TestCase
 {
     /**
      * @return array

@@ -50,6 +50,12 @@ class AclFromDataStoreFactory implements FactoryInterface
 
     /**
      * Create an object
+     * 'acl' => [
+     *      AclFromDataStoreFactory::KEY_DS_RULE_SERVICE => AclFromDataStoreFactory::DEFAULT_RULES_DS,
+     *      AclFromDataStoreFactory::KEY_DS_ROLE_SERVICE => AclFromDataStoreFactory::DEFAULT_ROLES_DS,
+     *      AclFromDataStoreFactory::KEY_DS_RESOURCE_SERVICE => AclFromDataStoreFactory::DEFAULT_RESOURCE_DS,
+     *      AclFromDataStoreFactory::KEY_DS_PRIVILEGE_SERVICE => AclFromDataStoreFactory::DEFAULT_PRIVILEGE_DS,
+     *  ],
      *
      * @param  ContainerInterface $container
      * @param  string $requestedName
