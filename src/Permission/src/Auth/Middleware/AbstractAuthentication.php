@@ -14,6 +14,7 @@ use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticateAdapterInterface;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticatePrepareAdapterInterface;
 use rollun\permission\Auth\Adapter\Interfaces\IdentityAdapterInterface;
+use rollun\permission\Auth\Adapter\Interfaces\RegisterAdapterInterface;
 use Zend\Stratigility\MiddlewareInterface;
 
 abstract class AbstractAuthentication implements MiddlewareInterface
@@ -22,7 +23,7 @@ abstract class AbstractAuthentication implements MiddlewareInterface
 
     const DEFAULT_IDENTITY = IdentityAction::DEFAULT_IDENTITY;
 
-    /** @var  AbstractWebAdapter|AuthenticatePrepareAdapterInterface|AuthenticateAdapterInterface */
+    /** @var  AbstractWebAdapter|AuthenticatePrepareAdapterInterface|AuthenticateAdapterInterface|RegisterAdapterInterface */
     protected $adapter;
 
     public function __construct(AbstractWebAdapter $adapter)

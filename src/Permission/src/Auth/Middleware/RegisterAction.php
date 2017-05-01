@@ -20,7 +20,7 @@ use rollun\permission\Auth\CredentialInvalidException;
 use Zend\Authentication\Storage\Session as SessionStorage;
 
 
-class AuthenticationAction extends AbstractAuthentication
+class RegisterAction extends AbstractAuthentication
 {
     const DEFAULT_SESSION_NAMESPACE = SessionAuthAdapter::DEFAULT_SESSION_NAMESPACE;
 
@@ -66,16 +66,16 @@ class AuthenticationAction extends AbstractAuthentication
             $this->adapter->setRequest($request);
             $this->adapter->setResponse($response);
 
-            $result = $this->adapter->register();
+            $result = $this->adapter->authenticate();
             if ($result->isValid()) {
                 $identity = $result->getIdentity();
                 $this->sessionStorage->write($identity);
                 $request = $request->withAttribute(static::KEY_IDENTITY, $identity)
-                    ->withAttribute('responseData', ['status' => 'login']);
-                $this->logger->debug("credential valid. Loggined $identity user. [". microtime(true) ."]");
+                    ->withAttribute('responseData', ['status' => 'Register success. Wait for confirm you user.']);
+                $this->logger->debug("credential valid. Register $identity user. [". microtime(true) ."]");
             } else {
-                $this->logger->debug("credential error. [". microtime(true) ."]");
-                $request = $request->withAttribute('responseData', ['status' => 'credential error.']);
+                $this->logger->debug("Register error. [". microtime(true) ."]");
+                $request = $request->withAttribute('responseData', ['status' => 'Register error.']);
                 //throw new CredentialInvalidException("Auth credential error.");
             }
         }

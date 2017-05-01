@@ -18,6 +18,9 @@ class TestEnvTest extends TestCase
         'HOST',
     ];
 
+    /**
+     *
+     */
     public function testEnv()
     {
         foreach ($this->nameEnvVars as $envVar) {

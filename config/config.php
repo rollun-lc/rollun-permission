@@ -1,5 +1,6 @@
 <?php
 
+
 use Zend\ConfigAggregator\ArrayProvider;
 use Zend\ConfigAggregator\ConfigAggregator;
 use Zend\ConfigAggregator\PhpFileProvider;
@@ -11,6 +12,11 @@ $cacheConfig = [
 ];
 
 $aggregator = new ConfigAggregator([
+    \Zend\Filter\ConfigProvider::class,
+    \Zend\Cache\ConfigProvider::class,
+    \Zend\Mail\ConfigProvider::class,
+    \Zend\Session\ConfigProvider::class,
+    \Zend\Validator\ConfigProvider::class,
     // Include cache configuration
     new ArrayProvider($cacheConfig),
 
