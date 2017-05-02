@@ -26,6 +26,7 @@ use rollun\permission\Auth\Adapter\BaseAuth;
 use rollun\permission\Auth\Adapter\Factory\AuthAdapterAbstractFactory;
 use rollun\permission\Auth\Adapter\GoogleOpenID;
 use rollun\permission\Auth\Adapter\Session;
+use rollun\permission\Auth\LazyLoadRegisterMiddlewareGetter;
 use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenErrorResponseGenerator;
 use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenErrorResponseGeneratorFactory;
 use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLErrorHandlerFactory;
@@ -57,6 +58,7 @@ class AuthInstaller extends InstallerAbstract
                     HelloUserAction::class => HelloUserAction::class,
                     LazyLoadAuthMiddlewareGetter::class => LazyLoadAuthMiddlewareGetter::class,
                     LazyLoadAuthPrepareMiddlewareGetter::class => LazyLoadAuthPrepareMiddlewareGetter::class,
+                    LazyLoadRegisterMiddlewareGetter::class => LazyLoadRegisterMiddlewareGetter::class
                 ],
                 'factories' => [
                     SessionManager::class => SessionManagerFactory::class,
@@ -72,6 +74,12 @@ class AuthInstaller extends InstallerAbstract
                 ]
             ],
             AuthAdapterAbstractFactory::KEY => [
+                'GoogleOpenRegisterID' => [
+                    AuthAdapterAbstractFactory::KEY_CLASS => GoogleOpenID::class,
+                    AuthAdapterAbstractFactory::KEY_ADAPTER_CONFIG => [
+                        'redirect_uri' => 'http://'.  constant("HOST") .'/register/GoogleOpenRegisterID',
+                    ],
+                ],
                 'GoogleOpenID' => [
                     AuthAdapterAbstractFactory::KEY_CLASS => GoogleOpenID::class,
                     AuthAdapterAbstractFactory::KEY_ADAPTER_CONFIG => [
@@ -86,6 +94,7 @@ class AuthInstaller extends InstallerAbstract
                 ]
             ],
             LazyLoadPipeAbstractFactory::KEY => [
+                'registerLLPipe' => LazyLoadRegisterMiddlewareGetter::class,
                 'authenticateLLPipe' => LazyLoadAuthMiddlewareGetter::class,
                 'authenticatePrepareLLPipe' => LazyLoadAuthPrepareMiddlewareGetter::class
             ],
@@ -110,6 +119,11 @@ class AuthInstaller extends InstallerAbstract
                         'identifyPipe',
                         'aclPipes'
                     ]
+                ],
+                'registerServicePipe' => [
+                    MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
+                        'registerLLPipe',
+                    ],
                 ],
                 'loginServicePipe' => [
                     MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
@@ -140,6 +154,10 @@ class AuthInstaller extends InstallerAbstract
                 ],
                 'loginServiceAR' => [
                     ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE => 'loginServicePipe',
+                    ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe',
+                ],
+                'registerServiceAR' => [
+                    ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE  => 'registerServicePipe',
                     ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe',
                 ],
                 'loginPrepareServiceAR' => [

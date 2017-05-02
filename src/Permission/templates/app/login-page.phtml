@@ -6,7 +6,7 @@
         <h2><?php $this->text ?></h2>
         Войти с помощью:<br>
         <ul>
-            <li><a href="<?php $this->path('login-prepare-service', ['resourceName'=> 'GoogleOpenID']) ?>">GoogleOpenID</a></li>
+            <li><a href="<?php echo $this->url('login-prepare-service', ['resourceName'=> 'GoogleOpenID']) ?>">GoogleOpenID</a></li>
         </ul>
     </div>
 </div>

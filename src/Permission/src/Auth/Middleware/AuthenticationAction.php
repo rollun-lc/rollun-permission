@@ -66,7 +66,7 @@ class AuthenticationAction extends AbstractAuthentication
             $this->adapter->setRequest($request);
             $this->adapter->setResponse($response);
 
-            $result = $this->adapter->register();
+            $result = $this->adapter->authenticate();
             if ($result->isValid()) {
                 $identity = $result->getIdentity();
                 $this->sessionStorage->write($identity);

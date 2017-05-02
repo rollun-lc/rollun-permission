@@ -62,14 +62,13 @@ class RegisterAction extends AbstractAuthentication
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
         if ($this->sessionStorage->isEmpty()) {
-
             $this->adapter->setRequest($request);
             $this->adapter->setResponse($response);
-
-            $result = $this->adapter->authenticate();
+            $result = $this->adapter->register();
             if ($result->isValid()) {
                 $identity = $result->getIdentity();
-                $this->sessionStorage->write($identity);
+                //Not write id to session. Add to feature.
+                //$this->sessionStorage->write($identity);
                 $request = $request->withAttribute(static::KEY_IDENTITY, $identity)
                     ->withAttribute('responseData', ['status' => 'Register success. Wait for confirm you user.']);
                 $this->logger->debug("credential valid. Register $identity user. [". microtime(true) ."]");
@@ -78,6 +77,9 @@ class RegisterAction extends AbstractAuthentication
                 $request = $request->withAttribute('responseData', ['status' => 'Register error.']);
                 //throw new CredentialInvalidException("Auth credential error.");
             }
+        }else {
+            $request = $request->withAttribute('responseData', ['status' => 'You already login.']);
+            $this->logger->debug("User already register. [". microtime(true) ."]");
         }
         if (isset($out)) {
             return $out($request, $response);

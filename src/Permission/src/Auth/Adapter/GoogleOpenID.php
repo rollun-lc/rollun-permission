@@ -29,6 +29,9 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
     /** @var  DataStoresInterface */
     protected $userDS;
 
+    /** @var string  */
+    protected $registrationEmail;
+
     public function __construct(array $config, Web $webClient = null, DataStoresInterface $userDS = null)
     {
         InsideConstruct::setConstructParams(
@@ -40,6 +43,10 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         if (!isset($this->userDS)) {
             throw new RuntimeException("userDS not set");
         }
+        if(isset($config['redirect_uri'])) {
+            $this->webClient->setRedirectUri($config['redirect_uri']);
+        }
+        $this->registrationEmail = $config['register_email'];
         parent::__construct($config);
     }
 
@@ -152,12 +159,22 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
             }
             if ($this->webClient->authByCode($code)) {
                 $userId = $this->webClient->getUserId();
-                $this->sentUserId($userId);
-                return new Result(
-                    Result::SUCCESS,
-                    $userId
-                    ['Success credential']
-                );
+                $user = $this->userDS->read($userId);
+                //if user not found
+                if (empty($user)) {
+                    $this->sentUserId($userId);
+                    return new Result(
+                        Result::SUCCESS,
+                        $userId,
+                        ['Success credential']
+                    );
+                } else {
+                    return new Result(
+                        Result::FAILURE,
+                        null,
+                        ['User already register']
+                    );
+                }
             }
             return new Result(
                 Result::FAILURE,
@@ -179,9 +196,11 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         $email = $this->webClient->getUserEmail();
         $message = "User: $email with id: $userId ask for register.";
         $mail->setBody($message);
-        $mail->setFrom("rollun.register@rollun.api.com", "Rollun Register API");
+
+        //TODO: remove this method to enother service...
+        $mail->setFrom("register@permission.".constant("HOST"), "Register API");
         $mail->setSubject("New user register: $email");
-        $mail->addTo("it.professor02@gmail.com");
+        $mail->addTo($this->registrationEmail);
         $transport = new Mail\Transport\Smtp();
         $options = new Mail\Transport\SmtpOptions([
             'name' => 'aspmx.l.google.com',
