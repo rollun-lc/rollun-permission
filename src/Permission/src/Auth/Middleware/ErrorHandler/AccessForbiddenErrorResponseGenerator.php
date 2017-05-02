@@ -62,7 +62,7 @@ class AccessForbiddenErrorResponseGenerator
         $message .= "file: [" . $e->getFile() . "]<br>" . "line: [" . $e->getLine() . "]<br>";
         $message .= "<br>";
         if (!is_null($e->getPrevious())) {
-            $message .= errorPrint($e->getPrevious());
+            $message .= $this->errorPrint($e->getPrevious());
         }
         return $message;
     }
