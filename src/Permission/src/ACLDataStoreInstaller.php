@@ -103,7 +103,7 @@ class ACLDataStoreInstaller extends InstallerAbstract
             $config['aclRoles'] = [
                 ['id' => 1, 'name' => 'guest', 'parent_id' => null],
                 ['id' => 2, 'name' => 'user', 'parent_id' => 1],
-                ['id' => 3, 'name' => 'service', 'parent_id' => 2],
+                ['id' => 3, 'name' => 'api-service', 'parent_id' => 2],
             ];
             $config['aclResource'] = [
                 //all [GET]
@@ -119,6 +119,8 @@ class ACLDataStoreInstaller extends InstallerAbstract
                 ['id' => 6, 'name' => 'rest', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/rest/', 'parent_id' => null],
                 //only user  [GET POST PUT DELETE]
                 ['id' => 7, 'name' => 'api', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/api/', 'parent_id' => null],
+                //only guest [GET]
+                ['id' => 8, 'name' => 'register', 'pattern' => '/^http:\/\/' . constant("HOST") . '\/register/', 'parent_id' => null],
             ];
             $config['aclPrivilege'] = [
                 ['id' => 1, 'name' => 'GET'],
@@ -148,6 +150,8 @@ class ACLDataStoreInstaller extends InstallerAbstract
                 ['id' => 12, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 2, 'allow_flag' => 1],
                 ['id' => 13, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 3, 'allow_flag' => 1],
                 ['id' => 14, 'role_id' => 2, 'resource_id' => 7, 'privilege_id' => 4, 'allow_flag' => 1],
+                //all [GET] register
+                ['id' => 15, 'role_id' => 1, 'resource_id' => 8, 'privilege_id' => 1, 'allow_flag' => 1],
             ];
         }
         return $config;

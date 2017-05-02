@@ -8,17 +8,19 @@
 
 namespace rollun\permission\Auth\Adapter;
 
+use Psr\Http\Message\ResponseInterface as Response;
 use rollun\api\Api\Google\Client\Web;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\dic\InsideConstruct;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticateAdapterInterface;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticatePrepareAdapterInterface;
+use rollun\permission\Auth\Adapter\Interfaces\RegisterAdapterInterface;
 use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
 use rollun\permission\Auth\RuntimeException;
 use Zend\Authentication\Result;
-use Psr\Http\Message\ResponseInterface as Response;
+use Zend\Mail;
 
-class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInterface, AuthenticatePrepareAdapterInterface
+class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInterface, AuthenticatePrepareAdapterInterface, RegisterAdapterInterface
 {
     const DEFAULT_WEB_SERVICE = Web::class;
     /** @var Web */
@@ -26,6 +28,9 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
 
     /** @var  DataStoresInterface */
     protected $userDS;
+
+    /** @var string  */
+    protected $registrationEmail;
 
     public function __construct(array $config, Web $webClient = null, DataStoresInterface $userDS = null)
     {
@@ -38,6 +43,10 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         if (!isset($this->userDS)) {
             throw new RuntimeException("userDS not set");
         }
+        if(isset($config['redirect_uri'])) {
+            $this->webClient->setRedirectUri($config['redirect_uri']);
+        }
+        $this->registrationEmail = $config['register_email'];
         parent::__construct($config);
     }
 
@@ -118,4 +127,88 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
             ['Invalid or absent credentials; challenging client']
         );
     }
+
+    /**
+     * @return Result
+     * @throws RuntimeException
+     */
+    public function register()
+    {
+        if (empty($this->request) || empty($this->response)) {
+            throw new RuntimeException(
+                'Request and Response objects must be set before calling authenticate()'
+            );
+        }
+        $query = $this->request->getQueryParams();
+        $code = isset($query['code']) ? $query['code'] : null;
+        $state = isset($query[Web::KEY_STATE]) ? $query[Web::KEY_STATE] : "";
+        try {
+            if (!isset($code)) {
+                return new Result(
+                    Result::FAILURE,
+                    null,
+                    ["code not set."]
+                );
+            }
+            if ($this->webClient->getResponseState() !== $state) {
+                return new Result(
+                    Result::FAILURE,
+                    null,
+                    ["State not equalse."]
+                );
+            }
+            if ($this->webClient->authByCode($code)) {
+                $userId = $this->webClient->getUserId();
+                $user = $this->userDS->read($userId);
+                //if user not found
+                if (empty($user)) {
+                    $this->sentUserId($userId);
+                    return new Result(
+                        Result::SUCCESS,
+                        $userId,
+                        ['Success credential']
+                    );
+                } else {
+                    return new Result(
+                        Result::FAILURE,
+                        null,
+                        ['User already register']
+                    );
+                }
+            }
+            return new Result(
+                Result::FAILURE,
+                null,
+                ['Fail credential']
+            );
+        } catch (\Exception $e) {
+            return new Result(
+                Result::FAILURE,
+                null,
+                [$e->getMessage()]
+            );
+        }
+    }
+
+    protected function sentUserId($userId)
+    {
+        $mail = new Mail\Message();
+        $email = $this->webClient->getUserEmail();
+        $message = "User: $email with id: $userId ask for register.";
+        $mail->setBody($message);
+
+        //TODO: remove this method to enother service...
+        $mail->setFrom("register@permission.".constant("HOST"), "Register API");
+        $mail->setSubject("New user register: $email");
+        $mail->addTo($this->registrationEmail);
+        $transport = new Mail\Transport\Smtp();
+        $options = new Mail\Transport\SmtpOptions([
+            'name' => 'aspmx.l.google.com',
+            'host' => 'aspmx.l.google.com',
+            'port' => 25,
+        ]);
+        $transport->setOptions($options);
+        $transport->send($mail);
+    }
+
 }

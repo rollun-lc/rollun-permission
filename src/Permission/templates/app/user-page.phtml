@@ -1,21 +1,19 @@
-<?php $this->headTitle("Logout"); ?>
+<?php $this->headTitle("User Page"); ?>
 
 <div class="row">
     <div class="col-md-4">
-        <h2>
-            {{ str }} <br>
-            {% if user is not empty %}
-            You name: '{{ user.name }}' <br>
-            You ID: '{{ user.id }}' <br>
-            {% if user.roles %}
-            You roles:
-            <ul>
-                {% for role in user.roles %}
-                <li>{{ role }}</li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            {% endif %}
-        </h2>
+        Hello <?php echo isset($this->src) ? $this->src : " world"?> <br>
+        <?php if(isset($this->user)) : ?>
+            You name: '<?php echo $this->user['name'] ?>' <br>
+            You ID: '<?php echo $this->user['id'] ?>' <br>
+            <?php if(isset($this->user['roles'])) : ?>
+                You role: <br>
+                <ul>
+                    <?php foreach ($this->user['roles'] as $role) : ?>
+                        <li><?php echo $role ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php endif; ?>
+        <?php endif; ?>
     </div>
 </div>
