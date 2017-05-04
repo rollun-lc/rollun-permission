@@ -21,13 +21,7 @@ class ConfigProvider
     {
         return [
             //'dependencies' => $this->getDependencies(),
-            'templates'    => [
-                'paths' => [
-                    'app'    => [__DIR__ . '/../templates/app'],
-                    'error'  => [__DIR__ . '/../templates/error'],
-                    'layout' => [__DIR__ . '/../templates/layout'],
-                ],
-            ]
+            'templates' => $this->getTemplates(),
         ];
     }
 
@@ -58,8 +52,6 @@ class ConfigProvider
         return [
             'paths' => [
                 'app'    => [__DIR__ . '/../templates/app'],
-                'error'  => [__DIR__ . '/../templates/error'],
-                'layout' => [__DIR__ . '/../templates/layout'],
             ],
         ];
     }

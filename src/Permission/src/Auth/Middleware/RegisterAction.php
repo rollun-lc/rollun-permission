@@ -67,8 +67,8 @@ class RegisterAction extends AbstractAuthentication
             $result = $this->adapter->register();
             if ($result->isValid()) {
                 $identity = $result->getIdentity();
-                //Not write id to session. Add to feature.
-                //$this->sessionStorage->write($identity);
+                //Add for block double register.
+                $this->sessionStorage->write($identity);
                 $request = $request->withAttribute(static::KEY_IDENTITY, $identity)
                     ->withAttribute('responseData', ['status' => 'Register success. Wait for confirm you user.']);
                 $this->logger->debug("credential valid. Register $identity user. [". microtime(true) ."]");
