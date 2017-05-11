@@ -31,7 +31,7 @@ class AccessForbiddenErrorResponseGenerator
         $this->urlHelper = $urlHelper;
     }
 
-    public function __invoke(\Exception $e, Request $request, Response $response)
+    public function __invoke(\Throwable $e, Request $request, Response $response)
     {
         if ($e instanceof AccessForbiddenException) {
             $user = $request->getAttribute(UserResolver::KEY_ATTRIBUTE_USER, ['roles' => [RoleResolver::DEFAULT_ROLE]]);
@@ -54,7 +54,7 @@ class AccessForbiddenErrorResponseGenerator
         return new HtmlResponse($this->errorPrint($e));
     }
 
-    protected function errorPrint(Exception $e)
+    protected function errorPrint(\Throwable $e)
     {
         static $id;
         $id++;
