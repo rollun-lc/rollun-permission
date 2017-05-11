@@ -54,7 +54,7 @@ class AccessForbiddenErrorResponseGenerator
         return new HtmlResponse($this->errorPrint($e));
     }
 
-    protected function errorPrint(Exception $e)
+    protected function errorPrint(\Throwable $e)
     {
         static $id;
         $id++;
