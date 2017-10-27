@@ -6,7 +6,7 @@
  * Time: 12:59
  */
 
-namespace rollun\permission;
+namespace rollun\permission\Installers;
 
 use rollun\datastore\DataStore\Cacheable;
 use rollun\datastore\DataStore\Factory\CacheableAbstractFactory;
@@ -14,8 +14,9 @@ use rollun\datastore\DataStore\Installers\CacheableInstaller;
 use rollun\installer\Command;
 use rollun\installer\Install\InstallerAbstract;
 use rollun\permission\Acl\DataSource\Factory\ConfigDataSourceAbstractFactory;
+use rollun\permission\ACLInstaller;
 
-class ACLDataStoreInstaller extends InstallerAbstract
+class AclConfigDSInstaller extends InstallerAbstract
 {
 
     /**
@@ -84,9 +85,7 @@ class ACLDataStoreInstaller extends InstallerAbstract
         ];
 
         if ($this->consoleIO->askConfirmation(
-            "Do you want to fill in the configuration with the basic settings (Need for tests) ?"
-        )
-        ) {
+            "Do you want to fill in the configuration with the basic settings (Need for tests) ?")) {
             $config['aclUser'] = [
                 ['id' => "0", 'name' => 'guest', 'password' => ''],
                 ['id' => "1", 'name' => 'service', 'password' => '123wqe321'],

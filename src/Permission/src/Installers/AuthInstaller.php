@@ -6,7 +6,7 @@
  * Time: 12:59
  */
 
-namespace rollun\permission;
+namespace rollun\permission\Installers;
 
 use rollun\actionrender\Factory\ActionRenderAbstractFactory;
 use rollun\actionrender\Factory\LazyLoadPipeAbstractFactory;
