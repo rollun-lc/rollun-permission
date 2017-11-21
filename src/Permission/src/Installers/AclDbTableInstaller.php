@@ -176,15 +176,27 @@ class AclDbTableInstaller extends InstallerAbstract
         if(!$this->container->has("db")) {
             return false;
         }
+        $config = $this->container->has("config");
         $tableManager = $this->getTableManager();
         return (
-            isset($tableManager) &&
             $tableManager->hasTable(AclUsersTable::TABLE_NAME) &&
+            isset($config['dataStore'][AclUsersTable::class]) &&
+            isset($config[TableGatewayAbstractFactory::KEY_TABLE_GATEWAY][AclUsersTable::TABLE_NAME]) &&
             $tableManager->hasTable(AclRolesTable::TABLE_NAME) &&
+            isset($config['dataStore'][AclRolesTable::class]) &&
+            isset($config[TableGatewayAbstractFactory::KEY_TABLE_GATEWAY][AclRolesTable::TABLE_NAME]) &&
             $tableManager->hasTable(AclPrivilegeTable::TABLE_NAME) &&
+            isset($config['dataStore'][AclPrivilegeTable::class]) &&
+            isset($config[TableGatewayAbstractFactory::KEY_TABLE_GATEWAY][AclPrivilegeTable::TABLE_NAME]) &&
             $tableManager->hasTable(AclResourceTable::TABLE_NAME) &&
+            isset($config['dataStore'][AclResourceTable::class]) &&
+            isset($config[TableGatewayAbstractFactory::KEY_TABLE_GATEWAY][AclResourceTable::TABLE_NAME]) &&
             $tableManager->hasTable(AclUserRolesTable::TABLE_NAME) &&
-            $tableManager->hasTable(AclRulesTable::TABLE_NAME)
+            isset($config['dataStore'][AclUserRolesTable::class]) &&
+            isset($config[TableGatewayAbstractFactory::KEY_TABLE_GATEWAY][AclUserRolesTable::TABLE_NAME]) &&
+            $tableManager->hasTable(AclRulesTable::TABLE_NAME) &&
+            isset($config['dataStore'][AclRulesTable::class]) &&
+            isset($config[TableGatewayAbstractFactory::KEY_TABLE_GATEWAY][AclRulesTable::TABLE_NAME])
         );
     }
 

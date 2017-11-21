@@ -14,11 +14,9 @@ use rollun\datastore\DataStore\Installers\CacheableInstaller;
 use rollun\installer\Command;
 use rollun\installer\Install\InstallerAbstract;
 use rollun\permission\Acl\DataSource\Factory\ConfigDataSourceAbstractFactory;
-use rollun\permission\ACLInstaller;
 
 class AclConfigDSInstaller extends InstallerAbstract
 {
-
     /**
      * install
      * @return array
