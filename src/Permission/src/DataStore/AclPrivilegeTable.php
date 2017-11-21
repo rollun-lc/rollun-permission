@@ -40,7 +40,7 @@ class AclPrivilegeTable extends AutoIdTable
                     TableManagerMysql::PRIMARY_KEY => true,
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
-                        'length' => 6,
+                        'length' => 10,
                     ]
                 ],
                 static::FILED_NAME => [

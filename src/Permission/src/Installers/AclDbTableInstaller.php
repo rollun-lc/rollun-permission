@@ -101,6 +101,7 @@ class AclDbTableInstaller extends InstallerAbstract
         $tableManager = $this->getTableManager();
         if (!$tableManager->hasTable($tableName)) {
             $tableManager->createTable($tableName);
+            $this->consoleIO->write("Created $tableName");
         }
     }
 
@@ -172,9 +173,11 @@ class AclDbTableInstaller extends InstallerAbstract
      */
     public function isInstall()
     {
+        if(!$this->container->has("db")) {
+            return false;
+        }
         $tableManager = $this->getTableManager();
-        return false;
-        /*return (
+        return (
             isset($tableManager) &&
             $tableManager->hasTable(AclUsersTable::TABLE_NAME) &&
             $tableManager->hasTable(AclRolesTable::TABLE_NAME) &&
@@ -182,7 +185,7 @@ class AclDbTableInstaller extends InstallerAbstract
             $tableManager->hasTable(AclResourceTable::TABLE_NAME) &&
             $tableManager->hasTable(AclUserRolesTable::TABLE_NAME) &&
             $tableManager->hasTable(AclRulesTable::TABLE_NAME)
-        );*/
+        );
     }
 
     public function getDependencyInstallers()

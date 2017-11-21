@@ -51,6 +51,13 @@ class AclRulesTable extends AutoIdTable
                 ],
                 static::FILED_ROLE_ID => [
                     TableManagerMysql::FIELD_TYPE => "Varchar",
+                    TableManagerMysql::FOREIGN_KEY => [
+                        'referenceTable' => AclRolesTable::TABLE_NAME,
+                        'referenceColumn' => AclRolesTable::FILED_ID,
+                        'onDeleteRule' => null,
+                        'onUpdateRule' => null,
+                        'name' => null,
+                    ],
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 6,
@@ -58,6 +65,13 @@ class AclRulesTable extends AutoIdTable
                 ],
                 static::FILED_RESOURCE_ID => [
                     TableManagerMysql::FIELD_TYPE => "Varchar",
+                    TableManagerMysql::FOREIGN_KEY => [
+                        'referenceTable' => AclResourceTable::TABLE_NAME,
+                        'referenceColumn' => AclResourceTable::FILED_ID,
+                        'onDeleteRule' => null,
+                        'onUpdateRule' => null,
+                        'name' => null,
+                    ],
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 6,
@@ -65,6 +79,13 @@ class AclRulesTable extends AutoIdTable
                 ],
                 static::FILED_PRIVILEGE_ID => [
                     TableManagerMysql::FIELD_TYPE => "Varchar",
+                    TableManagerMysql::FOREIGN_KEY => [
+                        'referenceTable' => AclPrivilegeTable::TABLE_NAME,
+                        'referenceColumn' => AclPrivilegeTable::FILED_ID,
+                        'onDeleteRule' => null,
+                        'onUpdateRule' => null,
+                        'name' => null,
+                    ],
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 6,
