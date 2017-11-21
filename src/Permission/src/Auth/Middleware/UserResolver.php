@@ -13,6 +13,8 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\datastore\DataStore\DataStoreAbstract;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\datastore\Rql\RqlQuery;
+use rollun\permission\DataStore\AclRolesTable;
+use rollun\permission\DataStore\AclUserRolesTable;
 use Zend\Stratigility\MiddlewareInterface;
 
 class UserResolver implements MiddlewareInterface
@@ -20,9 +22,9 @@ class UserResolver implements MiddlewareInterface
 
     const KEY_ATTRIBUTE_USER = 'user';
 
-    const KEY_ROLE_ID = 'role_id';
+    const KEY_ROLE_ID = AclUserRolesTable::FILED_ROLES_ID;
 
-    const KEY_ROLE_NAME = 'name';
+    const KEY_ROLE_NAME = AclRolesTable::FILED_NAME;
 
     /** @var  DataStoreAbstract */
     protected $userDS;

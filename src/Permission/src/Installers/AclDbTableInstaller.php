@@ -53,7 +53,13 @@ class AclDbTableInstaller extends InstallerAbstract
             'dependencies' => [
                 'abstract_factories' => [],
                 'invokables' => [],
-                'factories' => [
+                'aliases' => [
+                    "rulesDS" => AclRulesTable::class,
+                    "rolesDS" => AclRolesTable::class,
+                    "resourceDS" => AclResourceTable::class,
+                    "privilegeDS" => AclPrivilegeTable::class,
+                    "userDS" => AclUsersTable::class,
+                    "userRolesDS" => AclUserRolesTable::class,
                 ],
             ],
             TableGatewayAbstractFactory::KEY_TABLE_GATEWAY => [
@@ -173,7 +179,7 @@ class AclDbTableInstaller extends InstallerAbstract
      */
     public function isInstall()
     {
-        if(!$this->container->has("db")) {
+        if (!$this->container->has("db")) {
             return false;
         }
         $config = $this->container->has("config");
