@@ -6,7 +6,7 @@
  * Time: 12:59
  */
 
-namespace rollun\permission;
+namespace rollun\permission\Installers;
 
 use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
 use rollun\actionrender\Installers\MiddlewarePipeInstaller;
