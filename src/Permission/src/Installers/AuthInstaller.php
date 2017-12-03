@@ -16,8 +16,6 @@ use rollun\actionrender\Installers\BasicRenderInstaller;
 use rollun\actionrender\Installers\LazyLoadPipeInstaller;
 use rollun\actionrender\Installers\MiddlewarePipeInstaller;
 use rollun\actionrender\ReturnMiddleware;
-use rollun\permission\Auth\LazyLoadAuthMiddlewareGetter;
-use rollun\permission\Auth\LazyLoadAuthPrepareMiddlewareGetter;
 use rollun\api\Api\Google\Client\Installers\WebInstaller;
 use rollun\installer\Install\InstallerAbstract;
 use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
@@ -26,9 +24,13 @@ use rollun\permission\Auth\Adapter\BaseAuth;
 use rollun\permission\Auth\Adapter\Factory\AuthAdapterAbstractFactory;
 use rollun\permission\Auth\Adapter\GoogleOpenID;
 use rollun\permission\Auth\Adapter\Session;
+use rollun\permission\Auth\LazyLoadAuthMiddlewareGetter;
+use rollun\permission\Auth\LazyLoadAuthPrepareMiddlewareGetter;
 use rollun\permission\Auth\LazyLoadRegisterMiddlewareGetter;
+use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenApiGwErrorResponseGenerator;
 use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenErrorResponseGenerator;
 use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenErrorResponseGeneratorFactory;
+use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLApiErrorHandlerFactory;
 use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLErrorHandlerFactory;
 use rollun\permission\Auth\Middleware\Factory\IdentityFactory;
 use rollun\permission\Auth\Middleware\Factory\LogoutActionFactory;
@@ -37,9 +39,10 @@ use rollun\permission\Auth\Middleware\IdentityAction;
 use rollun\permission\Auth\Middleware\LoginAction;
 use rollun\permission\Auth\Middleware\LogoutAction;
 use rollun\permission\Auth\Middleware\UserResolver;
-use Zend\Session\Service\ContainerAbstractServiceFactory;
+use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\Session\Service\SessionManagerFactory;
 use Zend\Session\SessionManager;
+use Zend\Session\Storage\SessionArrayStorage;
 
 class AuthInstaller extends InstallerAbstract
 {
@@ -50,7 +53,37 @@ class AuthInstaller extends InstallerAbstract
      */
     public function install()
     {
-        $config = [
+        //ask for API or non api error handle
+        $errorHandlerFactory = [
+            AccessForbiddenApiGwErrorResponseGenerator::class => InvokableFactory::class,
+            AccessForbiddenErrorResponseGenerator::class => AccessForbiddenErrorResponseGeneratorFactory::class,
+            ACLErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER => ACLErrorHandlerFactory::class,
+        ];
+        if ($this->consoleIO->askConfirmation("You wont use API error handler ? ", false)) {
+            $errorHandlerFactory[ACLApiErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER] = ACLApiErrorHandlerFactory::class;
+        }
+
+        //ask for session saveHandler type
+        $session = [
+            'session_config' => [
+                'cookie_lifetime' => 60 * 60 * 2,
+                "gc_maxlifetime" => 60 * 60 * 2,
+            ],
+            'session_storage' => [
+                "type" => SessionArrayStorage::class,
+            ],
+            "session_manager" => [
+                "validators" => [
+                    #\Zend\Session\Validator\RemoteAddr::class,
+                    #\Zend\Session\Validator\HttpUserAgent::class,
+                ]
+            ],
+            'session_containers' => [
+                'WebSessionContainer'
+            ],
+        ];
+
+        $config = array_merge([
             'dependencies' => [
                 'invokables' => [
                     LoginAction::class => LoginAction::class,
@@ -60,17 +93,14 @@ class AuthInstaller extends InstallerAbstract
                     LazyLoadAuthPrepareMiddlewareGetter::class => LazyLoadAuthPrepareMiddlewareGetter::class,
                     LazyLoadRegisterMiddlewareGetter::class => LazyLoadRegisterMiddlewareGetter::class
                 ],
-                'factories' => [
+                'factories' => array_merge([
                     SessionManager::class => SessionManagerFactory::class,
                     IdentityAction::class => IdentityFactory::class,
                     LogoutAction::class => LogoutActionFactory::class,
                     UserResolver::class => UserResolverFactory::class,
-                    AccessForbiddenErrorResponseGenerator::class => AccessForbiddenErrorResponseGeneratorFactory::class,
-                    ACLErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER => ACLErrorHandlerFactory::class,
-                ],
+                ], $errorHandlerFactory),
                 'abstract_factories' => [
                     AuthAdapterAbstractFactory::class,
-                    ContainerAbstractServiceFactory::class,
                 ]
             ],
             AuthAdapterAbstractFactory::KEY => [
@@ -97,9 +127,6 @@ class AuthInstaller extends InstallerAbstract
                 'registerLLPipe' => LazyLoadRegisterMiddlewareGetter::class,
                 'authenticateLLPipe' => LazyLoadAuthMiddlewareGetter::class,
                 'authenticatePrepareLLPipe' => LazyLoadAuthPrepareMiddlewareGetter::class
-            ],
-            'session_containers' => [
-                'WebSessionContainer'
             ],
             IdentityFactory::KEY => [
                 IdentityFactory::KEY_ADAPTERS_SERVICE => [
@@ -157,7 +184,7 @@ class AuthInstaller extends InstallerAbstract
                     ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe',
                 ],
                 'registerServiceAR' => [
-                    ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE  => 'registerServicePipe',
+                    ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE => 'registerServicePipe',
                     ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe',
                 ],
                 'loginPrepareServiceAR' => [
@@ -169,9 +196,7 @@ class AuthInstaller extends InstallerAbstract
                     ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe'
                 ],
             ],
-
-
-        ];
+        ], $session);
         return $config;
     }
 
