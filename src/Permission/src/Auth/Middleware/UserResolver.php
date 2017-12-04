@@ -32,7 +32,7 @@ class UserResolver implements MiddlewareInterface
     /** @var  DataStoreAbstract */
     protected $userRolesDS;
     /**
-     * @var DataStoreAbstract
+     * @var DataStoreAbstract`
      */
     private $rolesDS;
 

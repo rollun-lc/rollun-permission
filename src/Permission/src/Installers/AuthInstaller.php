@@ -39,7 +39,9 @@ use rollun\permission\Auth\Middleware\IdentityAction;
 use rollun\permission\Auth\Middleware\LoginAction;
 use rollun\permission\Auth\Middleware\LogoutAction;
 use rollun\permission\Auth\Middleware\UserResolver;
+use rollun\permission\Auth\SaveHandler\Factory\DbTableSessionSaveHandlerFactory;
 use Zend\ServiceManager\Factory\InvokableFactory;
+use Zend\Session\SaveHandler\SaveHandlerInterface;
 use Zend\Session\Service\SessionManagerFactory;
 use Zend\Session\SessionManager;
 use Zend\Session\Storage\SessionArrayStorage;
@@ -63,27 +65,7 @@ class AuthInstaller extends InstallerAbstract
             $errorHandlerFactory[ACLApiErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER] = ACLApiErrorHandlerFactory::class;
         }
 
-        //ask for session saveHandler type
-        $session = [
-            'session_config' => [
-                'cookie_lifetime' => 60 * 60 * 2,
-                "gc_maxlifetime" => 60 * 60 * 2,
-            ],
-            'session_storage' => [
-                "type" => SessionArrayStorage::class,
-            ],
-            "session_manager" => [
-                "validators" => [
-                    #\Zend\Session\Validator\RemoteAddr::class,
-                    #\Zend\Session\Validator\HttpUserAgent::class,
-                ]
-            ],
-            'session_containers' => [
-                'WebSessionContainer'
-            ],
-        ];
-
-        $config = array_merge([
+        $config = [
             'dependencies' => [
                 'invokables' => [
                     LoginAction::class => LoginAction::class,
@@ -94,7 +76,6 @@ class AuthInstaller extends InstallerAbstract
                     LazyLoadRegisterMiddlewareGetter::class => LazyLoadRegisterMiddlewareGetter::class
                 ],
                 'factories' => array_merge([
-                    SessionManager::class => SessionManagerFactory::class,
                     IdentityAction::class => IdentityFactory::class,
                     LogoutAction::class => LogoutActionFactory::class,
                     UserResolver::class => UserResolverFactory::class,
@@ -196,7 +177,7 @@ class AuthInstaller extends InstallerAbstract
                     ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe'
                 ],
             ],
-        ], $session);
+        ];
         return $config;
     }
 
@@ -260,6 +241,7 @@ class AuthInstaller extends InstallerAbstract
     public function getDependencyInstallers()
     {
         return [
+            SessionInstaller::class,
             MiddlewarePipeInstaller::class,
             ActionRenderInstaller::class,
             BasicRenderInstaller::class,
