@@ -64,7 +64,6 @@ class AuthInstaller extends InstallerAbstract
         if ($this->consoleIO->askConfirmation("You wont use API error handler ? ", false)) {
             $errorHandlerFactory[ACLApiErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER] = ACLApiErrorHandlerFactory::class;
         }
-
         $config = [
             'dependencies' => [
                 'invokables' => [
@@ -75,11 +74,11 @@ class AuthInstaller extends InstallerAbstract
                     LazyLoadAuthPrepareMiddlewareGetter::class => LazyLoadAuthPrepareMiddlewareGetter::class,
                     LazyLoadRegisterMiddlewareGetter::class => LazyLoadRegisterMiddlewareGetter::class
                 ],
-                'factories' => array_merge([
+                'factories' => [
                     IdentityAction::class => IdentityFactory::class,
                     LogoutAction::class => LogoutActionFactory::class,
                     UserResolver::class => UserResolverFactory::class,
-                ], $errorHandlerFactory),
+                ],
                 'abstract_factories' => [
                     AuthAdapterAbstractFactory::class,
                 ]
@@ -178,6 +177,7 @@ class AuthInstaller extends InstallerAbstract
                 ],
             ],
         ];
+        $config['dependencies']['factories'] = array_merge_recursive($config['dependencies']['factories'], $errorHandlerFactory);
         return $config;
     }
 

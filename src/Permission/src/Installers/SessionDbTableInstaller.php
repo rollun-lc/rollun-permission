@@ -140,7 +140,7 @@ class SessionDbTableInstaller extends InstallerAbstract
         if (!$this->container->has("db")) {
             return false;
         }
-        $config = $this->container->has("config");
+        $config = $this->container->get("config");
         $tableManager = $this->getTableManager();
         return (
             $tableManager->hasTable(SessionTable::TABLE_NAME) &&
