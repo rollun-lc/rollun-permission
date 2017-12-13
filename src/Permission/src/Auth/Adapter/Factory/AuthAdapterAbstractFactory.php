@@ -10,6 +10,8 @@ namespace rollun\permission\Auth\Adapter\Factory;
 
 use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
@@ -38,8 +40,11 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
      */
     public function canCreate(ContainerInterface $container, $requestedName)
     {
-        $config = $container->get('config');
-
+        try {
+            $config = $container->get('config');
+        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+            return false;
+        }
         return isset($config[static::KEY][$requestedName]) &&
             isset($config[static::KEY][$requestedName][static::KEY_CLASS]) &&
             is_a($config[static::KEY][$requestedName][static::KEY_CLASS], static::EXTENDED_CLASS, true);
@@ -52,10 +57,8 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
      * @param  string $requestedName
      * @param  null|array $options
      * @return object
-     * @throws ServiceNotFoundException if unable to resolve the service.
-     * @throws ServiceNotCreatedException if an exception is raised when
-     *     creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
