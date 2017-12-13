@@ -14,23 +14,28 @@ use Zend\Authentication\AuthenticationService;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Authentication\Result;
 use Zend\Authentication\Storage\Session as SessionStorage;
+use Zend\Session\Container;
 
 class Session extends AbstractWebAdapter implements IdentityAdapterInterface
 {
-    const DEFAULT_SESSION_NAMESPACE = 'Auth\Adapter\Session';
+    const DEFAULT_SESSION_SERVICE_NAME = 'WebSessionContainer';
 
     const DEFAULT_SESSION_MEMBER = 'identity';
 
-    const DEFAULT_SESSION_STORAGE_SERVICE = SessionStorage::class;
+    /** @var  Container */
+    protected $sessionContainer;
 
-    /** @var  SessionStorage */
-    protected $sessionStorage;
-
-    public function __construct(array $config, SessionStorage $sessionStorage = null)
+    /**
+     * Session constructor.
+     * @param array $config
+     * @param Container|null $sessionContainer
+     * @throws SessionContainerNotExistException
+     */
+    public function __construct(array $config, Container $sessionContainer = null)
     {
-        InsideConstruct::setConstructParams(['sessionStorage' => static::DEFAULT_SESSION_STORAGE_SERVICE]);
-        if (!isset($this->$sessionStorage)) {
-            $this->sessionStorage = new SessionStorage(static::DEFAULT_SESSION_NAMESPACE, static::DEFAULT_SESSION_MEMBER);
+        InsideConstruct::setConstructParams(['sessionContainer' => static::DEFAULT_SESSION_SERVICE_NAME]);
+        if (is_null($this->sessionContainer)) {
+            throw new SessionContainerNotExistException(static::DEFAULT_SESSION_SERVICE_NAME);
         }
         parent::__construct($config);
     }
@@ -40,7 +45,7 @@ class Session extends AbstractWebAdapter implements IdentityAdapterInterface
      */
     public function identify()
     {
-        if ($this->sessionStorage->isEmpty()) {
+        if (!$this->sessionContainer->offsetExists(static::DEFAULT_SESSION_MEMBER)) {
             return new Result(
                 Result::FAILURE_IDENTITY_NOT_FOUND,
                 null,
@@ -49,7 +54,7 @@ class Session extends AbstractWebAdapter implements IdentityAdapterInterface
         } else {
             return new Result(
                 Result::SUCCESS,
-                $this->sessionStorage->read(),
+                $this->sessionContainer->offsetGet(static::DEFAULT_SESSION_MEMBER),
                 ['SessionStorage is empty']
             );
         }
