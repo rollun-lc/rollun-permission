@@ -17,35 +17,38 @@ use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use rollun\permission\Auth\Adapter\Session as SessionAuthAdapter;
 use rollun\permission\Auth\AlreadyLogginException;
 use rollun\permission\Auth\CredentialInvalidException;
-use Zend\Authentication\Storage\Session as SessionStorage;
+use rollun\permission\Auth\RuntimeException;
+use Zend\Session\Container;
 
 
 class AuthenticationAction extends AbstractAuthentication
 {
-    const DEFAULT_SESSION_NAMESPACE = SessionAuthAdapter::DEFAULT_SESSION_NAMESPACE;
 
     const DEFAULT_SESSION_MEMBER = SessionAuthAdapter::DEFAULT_SESSION_MEMBER;
 
-    const DEFAULT_SESSION_STORAGE_SERVICE = SessionAuthAdapter::DEFAULT_SESSION_STORAGE_SERVICE;
+    const DEFAULT_SESSION_SERVICE_NAME = SessionAuthAdapter::DEFAULT_SESSION_SERVICE_NAME;
 
-    /** @var  SessionStorage */
-    protected $sessionStorage;
+    /** @var  Container */
+    protected $sessionContainer;
 
     /** @var  Logger */
     protected $logger;
 
-    public function __construct(AbstractWebAdapter $adapter, SessionStorage $sessionStorage = null)
+    /**
+     * AuthenticationAction constructor.
+     * @param AbstractWebAdapter $adapter
+     * @param Container|null $sessionStorage
+     * @throws RuntimeException
+     */
+    public function __construct(AbstractWebAdapter $adapter, Container $sessionStorage = null)
     {
         InsideConstruct::setConstructParams(
             [
-                'sessionStorage' => static::DEFAULT_SESSION_STORAGE_SERVICE,
+                'sessionStorage' => static::DEFAULT_SESSION_SERVICE_NAME,
                 'logger' => Logger::DEFAULT_LOGGER_SERVICE
             ]);
-        if (!isset($this->sessionStorage)) {
-            $this->sessionStorage = new SessionStorage(
-                static::DEFAULT_SESSION_NAMESPACE,
-                static::DEFAULT_SESSION_MEMBER
-            );
+        if (!isset($this->sessionContainer)) {
+            throw new RuntimeException("Session container not found!");
         }
         parent::__construct($adapter);
     }
@@ -61,7 +64,7 @@ class AuthenticationAction extends AbstractAuthentication
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        if ($this->sessionStorage->isEmpty()) {
+        if (!$this->sessionContainer->offsetExists(static::DEFAULT_SESSION_MEMBER)) {
 
             $this->adapter->setRequest($request);
             $this->adapter->setResponse($response);
@@ -69,12 +72,12 @@ class AuthenticationAction extends AbstractAuthentication
             $result = $this->adapter->authenticate();
             if ($result->isValid()) {
                 $identity = $result->getIdentity();
-                $this->sessionStorage->write($identity);
+                $this->sessionContainer->offsetSet(static::DEFAULT_SESSION_MEMBER, $identity);
                 $request = $request->withAttribute(static::KEY_IDENTITY, $identity)
                     ->withAttribute('responseData', ['status' => 'login']);
-                $this->logger->debug("credential valid. Loggined $identity user. [". microtime(true) ."]");
+                $this->logger->debug("credential valid. Loggined $identity user. [" . microtime(true) . "]");
             } else {
-                $this->logger->debug("credential error. [". microtime(true) ."]");
+                $this->logger->debug("credential error. [" . microtime(true) . "]");
                 $request = $request->withAttribute('responseData', ['status' => 'credential error.']);
                 //throw new CredentialInvalidException("Auth credential error.");
             }

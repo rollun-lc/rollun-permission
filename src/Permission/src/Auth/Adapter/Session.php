@@ -10,10 +10,7 @@ namespace rollun\permission\Auth\Adapter;
 
 use rollun\dic\InsideConstruct;
 use rollun\permission\Auth\Adapter\Interfaces\IdentityAdapterInterface;
-use Zend\Authentication\AuthenticationService;
-use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Authentication\Result;
-use Zend\Authentication\Storage\Session as SessionStorage;
 use Zend\Session\Container;
 
 class Session extends AbstractWebAdapter implements IdentityAdapterInterface
