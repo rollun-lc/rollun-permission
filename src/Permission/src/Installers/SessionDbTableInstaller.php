@@ -9,10 +9,14 @@
 namespace rollun\permission\Installers;
 
 use Exception;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
+use rollun\datastore\DataStore\DataStoreException;
 use rollun\datastore\DataStore\DbTable;
 use rollun\datastore\DataStore\Factory\DbTableAbstractFactory;
 use rollun\datastore\DataStore\Installers\DbTableInstaller;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
+use rollun\datastore\RestException;
 use rollun\datastore\TableGateway\DbSql\MultiInsertSql;
 use rollun\datastore\TableGateway\Factory\TableGatewayAbstractFactory;
 use rollun\datastore\TableGateway\TableManagerMysql;
@@ -74,7 +78,7 @@ class SessionDbTableInstaller extends InstallerAbstract
     {
         try {
             $dbAdapter = $this->container->get('db');
-        } catch (ServiceNotFoundException $exception) {
+        } catch (ServiceNotFoundException |NotFoundExceptionInterface | ContainerExceptionInterface $exception) {
             $dbAdapter = null;
         }
         return $dbAdapter;
