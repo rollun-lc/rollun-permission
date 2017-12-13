@@ -17,7 +17,7 @@ use Zend\ServiceManager\Factory\FactoryInterface;
 use Zend\Session\SaveHandler\DbTableGateway;
 use Zend\Session\SaveHandler\DbTableGatewayOptions;
 
-class DbTableSessionSaveHandlerFactory
+class DbTableSessionSaveHandlerFactory implements FactoryInterface
 {
     const DEFAULT_SESSION_TABLE_NAME = "session";
 
