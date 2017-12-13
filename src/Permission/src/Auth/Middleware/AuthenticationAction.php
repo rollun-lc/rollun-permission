@@ -23,7 +23,6 @@ use Zend\Session\Container;
 
 class AuthenticationAction extends AbstractAuthentication
 {
-
     const DEFAULT_SESSION_MEMBER = SessionAuthAdapter::DEFAULT_SESSION_MEMBER;
 
     const DEFAULT_SESSION_SERVICE_NAME = SessionAuthAdapter::DEFAULT_SESSION_SERVICE_NAME;
@@ -44,7 +43,7 @@ class AuthenticationAction extends AbstractAuthentication
     {
         InsideConstruct::setConstructParams(
             [
-                'sessionStorage' => static::DEFAULT_SESSION_SERVICE_NAME,
+                'sessionContainer' => static::DEFAULT_SESSION_SERVICE_NAME,
                 'logger' => Logger::DEFAULT_LOGGER_SERVICE
             ]);
         if (!isset($this->sessionContainer)) {
