@@ -48,9 +48,9 @@ class LogoutActionFactory implements FactoryInterface
         } else if ($container->has(AuthenticationService::class)) {
             $authService = $container->get(AuthenticationService::class);
         } else {
-            $sessionFactory = new SessionManagerFactory();
-            $sessionManager = $sessionFactory($container, SessionManager::class);
-            $authStorage = new SessionStorage(Session::DEFAULT_SESSION_NAMESPACE, Session::DEFAULT_SESSION_MEMBER, $sessionManager);
+            $sessionManager = $container->get(SessionManager::class);
+            $authStorage = new SessionStorage(Session::DEFAULT_SESSION_SERVICE_NAME, Session::DEFAULT_SESSION_MEMBER, $sessionManager);
+
             $authService = new AuthenticationService($authStorage);
         }
         return new LogoutAction($authService);

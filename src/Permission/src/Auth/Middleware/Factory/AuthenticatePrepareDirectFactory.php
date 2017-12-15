@@ -40,7 +40,7 @@ class AuthenticatePrepareDirectFactory implements FactoryInterface
         $resourceName = $requestedName;
         if (!$container->has($resourceName)) {
             throw new ServiceNotFoundException(
-                'Can\'t make Middleware\DataStoreRest for resource: ' . $resourceName
+                'Can\'t make Middleware\AbstractWebAdapter for resource: ' . $resourceName
             );
         }
         $authenticationMiddleware = null;

@@ -51,7 +51,7 @@ class ConfigProvider
     {
         return [
             'paths' => [
-                'app'    => [__DIR__ . '/../templates/app'],
+                'app'    => [__DIR__ . '/../templates/auth'],
             ],
         ];
     }
