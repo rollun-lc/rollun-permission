@@ -46,7 +46,7 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         if(isset($config['redirect_uri'])) {
             $this->webClient->setRedirectUri($config['redirect_uri']);
         }
-        $this->registrationEmail = $config['register_email'];
+        $this->registrationEmail = isset($config['register_email']) ? $config['register_email'] : "";
         parent::__construct($config);
     }
 
@@ -109,9 +109,16 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
 
     /**
      * @return Result
+     * @throws RuntimeException
      */
     public function prepare()
     {
+        if (empty($this->request) || empty($this->response)) {
+            throw new RuntimeException(
+                'Request and Response objects must be set before calling authenticate()'
+            );
+        }
+        $query = $this->request->getQueryParams();
         $state = isset($query[Web::KEY_STATE]) ? $query[Web::KEY_STATE] : sha1(openssl_random_pseudo_bytes(1024));
 
         $response = $this->webClient->getAuthCodeRedirect($state);
