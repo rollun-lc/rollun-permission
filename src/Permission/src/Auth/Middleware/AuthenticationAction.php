@@ -36,10 +36,10 @@ class AuthenticationAction extends AbstractAuthentication
     /**
      * AuthenticationAction constructor.
      * @param AbstractWebAdapter $adapter
-     * @param Container|null $sessionStorage
+     * @param Container|null $sessionContainer
      * @throws RuntimeException
      */
-    public function __construct(AbstractWebAdapter $adapter, Container $sessionStorage = null)
+    public function __construct(AbstractWebAdapter $adapter, Container $sessionContainer = null)
     {
         InsideConstruct::setConstructParams(
             [

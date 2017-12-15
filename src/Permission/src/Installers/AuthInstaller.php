@@ -84,10 +84,10 @@ class AuthInstaller extends InstallerAbstract
                 ]
             ],
             AuthAdapterAbstractFactory::KEY => [
-                'GoogleOpenRegisterID' => [
+                'GoogleRegisterOpenID' => [
                     AuthAdapterAbstractFactory::KEY_CLASS => GoogleOpenID::class,
                     AuthAdapterAbstractFactory::KEY_ADAPTER_CONFIG => [
-                        'redirect_uri' => 'http://\'.  constant("HOST") .\'/register/GoogleOpenRegisterID',
+                        'redirect_uri' => 'http://\'.  constant("HOST") .\'/register/GoogleRegisterOpenID',
                     ],
                 ],
                 'GoogleOpenID' => [
