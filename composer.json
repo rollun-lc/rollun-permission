@@ -30,7 +30,7 @@
     "rollun-com/rollun-actionrender": "^5.0",
     "zendframework/zend-http": "^2.5",
     "rollun-com/rollun-datastore": "^4.0",
-    "rollun-com/rollun-api": "^3.0",
+    "rollun-com/rollun-api": "^3.5",
     "rollun-com/rollun-utils": "^3.0",
     "google/apiclient": "^2.0",
     "zendframework/zend-crypt": "^3.2",
