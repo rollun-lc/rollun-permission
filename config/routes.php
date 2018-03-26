@@ -36,23 +36,6 @@ if ($container->has('home-service')) {
         'home-page'
     );
 }
-
-if ($container->has('api-datastore')) {
-    $app->route(
-        '/api/datastore[/{resourceName}[/{id}]]',
-        'api-datastore',
-        ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-        'api-datastore'
-    );
-}
-if ($container->has('webhookActionRender')) {
-    $app->route(
-        '/api/webhook[/{resourceName}]',
-        'webhookActionRender', ['GET', 'POST'],
-        'webhook'
-    );
-}
-
 if ($container->has('loginPageAR')) {
     $app->route(
         '/login',

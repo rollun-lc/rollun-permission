@@ -17,6 +17,8 @@ $aggregator = new ConfigAggregator([
     \Zend\Mail\ConfigProvider::class,
     \Zend\Session\ConfigProvider::class,
     \Zend\Validator\ConfigProvider::class,
+    \Zend\Expressive\ConfigProvider::class,
+    \Zend\Expressive\Router\ConfigProvider::class,
     \rollun\actionrender\ConfigProvider::class,
     \rollun\permission\ConfigProvider::class,
     \rollun\datastore\ConfigProvider::class,
