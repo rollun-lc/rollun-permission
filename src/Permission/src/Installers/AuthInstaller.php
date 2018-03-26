@@ -9,12 +9,15 @@
 namespace rollun\permission\Installers;
 
 use rollun\actionrender\Factory\ActionRenderAbstractFactory;
+use rollun\actionrender\Factory\LazyLoadMiddlewareAbstractFactory;
 use rollun\actionrender\Factory\LazyLoadPipeAbstractFactory;
 use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
 use rollun\actionrender\Installers\ActionRenderInstaller;
 use rollun\actionrender\Installers\BasicRenderInstaller;
 use rollun\actionrender\Installers\LazyLoadPipeInstaller;
 use rollun\actionrender\Installers\MiddlewarePipeInstaller;
+use rollun\actionrender\MiddlewareDeterminator\Factory\AbstractMiddlewareDeterminatorAbstractFactory;
+use rollun\actionrender\MiddlewareDeterminator\Factory\AttributeParamAbstractFactory;
 use rollun\actionrender\ReturnMiddleware;
 use rollun\api\Api\Google\Client\Installers\WebInstaller;
 use rollun\installer\Install\InstallerAbstract;
@@ -24,9 +27,12 @@ use rollun\permission\Auth\Adapter\BaseAuth;
 use rollun\permission\Auth\Adapter\Factory\AuthAdapterAbstractFactory;
 use rollun\permission\Auth\Adapter\GoogleOpenID;
 use rollun\permission\Auth\Adapter\Session;
-use rollun\permission\Auth\LazyLoadAuthMiddlewareGetter;
-use rollun\permission\Auth\LazyLoadAuthPrepareMiddlewareGetter;
-use rollun\permission\Auth\LazyLoadRegisterMiddlewareGetter;
+use rollun\permission\Auth\AuthMiddlewareDeterminator;
+use rollun\permission\Auth\AuthPrepareMiddlewareDeterminator;
+use rollun\permission\Auth\Middleware\Factory\ImplicitAuthenticateAbstractFactory;
+use rollun\permission\Auth\Middleware\Factory\ImplicitAuthenticatePrepareAbstractFactory;
+use rollun\permission\Auth\Middleware\Factory\ImplicitRegisterAbstractFactory;
+use rollun\permission\Auth\RegisterMiddlewareDeterminator;
 use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenApiGwErrorResponseGenerator;
 use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenErrorResponseGenerator;
 use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenErrorResponseGeneratorFactory;
@@ -70,9 +76,9 @@ class AuthInstaller extends InstallerAbstract
                     LoginAction::class => LoginAction::class,
                     ReturnMiddleware::class => ReturnMiddleware::class,
                     HelloUserAction::class => HelloUserAction::class,
-                    LazyLoadAuthMiddlewareGetter::class => LazyLoadAuthMiddlewareGetter::class,
-                    LazyLoadAuthPrepareMiddlewareGetter::class => LazyLoadAuthPrepareMiddlewareGetter::class,
-                    LazyLoadRegisterMiddlewareGetter::class => LazyLoadRegisterMiddlewareGetter::class
+                    AuthMiddlewareDeterminator::class => AuthMiddlewareDeterminator::class,
+                    AuthPrepareMiddlewareDeterminator::class => AuthPrepareMiddlewareDeterminator::class,
+                    RegisterMiddlewareDeterminator::class => RegisterMiddlewareDeterminator::class
                 ],
                 'factories' => [
                     IdentityAction::class => IdentityFactory::class,
@@ -81,6 +87,9 @@ class AuthInstaller extends InstallerAbstract
                 ],
                 'abstract_factories' => [
                     AuthAdapterAbstractFactory::class,
+                    ImplicitAuthenticatePrepareAbstractFactory::class,
+                    ImplicitAuthenticateAbstractFactory::class,
+                    ImplicitRegisterAbstractFactory::class,
                 ]
             ],
             AuthAdapterAbstractFactory::KEY => [
@@ -103,10 +112,31 @@ class AuthInstaller extends InstallerAbstract
                     AuthAdapterAbstractFactory::KEY_CLASS => Session::class
                 ]
             ],
-            LazyLoadPipeAbstractFactory::KEY => [
-                'registerLLPipe' => LazyLoadRegisterMiddlewareGetter::class,
-                'authenticateLLPipe' => LazyLoadAuthMiddlewareGetter::class,
-                'authenticatePrepareLLPipe' => LazyLoadAuthPrepareMiddlewareGetter::class
+
+            AbstractMiddlewareDeterminatorAbstractFactory::KEY => [
+                RegisterMiddlewareDeterminator::class => [
+                    AttributeParamAbstractFactory::KEY_CLASS => RegisterMiddlewareDeterminator::class,
+                    AttributeParamAbstractFactory::KEY_NAME => "resourceName"
+                ],
+                AuthPrepareMiddlewareDeterminator::class => [
+                    AttributeParamAbstractFactory::KEY_CLASS => AuthPrepareMiddlewareDeterminator::class,
+                    AttributeParamAbstractFactory::KEY_NAME => "resourceName"
+                ],
+                AuthMiddlewareDeterminator::class => [
+                    AttributeParamAbstractFactory::KEY_CLASS => AuthMiddlewareDeterminator::class,
+                    AttributeParamAbstractFactory::KEY_NAME => "resourceName"
+                ],
+            ],
+            LazyLoadMiddlewareAbstractFactory::KEY => [
+                'registerLLPipe' => [
+                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => RegisterMiddlewareDeterminator::class ,
+                ],
+                'authenticatePrepareLLPipe' => [
+                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => AuthPrepareMiddlewareDeterminator::class ,
+                ],
+                'authenticateLLPipe' => [
+                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => AuthMiddlewareDeterminator::class ,
+                ],
             ],
             IdentityFactory::KEY => [
                 IdentityFactory::KEY_ADAPTERS_SERVICE => [
