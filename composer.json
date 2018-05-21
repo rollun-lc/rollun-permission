@@ -16,7 +16,6 @@
   ],
   "require": {
     "php": "^7.0",
-    "zendframework/zend-expressive": "^2.0.2",
     "zendframework/zend-stdlib": "^3.1",
     "zendframework/zend-servicemanager": "^3.3",
     "zendframework/zend-http": "^2.5",
@@ -26,10 +25,11 @@
     "zendframework/zend-authentication": "^2.5",
     "zendframework/zend-mail": "^2.7",
     "rollun-com/rollun-datastore": "^5.0",
-    "rollun-com/rollun-api": "dev-refactor-features",
+    "rollun-com/rollun-api": "4.0",
     "http-interop/http-middleware": "0.4.1"
   },
   "require-dev": {
+    "zendframework/zend-expressive": "^2.0.2",
     "zendframework/zend-component-installer": "^1.0",
     "zendframework/zend-config-aggregator": "^1.0",
     "zendframework/zend-expressive-fastroute": "^2.0",
