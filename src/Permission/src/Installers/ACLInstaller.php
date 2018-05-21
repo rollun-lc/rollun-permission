@@ -10,8 +10,6 @@ namespace rollun\permission\Installers;
 
 use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
 use rollun\actionrender\Installers\MiddlewarePipeInstaller;
-use rollun\datastore\DataStore\Installers\CacheableInstaller;
-use rollun\installer\Command;
 use rollun\installer\Install\InstallerAbstract;
 use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
 use rollun\permission\Acl\Middleware\AclMiddleware;
@@ -21,9 +19,6 @@ use rollun\permission\Acl\Middleware\Factory\RoleResolverFactory;
 use rollun\permission\Acl\Middleware\PrivilegeResolver;
 use rollun\permission\Acl\Middleware\ResourceResolver;
 use rollun\permission\Acl\Middleware\RoleResolver;
-use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenErrorResponseGenerator;
-use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenErrorResponseGeneratorFactory;
-use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLErrorHandlerFactory;
 use Zend\Permissions\Acl\Acl;
 use Zend\Session\Service\SessionManagerFactory;
 use Zend\Session\SessionManager;

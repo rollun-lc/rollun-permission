@@ -26,7 +26,8 @@
     "zendframework/zend-mail": "^2.7",
     "rollun-com/rollun-datastore": "^5.0",
     "rollun-com/rollun-api": "4.0",
-    "http-interop/http-middleware": "0.4.1"
+    "http-interop/http-middleware": "0.4.1",
+    "zendframework/zend-session": "^2.8"
   },
   "require-dev": {
     "zendframework/zend-expressive": "^2.0.2",

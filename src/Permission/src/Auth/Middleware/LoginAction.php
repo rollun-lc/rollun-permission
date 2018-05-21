@@ -8,14 +8,10 @@
 
 namespace rollun\permission\Auth\Middleware;
 
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use rollun\permission\Auth\Adapter\LogOutInterface;
-use Zend\Authentication\AuthenticationService;
-use Zend\Authentication\AuthenticationServiceInterface;
-use Zend\Diactoros\Response\HtmlResponse;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Stratigility\MiddlewareInterface;
 
 class LoginAction implements MiddlewareInterface
 {
@@ -34,4 +30,19 @@ class LoginAction implements MiddlewareInterface
         return $response;
     }
 
+    /**
+     * Process an incoming server request and return a response, optionally delegating
+     * to the next middleware component to create the response.
+     *
+     * @param Request $request
+     * @param DelegateInterface $delegate
+     *
+     * @return Response
+     */
+    public function process(Request $request, DelegateInterface $delegate)
+    {
+        $request = $request->withAttribute('responseData', ['text' => 'Login page!']);
+        $response = $delegate->process($request);
+        return $response;
+    }
 }

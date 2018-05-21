@@ -8,12 +8,13 @@
 
 namespace rollun\permission\Acl\Middleware;
 
+use Interop\Http\ServerMiddleware\DelegateInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\UriInterface;
 use rollun\datastore\DataStore\DataStoreAbstract;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
-use Zend\Stratigility\MiddlewareInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 
 class ResourceResolver implements MiddlewareInterface
 {
@@ -29,16 +30,15 @@ class ResourceResolver implements MiddlewareInterface
     }
 
     /**
+     * Process an incoming server request and return a response, optionally delegating
+     * to the next middleware component to create the response.
      *
-     * {@inheritdoc}
-     *
-     * Add resource to request attribute.
      * @param Request $request
-     * @param Response $response
-     * @param null|callable $out
-     * @return null|Response
+     * @param DelegateInterface $delegate
+     *
+     * @return Response
      */
-    public function __invoke(Request $request, Response $response, callable $out = null)
+    public function process(Request $request, DelegateInterface $delegate)
     {
         $resource = 'none';
         $urlWithPath = rtrim($request->getUri() . '?' . $request->getUri()->getQuery(), '?');
@@ -50,10 +50,7 @@ class ResourceResolver implements MiddlewareInterface
         }
         $request = $request->withAttribute(static::KEY_ATTRIBUTE_RESOURCE, $resource);
 
-        if (isset($out)) {
-            return $out($request, $response);
-        }
-
+        $response = $delegate->process($request);
         return $response;
     }
 }

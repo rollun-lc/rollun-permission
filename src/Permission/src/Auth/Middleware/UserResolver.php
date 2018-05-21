@@ -8,6 +8,8 @@
 
 namespace rollun\permission\Auth\Middleware;
 
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\datastore\DataStore\DataStoreAbstract;
@@ -15,7 +17,6 @@ use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\datastore\Rql\RqlQuery;
 use rollun\permission\DataStore\AclRolesTable;
 use rollun\permission\DataStore\AclUserRolesTable;
-use Zend\Stratigility\MiddlewareInterface;
 
 class UserResolver implements MiddlewareInterface
 {
@@ -57,10 +58,7 @@ class UserResolver implements MiddlewareInterface
      */
     public function __invoke(Request $request, Response $response, callable $out = null)
     {
-        $identity = $request->getAttribute(IdentityAction::KEY_ATTRIBUTE_IDENTITY);
-        $user = $this->getUser($identity);
 
-        $request = $request->withAttribute(static::KEY_ATTRIBUTE_USER, $user);
 
         if (isset($out)) {
             return $out($request,$response);
@@ -72,7 +70,7 @@ class UserResolver implements MiddlewareInterface
     /**
      * return user array (with roles)
      * @param string $userId
-     * @return LazyAuthenticationAction
+     * @return array
      */
     protected function getUser($userId)
     {
@@ -99,5 +97,24 @@ class UserResolver implements MiddlewareInterface
             }
         }
         return $roles;
+    }
+
+    /**
+     * Process an incoming server request and return a response, optionally delegating
+     * to the next middleware component to create the response.
+     *
+     * @param Request $request
+     * @param DelegateInterface $delegate
+     *
+     * @return Response
+     */
+    public function process(Request $request, DelegateInterface $delegate)
+    {
+        $identity = $request->getAttribute(IdentityAction::KEY_ATTRIBUTE_IDENTITY);
+        $user = $this->getUser($identity);
+
+        $request = $request->withAttribute(static::KEY_ATTRIBUTE_USER, $user);
+        $response = $delegate->process($request);
+        return $response;
     }
 }

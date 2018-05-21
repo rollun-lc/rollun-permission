@@ -9,9 +9,8 @@
 namespace rollun\permission\Auth\Adapter;
 
 
-use rollun\logger\Exception\LoggedException;
 
-class SessionContainerNotExistException extends LoggedException
+class SessionContainerNotExistException extends \RuntimeException
 {
 
 }

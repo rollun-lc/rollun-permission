@@ -10,11 +10,10 @@ namespace rollun\permission\Installers;
 
 use rollun\actionrender\Factory\ActionRenderAbstractFactory;
 use rollun\actionrender\Factory\LazyLoadMiddlewareAbstractFactory;
-use rollun\actionrender\Factory\LazyLoadPipeAbstractFactory;
 use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
 use rollun\actionrender\Installers\ActionRenderInstaller;
 use rollun\actionrender\Installers\BasicRenderInstaller;
-use rollun\actionrender\Installers\LazyLoadPipeInstaller;
+use rollun\actionrender\Installers\LazyLoadMiddlewareInstaller;
 use rollun\actionrender\Installers\MiddlewarePipeInstaller;
 use rollun\actionrender\MiddlewareDeterminator\Factory\AbstractMiddlewareDeterminatorAbstractFactory;
 use rollun\actionrender\MiddlewareDeterminator\Factory\AttributeParamAbstractFactory;
@@ -253,8 +252,6 @@ class AuthInstaller extends InstallerAbstract
             isset($config[AuthAdapterAbstractFactory::KEY]['GoogleOpenID']) &&
             isset($config[AuthAdapterAbstractFactory::KEY]['BaseAuthIdentity']) &&
             isset($config[AuthAdapterAbstractFactory::KEY]['SessionIdentity']) &&
-            isset($config[LazyLoadPipeAbstractFactory::KEY]['authenticateLLPipe']) &&
-            isset($config[LazyLoadPipeAbstractFactory::KEY]['authenticatePrepareLLPipe']) &&
             isset($config[IdentityFactory::KEY]) &&
             isset($config[UserResolverFactory::KEY]) &&
             isset($config[MiddlewarePipeAbstractFactory::KEY]['loginServicePipe']) &&
@@ -275,7 +272,7 @@ class AuthInstaller extends InstallerAbstract
             MiddlewarePipeInstaller::class,
             ActionRenderInstaller::class,
             BasicRenderInstaller::class,
-            LazyLoadPipeInstaller::class,
+            LazyLoadMiddlewareInstaller::class,
             WebInstaller::class,
         ];
     }

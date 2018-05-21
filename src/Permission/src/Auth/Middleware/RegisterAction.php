@@ -8,15 +8,16 @@
 
 namespace rollun\permission\Auth\Middleware;
 
+use Interop\Http\ServerMiddleware\DelegateInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Log\LoggerInterface;
 use rollun\dic\InsideConstruct;
-use rollun\logger\Logger;
 use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use rollun\permission\Auth\Adapter\Session as SessionAuthAdapter;
 use rollun\permission\Auth\AlreadyLogginException;
 use rollun\permission\Auth\CredentialInvalidException;
+use Zend\Diactoros\Response\EmptyResponse;
 use Zend\Session\Container;
 
 class RegisterAction extends AbstractAuthentication
@@ -25,15 +26,21 @@ class RegisterAction extends AbstractAuthentication
     /** @var  Container */
     protected $sessionContainer;
 
-    /** @var  Logger */
+    /** @var  LoggerInterface */
     protected $logger;
 
+    /**
+     * RegisterAction constructor.
+     * @param AbstractWebAdapter $adapter
+     * @param Container|null $sessionContainer
+     * @throws \ReflectionException
+     */
     public function __construct(AbstractWebAdapter $adapter, Container $sessionContainer = null)
     {
         InsideConstruct::setConstructParams(
             [
                 'sessionStorage' => SessionAuthAdapter::DEFAULT_SESSION_SERVICE_NAME,
-                'logger' => Logger::DEFAULT_LOGGER_SERVICE
+                'logger' => LoggerInterface::class,
             ]);
         if (!isset($this->sessionContainer)) {
             $this->sessionContainer = new Container(SessionAuthAdapter::DEFAULT_SESSION_SERVICE_NAME);
@@ -42,18 +49,19 @@ class RegisterAction extends AbstractAuthentication
     }
 
     /**
-     * Authentication user
+     * Process an incoming server request and return a response, optionally delegating
+     * to the next middleware component to create the response.
+     *
      * @param Request $request
-     * @param Response $response
-     * @param null|callable $out
-     * @return null|Response
-     * @throws AlreadyLogginException
-     * @throws CredentialInvalidException
+     * @param DelegateInterface $delegate
+     *
+     * @return Response
      */
-    public function __invoke(Request $request, Response $response, callable $out = null)
+    public function process(Request $request, DelegateInterface $delegate)
     {
         if (!$this->sessionContainer->offsetExists(SessionAuthAdapter::DEFAULT_SESSION_MEMBER)) {
             $this->adapter->setRequest($request);
+            $response = new EmptyResponse();
             $this->adapter->setResponse($response);
             $result = $this->adapter->register();
             if ($result->isValid()) {
@@ -72,9 +80,7 @@ class RegisterAction extends AbstractAuthentication
             $request = $request->withAttribute('responseData', ['status' => 'You already login.']);
             $this->logger->debug("User already register. [". microtime(true) ."]");
         }
-        if (isset($out)) {
-            return $out($request, $response);
-        }
+        $response = $delegate->process($request);
         return $response;
     }
 }

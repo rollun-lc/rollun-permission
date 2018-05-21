@@ -8,50 +8,52 @@
 
 namespace rollun\permission\Auth\Middleware;
 
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use rollun\logger\Logger;
-use rollun\permission\Auth\Adapter\LogOutInterface;
-use Zend\Authentication\AuthenticationService;
+use Psr\Log\LoggerInterface;
+use rollun\dic\InsideConstruct;
 use Zend\Authentication\AuthenticationServiceInterface;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
-use Zend\Stratigility\MiddlewareInterface;
 
 class LogoutAction implements MiddlewareInterface
 {
     /** @var AuthenticationServiceInterface */
     protected $authenticationService;
 
-    /** @var  Logger */
+    /** @var  LoggerInterface */
     protected $logger;
 
     /**
      * LogoutAction constructor.
      * @param AuthenticationServiceInterface $authenticationService
+     * @throws \ReflectionException
      */
     public function __construct(AuthenticationServiceInterface $authenticationService)
     {
-        $this->logger = new Logger();
         $this->authenticationService = $authenticationService;
+        InsideConstruct::setConstructParams(["logger" => LoggerInterface::class]);
     }
 
     /**
+     * Process an incoming server request and return a response, optionally delegating
+     * to the next middleware component to create the response.
+     *
      * @param Request $request
-     * @param Response $response
-     * @param null|callable $out
-     * @return null|Response
+     * @param DelegateInterface $delegate
+     *
+     * @return Response
      */
-    public function __invoke(Request $request, Response $response, callable $out = null)
+    public function process(Request $request, DelegateInterface $delegate)
     {
         if ($this->authenticationService->hasIdentity()) {
             $this->authenticationService->clearIdentity();
         }
         $this->logger->debug("In LogoutAction[" . microtime(true) . "]");
         $request = $request->withAttribute('responseData', ['status' => 'Logout complete!']);
-        if (isset($out)) {
-            return ($out($request, $response));
-        }
+        $response = $delegate->process($request);
         return $response;
     }
 }

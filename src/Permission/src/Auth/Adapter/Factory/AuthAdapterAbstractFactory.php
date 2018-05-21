@@ -42,7 +42,9 @@ class AuthAdapterAbstractFactory implements AbstractFactoryInterface
     {
         try {
             $config = $container->get('config');
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface $e) {
+        } catch (NotFoundExceptionInterface $e) {
+            return false;
+        } catch (ContainerExceptionInterface $e) {
             return false;
         }
         return isset($config[static::KEY][$requestedName]) &&

@@ -8,13 +8,15 @@
 
 namespace rollun\permission\Auth\Middleware;
 
+use Interop\Http\ServerMiddleware\DelegateInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticateAdapterInterface;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticatePrepareAdapterInterface;
 use rollun\permission\Auth\Adapter\Interfaces\IdentityAdapterInterface;
-use Zend\Stratigility\MiddlewareInterface;
+use Zend\Diactoros\Response\EmptyResponse;
 
 class IdentityAction implements MiddlewareInterface
 {
@@ -31,17 +33,21 @@ class IdentityAction implements MiddlewareInterface
     }
 
     /**
+     * Process an incoming server request and return a response, optionally delegating
+     * to the next middleware component to create the response.
+     *
      * @param Request $request
-     * @param Response $response
-     * @param null|callable $out
-     * @return null|Response
+     * @param DelegateInterface $delegate
+     *
+     * @return Response
      */
-    public function __invoke(Request $request, Response $response, callable $out = null)
+    public function process(Request $request, DelegateInterface $delegate)
     {
         /** @var  $adapter AbstractWebAdapter|IdentityAdapterInterface */
         foreach ($this->adapters as $adapter){
             $adapter->setRequest($request);
-            $adapter->setResponse($response);
+            $emptyResponse = new EmptyResponse();
+            $adapter->setResponse($emptyResponse);
             $result = $adapter->identify();
             if($result->isValid()) {
                 $identity = $result->getIdentity();
@@ -50,9 +56,7 @@ class IdentityAction implements MiddlewareInterface
         }
         $identity = isset($identity) ? $identity : static::DEFAULT_IDENTITY;
         $request = $request->withAttribute(static::KEY_ATTRIBUTE_IDENTITY, $identity);
-        if (isset($out)) {
-            return $out($request, $response);
-        }
+        $response = $delegate->process($request);
         return $response;
     }
 }

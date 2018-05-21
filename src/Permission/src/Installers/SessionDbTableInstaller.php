@@ -10,27 +10,16 @@ namespace rollun\permission\Installers;
 
 use Exception;
 use Psr\Container\ContainerExceptionInterface;
-use Psr\Container\NotFoundExceptionInterface;
-use rollun\datastore\DataStore\DataStoreException;
 use rollun\datastore\DataStore\DbTable;
 use rollun\datastore\DataStore\Factory\DbTableAbstractFactory;
 use rollun\datastore\DataStore\Installers\DbTableInstaller;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
-use rollun\datastore\RestException;
 use rollun\datastore\TableGateway\DbSql\MultiInsertSql;
 use rollun\datastore\TableGateway\Factory\TableGatewayAbstractFactory;
 use rollun\datastore\TableGateway\TableManagerMysql;
 use rollun\installer\Install\InstallerAbstract;
-use rollun\permission\DataStore\AclPrivilegeTable;
-use rollun\permission\DataStore\AclResourceTable;
-use rollun\permission\DataStore\AclRolesTable;
-use rollun\permission\DataStore\AclRulesTable;
-use rollun\permission\DataStore\AclUserRolesTable;
-use rollun\permission\DataStore\AclUsersTable;
-use rollun\permission\DataStore\DataProvider\AclDefaultDataProvider;
 use rollun\permission\DataStore\SessionTable;
 use Zend\Db\TableGateway\TableGateway;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
 
 class SessionDbTableInstaller extends InstallerAbstract
 {
@@ -78,7 +67,7 @@ class SessionDbTableInstaller extends InstallerAbstract
     {
         try {
             $dbAdapter = $this->container->get('db');
-        } catch (ServiceNotFoundException |NotFoundExceptionInterface | ContainerExceptionInterface $exception) {
+        } catch (ContainerExceptionInterface $exception) {
             $dbAdapter = null;
         }
         return $dbAdapter;

@@ -8,33 +8,31 @@
 
 namespace rollun\permission\Acl\Middleware;
 
+use Interop\Http\ServerMiddleware\DelegateInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Zend\Stratigility\MiddlewareInterface;
+use Interop\Http\ServerMiddleware\MiddlewareInterface;
 
 class PrivilegeResolver implements MiddlewareInterface
 {
 
     const KEY_ATTRIBUTE_PRIVILEGE = 'privilege';
+
     /**
-     * {@inheritdoc}F
-     *
-     * add privilege to request attribute
+     * Process an incoming server request and return a response, optionally delegating
+     * to the next middleware component to create the response.
      *
      * @param Request $request
-     * @param Response $response
-     * @param null|callable $out
-     * @return null|Response
+     * @param DelegateInterface $delegate
+     *
+     * @return Response
      */
-    public function __invoke(Request $request, Response $response, callable $out = null)
+    public function process(Request $request, DelegateInterface $delegate)
     {
         $privilege = $request->getMethod();
         $request = $request->withAttribute(static::KEY_ATTRIBUTE_PRIVILEGE, $privilege);
 
-        if (isset($out)) {
-            return $out($request, $response);
-        }
-
+        $response = $delegate->process($request);
         return $response;
     }
 }

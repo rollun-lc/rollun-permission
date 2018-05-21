@@ -8,42 +8,13 @@
 
 namespace rollun\permission\Installers;
 
-use rollun\actionrender\Factory\ActionRenderAbstractFactory;
-use rollun\actionrender\Factory\LazyLoadPipeAbstractFactory;
-use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
 use rollun\actionrender\Installers\ActionRenderInstaller;
 use rollun\actionrender\Installers\BasicRenderInstaller;
-use rollun\actionrender\Installers\LazyLoadPipeInstaller;
 use rollun\actionrender\Installers\MiddlewarePipeInstaller;
-use rollun\actionrender\ReturnMiddleware;
 use rollun\api\Api\Google\Client\Installers\WebInstaller;
 use rollun\installer\Install\InstallerAbstract;
-use rollun\permission\Acl\Factory\AclFromDataStoreFactory;
-use rollun\permission\Api\Example\HelloUserAction;
-use rollun\permission\Auth\Adapter\BaseAuth;
-use rollun\permission\Auth\Adapter\Factory\AuthAdapterAbstractFactory;
-use rollun\permission\Auth\Adapter\GoogleOpenID;
-use rollun\permission\Auth\Adapter\Session;
-use rollun\permission\Auth\AuthMiddlewareDeterminator;
-use rollun\permission\Auth\AuthPrepareMiddlewareDeterminator;
-use rollun\permission\Auth\RegisterMiddlewareDeterminator;
-use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenApiGwErrorResponseGenerator;
-use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenErrorResponseGenerator;
-use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenErrorResponseGeneratorFactory;
-use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLApiErrorHandlerFactory;
-use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLErrorHandlerFactory;
-use rollun\permission\Auth\Middleware\Factory\IdentityFactory;
-use rollun\permission\Auth\Middleware\Factory\LogoutActionFactory;
-use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
-use rollun\permission\Auth\Middleware\IdentityAction;
-use rollun\permission\Auth\Middleware\LoginAction;
-use rollun\permission\Auth\Middleware\LogoutAction;
-use rollun\permission\Auth\Middleware\UserResolver;
 use rollun\permission\Auth\SaveHandler\Factory\DbTableSessionSaveHandlerFactory;
-use Zend\ServiceManager\Factory\InvokableFactory;
 use Zend\Session\SaveHandler\SaveHandlerInterface;
-use Zend\Session\Service\SessionManagerFactory;
-use Zend\Session\SessionManager;
 use Zend\Session\Storage\SessionArrayStorage;
 
 class SessionInstaller extends InstallerAbstract
