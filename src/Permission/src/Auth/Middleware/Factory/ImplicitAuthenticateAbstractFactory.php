@@ -16,9 +16,10 @@ use rollun\permission\Auth\Middleware\AuthenticationAction;
 use rollun\permission\Auth\RuntimeException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AuthenticateDirectFactory implements FactoryInterface
+class ImplicitAuthenticateAbstractFactory extends AbstractImplicitAbstractFactory
 {
 
     /**
@@ -28,19 +29,13 @@ class AuthenticateDirectFactory implements FactoryInterface
      * @param  string $requestedName
      * @param  null|array $options
      * @return object
-     * @throws ServiceNotFoundException if unable to resolve the service.
-     * @throws ServiceNotCreatedException if an exception is raised when
-     *     creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws RuntimeException
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $resourceName = $requestedName;
-        if (!$container->has($resourceName)) {
-            throw new ServiceNotFoundException(
-                'Can\'t make Middleware\DataStoreRest for resource: ' . $resourceName
-            );
-        }
+        $resourceName = $this->getResourceName($requestedName);
         $authenticationMiddleware = null;
         $resourceObject = $container->get($resourceName);
         switch (true) {
@@ -60,5 +55,14 @@ class AuthenticateDirectFactory implements FactoryInterface
                 }
         }
         return $authenticationMiddleware;
+    }
+
+    /**
+     * Return service postfix
+     * @return string
+     */
+    static public function getImplicitPostfix()
+    {
+        return "AuthenticateMiddleware";
     }
 }

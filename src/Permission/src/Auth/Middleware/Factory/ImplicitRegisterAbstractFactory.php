@@ -12,15 +12,15 @@ use Interop\Container\ContainerInterface;
 use Interop\Container\Exception\ContainerException;
 use rollun\permission\Auth\Adapter\AbstractWebAdapter;
 use rollun\permission\Auth\Adapter\Interfaces\AuthenticateAdapterInterface;
-use rollun\permission\Auth\Adapter\Interfaces\AuthenticatePrepareAdapterInterface;
 use rollun\permission\Auth\Middleware\AuthenticationAction;
-use rollun\permission\Auth\Middleware\AuthenticationPrepareAction;
+use rollun\permission\Auth\Middleware\RegisterAction;
 use rollun\permission\Auth\RuntimeException;
 use Zend\ServiceManager\Exception\ServiceNotCreatedException;
 use Zend\ServiceManager\Exception\ServiceNotFoundException;
+use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
-class AuthenticatePrepareDirectFactory implements FactoryInterface
+class ImplicitRegisterAbstractFactory extends AbstractImplicitAbstractFactory
 {
 
     /**
@@ -30,37 +30,39 @@ class AuthenticatePrepareDirectFactory implements FactoryInterface
      * @param  string $requestedName
      * @param  null|array $options
      * @return object
-     * @throws ServiceNotFoundException if unable to resolve the service.
-     * @throws ServiceNotCreatedException if an exception is raised when
-     *     creating a service.
-     * @throws ContainerException if any other error occurs
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
-        $resourceName = $requestedName;
-        if (!$container->has($resourceName)) {
-            throw new ServiceNotFoundException(
-                'Can\'t make Middleware\AbstractWebAdapter for resource: ' . $resourceName
-            );
-        }
+        $resourceName = $this->getResourceName($requestedName);
         $authenticationMiddleware = null;
         $resourceObject = $container->get($resourceName);
         switch (true) {
             case is_a($resourceObject, AbstractWebAdapter::class, true) &&
-                is_a($resourceObject, AuthenticatePrepareAdapterInterface::class, true):
-                $authenticationMiddleware = new AuthenticationPrepareAction($resourceObject);
+                is_a($resourceObject, AuthenticateAdapterInterface::class, true):
+                $authenticationMiddleware = new RegisterAction($resourceObject);
                 break;
-            case is_a($resourceObject, AuthenticationPrepareAction::class):
+            case is_a($resourceObject, RegisterAction::class):
                 $authenticationMiddleware = $resourceObject;
                 break ;
             default:
                 if (!isset($authenticationMiddleware)) {
                     throw new ServiceNotCreatedException(
-                        'Can\'t make ' . AuthenticationPrepareAction::class
+                        'Can\'t make ' . RegisterAction::class
                         . ' for resource: ' . $resourceName
                     );
                 }
         }
         return $authenticationMiddleware;
+    }
+
+    /**
+     * Return service postfix
+     * @return string
+     */
+    static public function getImplicitPostfix()
+    {
+        return "RegisterMiddleware";
     }
 }
