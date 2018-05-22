@@ -12,6 +12,7 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use rollun\actionrender\Renderer\Html\HtmlParamResolver;
 use rollun\permission\Auth\Middleware\UserResolver;
 use Zend\Diactoros\Response\HtmlResponse;
 use Zend\Diactoros\Response\JsonResponse;
@@ -40,6 +41,7 @@ class HelloUserAction implements MiddlewareInterface
             throw new \Exception("Exception by string: ".  $data['str']);
         }
         $request = $request->withAttribute('responseData', $data);
+        $request = $request->withAttribute(HtmlParamResolver::KEY_ATTRIBUTE_TEMPLATE_NAME, "app::user-page");
         $response = $delegate->process($request);
         return $response;
     }
