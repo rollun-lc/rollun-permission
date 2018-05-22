@@ -41,7 +41,6 @@ class HelloUserAction implements MiddlewareInterface
             throw new \Exception("Exception by string: ".  $data['str']);
         }
         $request = $request->withAttribute('responseData', $data);
-        $request = $request->withAttribute(HtmlParamResolver::KEY_ATTRIBUTE_TEMPLATE_NAME, "app::user-page");
         $response = $delegate->process($request);
         return $response;
     }
