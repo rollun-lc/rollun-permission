@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 02.02.17
- * Time: 17:05
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Acl\Middleware;
@@ -11,22 +9,28 @@ namespace rollun\permission\Acl\Middleware;
 use Interop\Http\ServerMiddleware\DelegateInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
-use Psr\Http\Message\UriInterface;
-use rollun\datastore\DataStore\DataStoreAbstract;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
+use rollun\permission\Acl\ResourceProducer\ResourceProducerInterface;
 
 class ResourceResolver implements MiddlewareInterface
 {
-
     const KEY_ATTRIBUTE_RESOURCE = 'resource';
 
-    /** @var  DataStoreAbstract */
+    /**
+     * @var DataStoresInterface
+     */
     protected $resourceDataStore;
 
-    public function __construct(DataStoresInterface $resourceDataStore)
+    /**
+     * @var ResourceProducerInterface[]
+     */
+    protected $resourceProducers;
+
+    public function __construct(DataStoresInterface $resourceDataStore, array $resourceProducers)
     {
         $this->resourceDataStore = $resourceDataStore;
+        $this->resourceProducers = $resourceProducers;
     }
 
     /**
@@ -41,16 +45,19 @@ class ResourceResolver implements MiddlewareInterface
     public function process(Request $request, DelegateInterface $delegate)
     {
         $resource = 'none';
-        $urlWithPath = rtrim($request->getUri() . '?' . $request->getUri()->getQuery(), '?');
-        foreach($this->resourceDataStore as $item) {
-            if(preg_match($item['pattern'], $urlWithPath)) {
-                $resource = $item['name'];
-                break;
+
+        foreach ($this->resourceDataStore as $item) {
+            foreach ($this->resourceProducers as $resourceProducer) {
+                if ($resourceProducer->canProduce($request) && $resourceProducer->produce($request) === $item['name']) {
+                    $resource = $item['name'];
+                    break;
+                }
             }
         }
-        $request = $request->withAttribute(static::KEY_ATTRIBUTE_RESOURCE, $resource);
 
+        $request = $request->withAttribute(static::KEY_ATTRIBUTE_RESOURCE, $resource);
         $response = $delegate->process($request);
+
         return $response;
     }
 }

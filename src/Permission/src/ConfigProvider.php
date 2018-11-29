@@ -52,6 +52,7 @@ class ConfigProvider
         return [
             'paths' => [
                 'app'    => [__DIR__ . '/../templates/auth'],
+                'layout' => [__DIR__ . '/../templates/layout'],
             ],
         ];
     }

@@ -1,27 +1,36 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 30.01.17
- * Time: 17:21
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Acl\Factory;
 
 use Interop\Container\ContainerInterface;
-use Interop\Container\Exception\ContainerException;
-use rollun\datastore\DataStore\DataStoreAbstract;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
-use rollun\datastore\Rql\RqlQuery;
 use Zend\Permissions\Acl\Acl;
-use Zend\Permissions\Acl\Role\GenericRole;
-use Zend\ServiceManager\Exception\ServiceNotCreatedException;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
+/**
+ * Create instance of Acl using 'config' service as array in ContainerInterface
+ *
+ * Config example:
+ * <code>
+ *  [
+ *      'acl' => [
+ *          AclFromDataStoreFactory::KEY_DS_RULE_SERVICE => 'ruleDataStoreService',
+ *          AclFromDataStoreFactory::KEY_DS_ROLE_SERVICE => 'roleDataStoreService',
+ *          AclFromDataStoreFactory::KEY_DS_RESOURCE_SERVICE => 'resourceDataStoreService',
+ *          AclFromDataStoreFactory::KEY_DS_PRIVILEGE_SERVICE => 'privilegeDataStoreService',
+ *      ],
+ *  ]
+ * </code>
+ *
+ * Class AclFromDataStoreFactory
+ * @package rollun\permission\Acl\Factory
+ */
 class AclFromDataStoreFactory implements FactoryInterface
 {
-
     const KEY_ACL = 'acl';
 
     const KEY_DS_RULE_SERVICE = 'dataStoreRuleService';
@@ -49,54 +58,26 @@ class AclFromDataStoreFactory implements FactoryInterface
     const DEFAULT_PRIVILEGE_DS = 'privilegeDS';
 
     /**
-     * Create an object
-     * 'acl' => [
-     *      AclFromDataStoreFactory::KEY_DS_RULE_SERVICE => AclFromDataStoreFactory::DEFAULT_RULES_DS,
-     *      AclFromDataStoreFactory::KEY_DS_ROLE_SERVICE => AclFromDataStoreFactory::DEFAULT_ROLES_DS,
-     *      AclFromDataStoreFactory::KEY_DS_RESOURCE_SERVICE => AclFromDataStoreFactory::DEFAULT_RESOURCE_DS,
-     *      AclFromDataStoreFactory::KEY_DS_PRIVILEGE_SERVICE => AclFromDataStoreFactory::DEFAULT_PRIVILEGE_DS,
-     *  ],
-     *
-     * @param  ContainerInterface $container
-     * @param  string $requestedName
-     * @param  null|array $options
-     * @return object
-     * @throws ServiceNotFoundException if unable to resolve the service.
-     * @throws ServiceNotCreatedException if an exception is raised when
-     *     creating a service.
-     * @throws ContainerException if any other error occurs
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array|null $options
+     * @return object|Acl
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $config = $container->get('config');
-        $rulesDS = isset($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]) ?
-            $config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE] : static::DEFAULT_RULES_DS;
-        $rolesDS = isset($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]) ?
-            $config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE] : static::DEFAULT_ROLES_DS;
-        $resourceDS = isset($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]) ?
-            $config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE] : static::DEFAULT_RESOURCE_DS;
-        $privilegeDS = isset($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE]) ?
-            $config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE] : static::DEFAULT_PRIVILEGE_DS;
 
-        if (!$container->has($rulesDS) ||
-            !$container->has($rolesDS) ||
-            !$container->has($resourceDS) ||
-            !$container->has($privilegeDS)
-        ) {
-            throw new ServiceNotCreatedException('Not found dataStore service');
-        }
+        $rulesDS = isset($config[static::KEY_ACL][static::KEY_DS_RULE_SERVICE]) ?? static::DEFAULT_RULES_DS;
+        $rolesDS = isset($config[static::KEY_ACL][static::KEY_DS_ROLE_SERVICE]) ?? static::DEFAULT_ROLES_DS;
+        $resourceDS = isset($config[static::KEY_ACL][static::KEY_DS_PRIVILEGE_SERVICE]) ?? static::DEFAULT_RESOURCE_DS;
+        $privilegeDS = isset($config[static::KEY_ACL][static::KEY_DS_RESOURCE_SERVICE]) ?? static::DEFAULT_PRIVILEGE_DS;
 
-        /** @var DataStoreAbstract $dataStoreRule */
         $dataStoreRule = $container->get($rulesDS);
-        /** @var DataStoreAbstract $dataStoreRole */
         $dataStoreRole = $container->get($rolesDS);
-        /** @var DataStoreAbstract $dataStorePrivilege */
         $dataStorePrivilege = $container->get($resourceDS);
-        /** @var DataStoreAbstract $dataStoreResource */
         $dataStoreResource = $container->get($privilegeDS);
 
         $acl = new Acl();
-
         $this->aclAdd($dataStoreRole, $acl, "Role");
         $this->aclAdd($dataStoreResource, $acl, "Resource");
 
@@ -104,6 +85,7 @@ class AclFromDataStoreFactory implements FactoryInterface
             $role = $dataStoreRole->read($item['role_id']);
             $resource = $dataStoreResource->read($item['resource_id']);
             $privilege = $dataStorePrivilege->read($item['privilege_id']);
+
             if ($item['allow_flag']) {
                 $acl->allow($role['name'], $resource['name'], $privilege['name']);
             } else {
@@ -122,11 +104,10 @@ class AclFromDataStoreFactory implements FactoryInterface
     private function aclAdd(DataStoresInterface $dataStore, Acl $acl, $addType)
     {
         $iterator = $dataStore->getIterator();
-        foreach ($iterator as $role) {
-            //todo: Check if exist role and resources.
-            $parent = isset($role['parent_id']) ? $dataStore->read($role['parent_id'])['name'] : null;
-            $acl->{"add" . $addType}($role['name'], $parent);
+
+        foreach ($iterator as $record) {
+            $parent = isset($record['parent_id']) ? $dataStore->read($record['parent_id'])['name'] : null;
+            $acl->{"add" . $addType}($record['name'], $parent);
         }
     }
-
 }

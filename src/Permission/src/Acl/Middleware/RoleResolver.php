@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 27.01.17
- * Time: 14:54
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Acl\Middleware;
@@ -13,7 +11,6 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\permission\Auth\Middleware\UserResolver;
-use Zend\Authentication\AuthenticationServiceInterface;
 
 class RoleResolver implements MiddlewareInterface
 {
@@ -37,6 +34,7 @@ class RoleResolver implements MiddlewareInterface
         $request = $request->withAttribute(static::KEY_ATTRIBUTE_ROLE, $roles);
 
         $response = $delegate->process($request);
+
         return $response;
     }
 }

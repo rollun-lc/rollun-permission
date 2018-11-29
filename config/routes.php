@@ -41,7 +41,7 @@ if ($container->has('loginPageAR')) {
         '/login',
         'loginPageAR',
         ['GET', 'POST'],
-        'login-page'
+        'app-login-page'
     );
 }
 if ($container->has('loginServiceAR')) {

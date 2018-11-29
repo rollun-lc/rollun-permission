@@ -27,6 +27,10 @@ class IdentityAction implements MiddlewareInterface
     /** @var  AbstractWebAdapter[] */
     protected $adapters;
 
+    /**
+     * IdentityAction constructor.
+     * @param AbstractWebAdapter[] $adapters
+     */
     public function __construct(array $adapters)
     {
         $this->adapters = $adapters;

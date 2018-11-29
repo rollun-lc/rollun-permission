@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 16.06.16
- * Time: 13:36
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Acl;

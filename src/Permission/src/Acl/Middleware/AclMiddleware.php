@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 27.01.17
- * Time: 14:56
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Acl\Middleware;
@@ -12,21 +10,20 @@ use Interop\Http\ServerMiddleware\DelegateInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use rollun\permission\Acl\AccessForbiddenException;
-use Zend\Permissions\Acl\Acl;
 use Zend\Permissions\Acl\AclInterface;
 use Interop\Http\ServerMiddleware\MiddlewareInterface;
 
 class AclMiddleware implements MiddlewareInterface
 {
-
-    /** @var  AclInterface */
+    /**
+     * @var AclInterface
+     */
     protected $acl;
 
     public function __construct(AclInterface $acl)
     {
         $this->acl = $acl;
     }
-
 
     /**
      * Process an incoming server request and return a response, optionally delegating
@@ -45,7 +42,7 @@ class AclMiddleware implements MiddlewareInterface
         $privilege = $request->getAttribute(PrivilegeResolver::KEY_ATTRIBUTE_PRIVILEGE);
         $isAllowed = false;
 
-        if($this->acl->hasResource($resource)) {
+        if ($this->acl->hasResource($resource)) {
             foreach ($roles as $role) {
                 if ($this->acl->isAllowed($role, $resource, $privilege)) {
                     $isAllowed = true;
@@ -56,11 +53,13 @@ class AclMiddleware implements MiddlewareInterface
 
         if (!$isAllowed) {
             throw new AccessForbiddenException(
-                "Access forbidden for 'roles:[" . implode($roles) . "];resource: $resource;method: {$request->getMethod()}'"
+                "Access forbidden for 'roles:[" . implode($roles)
+                . "];resource: $resource;method: {$request->getMethod()}'"
             );
         }
 
         $response = $delegate->process($request);
+
         return $response;
     }
 }

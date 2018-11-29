@@ -23,13 +23,14 @@ use Zend\Mail;
 class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInterface, AuthenticatePrepareAdapterInterface, RegisterAdapterInterface
 {
     const DEFAULT_WEB_SERVICE = Web::class;
+
     /** @var Web */
     protected $webClient;
 
     /** @var  DataStoresInterface */
     protected $userDS;
 
-    /** @var string  */
+    /** @var string */
     protected $registrationEmail;
 
     public function __construct(array $config, Web $webClient = null, DataStoresInterface $userDS = null)
@@ -43,7 +44,7 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         if (!isset($this->userDS)) {
             throw new RuntimeException("userDS not set");
         }
-        if(isset($config['redirect_uri'])) {
+        if (isset($config['redirect_uri'])) {
             $this->webClient->setRedirectUri($config['redirect_uri']);
         }
         $this->registrationEmail = isset($config['register_email']) ? $config['register_email'] : "";
@@ -69,16 +70,12 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         try {
             if (!isset($code)) {
                 return new Result(
-                    Result::FAILURE,
-                    null,
-                    ["code not set."]
+                    Result::FAILURE, null, ["code not set."]
                 );
             }
             if ($this->webClient->getResponseState() !== $state) {
                 return new Result(
-                    Result::FAILURE,
-                    null,
-                    ["State not equalse."]
+                    Result::FAILURE, null, ["State not equalse."]
                 );
             }
             if ($this->webClient->authByCode($code)) {
@@ -87,22 +84,17 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
                 if (!empty($user)) {
                     //unset($user['pass'])
                     return new Result(
-                        Result::SUCCESS,
-                        $user[$this->userDS->getIdentifier()],
-                        ['Success credential']
+                        Result::SUCCESS, $user[$this->userDS->getIdentifier()], ['Success credential']
                     );
                 }
             }
+
             return new Result(
-                Result::FAILURE,
-                null,
-                ['Fail credential']
+                Result::FAILURE, null, ['Fail credential']
             );
         } catch (\Exception $e) {
             return new Result(
-                Result::FAILURE,
-                null,
-                [$e->getMessage()]
+                Result::FAILURE, null, [$e->getMessage()]
             );
         }
     }
@@ -129,9 +121,7 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         $this->request = $this->request->withAttribute(Response::class, $response);
 
         return new Result(
-            Result::SUCCESS,
-            null,
-            ['Invalid or absent credentials; challenging client']
+            Result::SUCCESS, null, ['Invalid or absent credentials; challenging client']
         );
     }
 
@@ -152,16 +142,12 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         try {
             if (!isset($code)) {
                 return new Result(
-                    Result::FAILURE,
-                    null,
-                    ["code not set."]
+                    Result::FAILURE, null, ["code not set."]
                 );
             }
             if ($this->webClient->getResponseState() !== $state) {
                 return new Result(
-                    Result::FAILURE,
-                    null,
-                    ["State not equalse."]
+                    Result::FAILURE, null, ["State not equalse."]
                 );
             }
             if ($this->webClient->authByCode($code)) {
@@ -170,29 +156,23 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
                 //if user not found
                 if (empty($user)) {
                     $this->sentUserId($userId);
+
                     return new Result(
-                        Result::SUCCESS,
-                        $userId,
-                        ['Success credential']
+                        Result::SUCCESS, $userId, ['Success credential']
                     );
                 } else {
                     return new Result(
-                        Result::FAILURE,
-                        null,
-                        ['User already register']
+                        Result::FAILURE, null, ['User already register']
                     );
                 }
             }
+
             return new Result(
-                Result::FAILURE,
-                null,
-                ['Fail credential']
+                Result::FAILURE, null, ['Fail credential']
             );
         } catch (\Exception $e) {
             return new Result(
-                Result::FAILURE,
-                null,
-                [$e->getMessage()]
+                Result::FAILURE, null, [$e->getMessage()]
             );
         }
     }
@@ -205,15 +185,17 @@ class GoogleOpenID extends AbstractWebAdapter implements AuthenticateAdapterInte
         $mail->setBody($message);
 
         //TODO: remove this method to enother service...
-        $mail->setFrom("register@permission.".constant("HOST"), "Register API");
+        $mail->setFrom("register@permission." . constant("HOST"), "Register API");
         $mail->setSubject("New user register: $email");
         $mail->addTo($this->registrationEmail);
         $transport = new Mail\Transport\Smtp();
-        $options = new Mail\Transport\SmtpOptions([
-            'name' => 'aspmx.l.google.com',
-            'host' => 'aspmx.l.google.com',
-            'port' => 25,
-        ]);
+        $options = new Mail\Transport\SmtpOptions(
+            [
+                'name' => 'aspmx.l.google.com',
+                'host' => 'aspmx.l.google.com',
+                'port' => 25,
+            ]
+        );
         $transport->setOptions($options);
         $transport->send($mail);
     }

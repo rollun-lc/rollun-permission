@@ -1,39 +1,34 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 03.02.17
- * Time: 10:30
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Acl\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
-use Interop\Container\Exception\ContainerException;
 use rollun\permission\Acl\Middleware\AclMiddleware;
 use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Exception\ServiceNotCreatedException;
-use Zend\ServiceManager\Exception\ServiceNotFoundException;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
+/**
+ * Create instance of AclMiddleware
+ *
+ * Class AclMiddlewareFactory
+ * @package rollun\permission\Acl\Middleware\Factory
+ */
 class AclMiddlewareFactory implements FactoryInterface
 {
-
     /**
-     * Create an object
-     *
-     * @param  ContainerInterface $container
-     * @param  string $requestedName
-     * @param  null|array $options
-     * @return object
-     * @throws ServiceNotFoundException if unable to resolve the service.
-     * @throws ServiceNotCreatedException if an exception is raised when
-     *     creating a service.
-     * @throws ContainerException if any other error occurs
+     * @param ContainerInterface $container
+     * @param string $requestedName
+     * @param array|null $options
+     * @return AclMiddleware
      */
     public function __invoke(ContainerInterface $container, $requestedName, array $options = null)
     {
         $acl = $container->get(Acl::class);
+
         return new AclMiddleware($acl);
     }
 }

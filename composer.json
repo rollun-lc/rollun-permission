@@ -24,6 +24,7 @@
     "zendframework/zend-permissions-acl": "^2.6",
     "zendframework/zend-authentication": "^2.5",
     "zendframework/zend-mail": "^2.7",
+    "rollun-com/rollun-actionrender": "^6.0",
     "rollun-com/rollun-datastore": "^5.0",
     "rollun-com/rollun-api": "4.0",
     "http-interop/http-middleware": "0.4.1",
@@ -48,7 +49,7 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "rollun\\test\\permission\\": "tests/src"
+      "rollun\\test\\": "tests"
     }
   },
   "scripts": {

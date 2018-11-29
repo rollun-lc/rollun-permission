@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 03.02.17
- * Time: 13:06
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Acl\Middleware;
@@ -15,7 +13,6 @@ use Interop\Http\ServerMiddleware\MiddlewareInterface;
 
 class PrivilegeResolver implements MiddlewareInterface
 {
-
     const KEY_ATTRIBUTE_PRIVILEGE = 'privilege';
 
     /**
@@ -33,6 +30,7 @@ class PrivilegeResolver implements MiddlewareInterface
         $request = $request->withAttribute(static::KEY_ATTRIBUTE_PRIVILEGE, $privilege);
 
         $response = $delegate->process($request);
+
         return $response;
     }
 }

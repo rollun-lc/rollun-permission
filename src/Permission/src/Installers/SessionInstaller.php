@@ -105,7 +105,7 @@ class SessionInstaller extends InstallerAbstract
             MiddlewarePipeInstaller::class,
             ActionRenderInstaller::class,
             BasicRenderInstaller::class,
-            LazyLoadPipeInstaller::class,
+//            LazyLoadPipeInstaller::class,
             WebInstaller::class,
         ];
     }

@@ -1,19 +1,18 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 01.02.17
- * Time: 12:11
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Acl\DataSource;
 
 use rollun\datastore\DataStore\Interfaces\DataSourceInterface;
-use rollun\datastore\DataStore\Memory;
 
 class MemoryConfig implements DataSourceInterface
 {
-    /** @var  array */
+    /**
+     * @var array
+     */
     protected $items;
 
     /**
@@ -32,7 +31,9 @@ class MemoryConfig implements DataSourceInterface
     }
 
     /**
-     * @return array Return data of DataSource
+     * {@inheritdoc}
+     *
+     * @return array
      */
     public function getAll()
     {
