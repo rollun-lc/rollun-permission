@@ -36,7 +36,7 @@ use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenApiGwErrorResp
 use rollun\permission\Auth\Middleware\ErrorHandler\AccessForbiddenErrorResponseGenerator;
 use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AccessForbiddenErrorResponseGeneratorFactory;
 use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLApiErrorHandlerFactory;
-use rollun\permission\Auth\Middleware\ErrorHandler\Factory\ACLErrorHandlerFactory;
+use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AclErrorHandlerFactory;
 use rollun\permission\Auth\Middleware\Factory\IdentityFactory;
 use rollun\permission\Auth\Middleware\Factory\LogoutActionFactory;
 use rollun\permission\Auth\Middleware\Factory\UserResolverFactory;
@@ -44,31 +44,27 @@ use rollun\permission\Auth\Middleware\IdentityAction;
 use rollun\permission\Auth\Middleware\LoginAction;
 use rollun\permission\Auth\Middleware\LogoutAction;
 use rollun\permission\Auth\Middleware\UserResolver;
-use rollun\permission\Auth\SaveHandler\Factory\DbTableSessionSaveHandlerFactory;
 use Zend\ServiceManager\Factory\InvokableFactory;
-use Zend\Session\SaveHandler\SaveHandlerInterface;
-use Zend\Session\Service\SessionManagerFactory;
 use Zend\Session\SessionManager;
-use Zend\Session\Storage\SessionArrayStorage;
 
 class AuthInstaller extends InstallerAbstract
 {
-
     /**
      * install
      * @return array
      */
     public function install()
     {
-        //ask for API or non api error handle
         $errorHandlerFactory = [
             AccessForbiddenApiGwErrorResponseGenerator::class => InvokableFactory::class,
             AccessForbiddenErrorResponseGenerator::class => AccessForbiddenErrorResponseGeneratorFactory::class,
-            ACLErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER => ACLErrorHandlerFactory::class,
+            AclErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER => AclErrorHandlerFactory::class,
         ];
+
         if ($this->consoleIO->askConfirmation("You wont use API error handler ? ", false)) {
             $errorHandlerFactory[ACLApiErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER] = ACLApiErrorHandlerFactory::class;
         }
+
         $config = [
             'dependencies' => [
                 'invokables' => [
@@ -77,7 +73,7 @@ class AuthInstaller extends InstallerAbstract
                     HelloUserAction::class => HelloUserAction::class,
                     AuthMiddlewareDeterminator::class => AuthMiddlewareDeterminator::class,
                     AuthPrepareMiddlewareDeterminator::class => AuthPrepareMiddlewareDeterminator::class,
-                    RegisterMiddlewareDeterminator::class => RegisterMiddlewareDeterminator::class
+                    RegisterMiddlewareDeterminator::class => RegisterMiddlewareDeterminator::class,
                 ],
                 'factories' => [
                     IdentityAction::class => IdentityFactory::class,
@@ -89,7 +85,7 @@ class AuthInstaller extends InstallerAbstract
                     ImplicitAuthenticatePrepareAbstractFactory::class,
                     ImplicitAuthenticateAbstractFactory::class,
                     ImplicitRegisterAbstractFactory::class,
-                ]
+                ],
             ],
             AuthAdapterAbstractFactory::KEY => [
                 'GoogleRegisterOpenID' => [
@@ -101,46 +97,46 @@ class AuthInstaller extends InstallerAbstract
                 'GoogleOpenID' => [
                     AuthAdapterAbstractFactory::KEY_CLASS => GoogleOpenID::class,
                     AuthAdapterAbstractFactory::KEY_ADAPTER_CONFIG => [
-                        'redirect_uri' => 'http://\'.  constant("HOST") .\'/login/GoogleOpenID'
+                        'redirect_uri' => 'http://\'.  constant("HOST") .\'/login/GoogleOpenID',
                     ],
                 ],
                 'BaseAuthIdentity' => [
-                    AuthAdapterAbstractFactory::KEY_CLASS => BaseAuth::class
+                    AuthAdapterAbstractFactory::KEY_CLASS => BaseAuth::class,
                 ],
                 'SessionIdentity' => [
-                    AuthAdapterAbstractFactory::KEY_CLASS => Session::class
-                ]
+                    AuthAdapterAbstractFactory::KEY_CLASS => Session::class,
+                ],
             ],
 
             AbstractMiddlewareDeterminatorAbstractFactory::KEY => [
                 RegisterMiddlewareDeterminator::class => [
                     AttributeParamAbstractFactory::KEY_CLASS => RegisterMiddlewareDeterminator::class,
-                    AttributeParamAbstractFactory::KEY_NAME => "resourceName"
+                    AttributeParamAbstractFactory::KEY_NAME => "resourceName",
                 ],
                 AuthPrepareMiddlewareDeterminator::class => [
                     AttributeParamAbstractFactory::KEY_CLASS => AuthPrepareMiddlewareDeterminator::class,
-                    AttributeParamAbstractFactory::KEY_NAME => "resourceName"
+                    AttributeParamAbstractFactory::KEY_NAME => "resourceName",
                 ],
                 AuthMiddlewareDeterminator::class => [
                     AttributeParamAbstractFactory::KEY_CLASS => AuthMiddlewareDeterminator::class,
-                    AttributeParamAbstractFactory::KEY_NAME => "resourceName"
+                    AttributeParamAbstractFactory::KEY_NAME => "resourceName",
                 ],
             ],
             LazyLoadMiddlewareAbstractFactory::KEY => [
                 'registerLLPipe' => [
-                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => RegisterMiddlewareDeterminator::class ,
+                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => RegisterMiddlewareDeterminator::class,
                 ],
                 'authenticatePrepareLLPipe' => [
-                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => AuthPrepareMiddlewareDeterminator::class ,
+                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => AuthPrepareMiddlewareDeterminator::class,
                 ],
                 'authenticateLLPipe' => [
-                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => AuthMiddlewareDeterminator::class ,
+                    LazyLoadMiddlewareAbstractFactory::KEY_MIDDLEWARE_DETERMINATOR => AuthMiddlewareDeterminator::class,
                 ],
             ],
             IdentityFactory::KEY => [
                 IdentityFactory::KEY_ADAPTERS_SERVICE => [
                     'BaseAuthIdentity',
-                    'SessionIdentity'
+                    'SessionIdentity',
                 ],
             ],
             UserResolverFactory::KEY => [
@@ -151,10 +147,10 @@ class AuthInstaller extends InstallerAbstract
             MiddlewarePipeAbstractFactory::KEY => [
                 'permissionPipe' => [
                     MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
-                        ACLErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER,
+                        AclErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER,
                         'identifyPipe',
-                        'aclPipes'
-                    ]
+                        'aclPipes',
+                    ],
                 ],
                 'registerServicePipe' => [
                     MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
@@ -163,21 +159,21 @@ class AuthInstaller extends InstallerAbstract
                 ],
                 'loginServicePipe' => [
                     MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
-                        'authenticateLLPipe'
-                    ]
+                        'authenticateLLPipe',
+                    ],
                 ],
                 'loginPrepareServicePipe' => [
                     MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
                         'authenticatePrepareLLPipe',
-                        ReturnMiddleware::class
-                    ]
+                        ReturnMiddleware::class,
+                    ],
                 ],
                 'identifyPipe' => [
                     MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
                         IdentityAction::class,
-                        UserResolver::class
-                    ]
-                ]
+                        UserResolver::class,
+                    ],
+                ],
             ],
             ActionRenderAbstractFactory::KEY => [
                 'loginPageAR' => [
@@ -202,11 +198,15 @@ class AuthInstaller extends InstallerAbstract
                 ],
                 'user-page' => [
                     ActionRenderAbstractFactory::KEY_ACTION_MIDDLEWARE_SERVICE => HelloUserAction::class,
-                    ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe'
+                    ActionRenderAbstractFactory::KEY_RENDER_MIDDLEWARE_SERVICE => 'simpleHtmlJsonRendererLLPipe',
                 ],
             ],
         ];
-        $config['dependencies']['factories'] = array_merge_recursive($config['dependencies']['factories'], $errorHandlerFactory);
+        $config['dependencies']['factories'] = array_merge_recursive(
+            $config['dependencies']['factories'],
+            $errorHandlerFactory
+        );
+
         return $config;
     }
 
@@ -233,36 +233,36 @@ class AuthInstaller extends InstallerAbstract
             default:
                 $description = "Does not exist.";
         }
+
         return $description;
     }
 
     public function isInstall()
     {
         $config = $this->container->get('config');
-        return (
-            isset($config['dependencies']['invokables'][LoginAction::class]) &&
-            isset($config['dependencies']['invokables'][ReturnMiddleware::class]) &&
-            isset($config['dependencies']['invokables'][HelloUserAction::class]) &&
-            isset($config['dependencies']['factories'][SessionManager::class]) &&
-            isset($config['dependencies']['factories'][IdentityAction::class]) &&
-            isset($config['dependencies']['factories'][LogoutAction::class]) &&
-            isset($config['dependencies']['factories'][UserResolver::class]) &&
-            isset($config['dependencies']['abstract_factories']) &&
-            in_array(AuthAdapterAbstractFactory::class, $config['dependencies']['abstract_factories']) &&
-            isset($config[AuthAdapterAbstractFactory::KEY]['GoogleOpenID']) &&
-            isset($config[AuthAdapterAbstractFactory::KEY]['BaseAuthIdentity']) &&
-            isset($config[AuthAdapterAbstractFactory::KEY]['SessionIdentity']) &&
-            isset($config[IdentityFactory::KEY]) &&
-            isset($config[UserResolverFactory::KEY]) &&
-            isset($config[MiddlewarePipeAbstractFactory::KEY]['loginServicePipe']) &&
-            isset($config[MiddlewarePipeAbstractFactory::KEY]['loginPrepareServicePipe']) &&
-            isset($config[MiddlewarePipeAbstractFactory::KEY]['identifyPipe']) &&
-            isset($config[ActionRenderAbstractFactory::KEY]['loginPageAR']) &&
-            isset($config[ActionRenderAbstractFactory::KEY]['logoutAR']) &&
-            isset($config[ActionRenderAbstractFactory::KEY]['loginServiceAR']) &&
-            isset($config[ActionRenderAbstractFactory::KEY]['loginPrepareServiceAR']) &&
-            isset($config[ActionRenderAbstractFactory::KEY]['user-page'])
-        );
+
+        return (isset($config['dependencies']['invokables'][LoginAction::class])
+            && isset($config['dependencies']['invokables'][ReturnMiddleware::class])
+            && isset($config['dependencies']['invokables'][HelloUserAction::class])
+            && isset($config['dependencies']['factories'][SessionManager::class])
+            && isset($config['dependencies']['factories'][IdentityAction::class])
+            && isset($config['dependencies']['factories'][LogoutAction::class])
+            && isset($config['dependencies']['factories'][UserResolver::class])
+            && isset($config['dependencies']['abstract_factories'])
+            && in_array(AuthAdapterAbstractFactory::class, $config['dependencies']['abstract_factories'])
+            && isset($config[AuthAdapterAbstractFactory::KEY]['GoogleOpenID'])
+            && isset($config[AuthAdapterAbstractFactory::KEY]['BaseAuthIdentity'])
+            && isset($config[AuthAdapterAbstractFactory::KEY]['SessionIdentity'])
+            && isset($config[IdentityFactory::KEY])
+            && isset($config[UserResolverFactory::KEY])
+            && isset($config[MiddlewarePipeAbstractFactory::KEY]['loginServicePipe'])
+            && isset($config[MiddlewarePipeAbstractFactory::KEY]['loginPrepareServicePipe'])
+            && isset($config[MiddlewarePipeAbstractFactory::KEY]['identifyPipe'])
+            && isset($config[ActionRenderAbstractFactory::KEY]['loginPageAR'])
+            && isset($config[ActionRenderAbstractFactory::KEY]['logoutAR'])
+            && isset($config[ActionRenderAbstractFactory::KEY]['loginServiceAR'])
+            && isset($config[ActionRenderAbstractFactory::KEY]['loginPrepareServiceAR'])
+            && isset($config[ActionRenderAbstractFactory::KEY]['user-page']));
     }
 
     public function getDependencyInstallers()

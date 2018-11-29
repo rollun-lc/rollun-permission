@@ -142,7 +142,7 @@ class SessionDbTableInstaller extends InstallerAbstract
     {
         return [
             DbTableInstaller::class,
-            ACLInstaller::class
+            AclInstallerNew::class
         ];
     }
 

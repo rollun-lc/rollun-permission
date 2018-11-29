@@ -48,7 +48,11 @@ class ResourceResolver implements MiddlewareInterface
 
         foreach ($this->resourceDataStore as $item) {
             foreach ($this->resourceProducers as $resourceProducer) {
-                if ($resourceProducer->canProduce($request) && $resourceProducer->produce($request) === $item['name']) {
+                if (!$resourceProducer->canProduce($request)) {
+                    continue;
+                }
+
+                if ($resourceProducer->produce($request) === $item['name']) {
                     $resource = $item['name'];
                     break;
                 }

@@ -2,6 +2,19 @@
 
 namespace rollun\permission;
 
+use rollun\actionrender\Factory\MiddlewarePipeAbstractFactory;
+use rollun\permission\Acl\Middleware\AclMiddleware;
+use rollun\permission\Acl\Middleware\PrivilegeResolver;
+use rollun\permission\Acl\Middleware\ResourceResolver;
+use rollun\permission\Acl\Middleware\RoleResolver;
+use rollun\permission\Auth\AuthenticationServiceChainAbstractFactory;
+use rollun\permission\Auth\BasicAccessAbstractFactory;
+use rollun\permission\Auth\Middleware\ErrorHandler\Factory\AclErrorHandlerFactory;
+use Zend\Expressive\Authentication\AuthenticationInterface;
+use Zend\Expressive\Authentication\AuthenticationMiddleware;
+use Zend\Expressive\Authentication\UserRepository\Htpasswd;
+use Zend\Expressive\Authentication\UserRepository\HtpasswdFactory;
+
 /**
  * The configuration provider for the App module
  *
@@ -20,8 +33,21 @@ class ConfigProvider
     public function __invoke()
     {
         return [
-            //'dependencies' => $this->getDependencies(),
+            'dependencies' => $this->getDependencies(),
             'templates' => $this->getTemplates(),
+            'authentication' => $this->getAuthenticationConfig(),
+            MiddlewarePipeAbstractFactory::KEY => $this->getMiddlewarePipeConfig(),
+            AuthenticationServiceChainAbstractFactory::KEY => $this->getAuthenticationServiceChainConfig(),
+            BasicAccessAbstractFactory::KEY => $this->getBasicAccessConfig(),
+        ];
+    }
+
+    public function getAuthenticationConfig()
+    {
+        return [
+            'htpasswd' => [
+
+            ]
         ];
     }
 
@@ -33,11 +59,57 @@ class ConfigProvider
     public function getDependencies()
     {
         return [
-            'invokables' => [
-
+            'abstract_factories' => [
+                AuthenticationServiceChainAbstractFactory::class,
+                BasicAccessAbstractFactory::class,
             ],
-            'factories'  => [
+            'factories' => [
+                Htpasswd::class => HtpasswdFactory::class
+            ],
+            'aliases' => [
+                AuthenticationInterface::class => 'basicAccess'
+            ]
+        ];
+    }
 
+    public function getBasicAccessConfig()
+    {
+        return [
+            'basicAccess' => [
+                'realm' => 'realmValue',
+                'userRepository' => Htpasswd::class
+            ]
+        ];
+    }
+
+    public function getAuthenticationServiceChainConfig()
+    {
+        return [
+            'authenticationServiceChain' => [
+                'authenticationServices' => [
+
+                ]
+            ],
+        ];
+    }
+
+    public function getMiddlewarePipeConfig()
+    {
+        return [
+            'permissionPipe' => [
+                MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
+                    AclErrorHandlerFactory::DEFAULT_ACL_ERROR_HANDLER,
+                    AuthenticationMiddleware::class,
+                    'aclPipe',
+                ],
+            ],
+            'aclPipe' => [
+                MiddlewarePipeAbstractFactory::KEY_MIDDLEWARES => [
+                    RoleResolver::class,
+                    ResourceResolver::class,
+                    PrivilegeResolver::class,
+                    AclMiddleware::class,
+                ],
             ],
         ];
     }
@@ -51,7 +123,7 @@ class ConfigProvider
     {
         return [
             'paths' => [
-                'app'    => [__DIR__ . '/../templates/auth'],
+                'app' => [__DIR__ . '/../templates/auth'],
                 'layout' => [__DIR__ . '/../templates/layout'],
             ],
         ];

@@ -210,7 +210,7 @@ class AclDbTableInstaller extends InstallerAbstract
     {
         return [
             DbTableInstaller::class,
-            ACLInstaller::class
+            AclInstallerNew::class
         ];
     }
 

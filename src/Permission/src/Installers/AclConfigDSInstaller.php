@@ -1,9 +1,7 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 13.01.17
- * Time: 12:59
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\Installers;
@@ -11,7 +9,6 @@ namespace rollun\permission\Installers;
 use rollun\datastore\DataStore\Cacheable;
 use rollun\datastore\DataStore\Factory\CacheableAbstractFactory;
 use rollun\datastore\DataStore\Installers\CacheableInstaller;
-use rollun\installer\Command;
 use rollun\installer\Install\InstallerAbstract;
 use rollun\permission\Acl\DataSource\Factory\ConfigDataSourceAbstractFactory;
 
@@ -197,7 +194,7 @@ class AclConfigDSInstaller extends InstallerAbstract
     {
         return [
             CacheableInstaller::class,
-            ACLInstaller::class
+            AclInstallerNew::class
         ];
     }
 }
