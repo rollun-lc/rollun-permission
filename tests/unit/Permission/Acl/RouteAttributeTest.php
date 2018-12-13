@@ -9,8 +9,8 @@ namespace rollun\test\unit\Permission\Acl;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use rollun\permission\Acl\ResourceProducer\RouteAttribute;
-use rollun\permission\Acl\ResourceProducer\RouteReceiver\RouteNameReceiverInterface;
+use rollun\permission\Authorization\ResourceProducer\RouteAttribute;
+use rollun\permission\Authorization\ResourceProducer\RouteReceiver\RouteNameReceiverInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 
 class RouteAttributeTest extends TestCase

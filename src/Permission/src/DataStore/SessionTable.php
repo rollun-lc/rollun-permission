@@ -1,13 +1,10 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: victorsecuring
- * Date: 03.12.17
- * Time: 2:23 PM
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\DataStore;
-
 
 use rollun\datastore\DataStore\SerializedDbTable;
 use rollun\datastore\TableGateway\TableManagerMysql;
@@ -15,12 +12,10 @@ use rollun\datastore\TableGateway\TableManagerMysql;
 class SessionTable extends SerializedDbTable
 {
     const TABLE_NAME = 'session';
-
     const FILED_ID = 'id';
     const FIELD_MODIFIED = 'modified';
     const FILED_LIFETIME = 'lifetime';
     const FILED_DATA = 'data';
-
 
     /**
      * @return string
@@ -43,28 +38,28 @@ class SessionTable extends SerializedDbTable
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 32,
-                    ]
+                    ],
                 ],
                 static::FIELD_MODIFIED => [
                     TableManagerMysql::FIELD_TYPE => "Integer",
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => true,
-                    ]
+                    ],
                 ],
                 static::FILED_LIFETIME => [
                     TableManagerMysql::FIELD_TYPE => "Integer",
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => true,
-                    ]
+                    ],
                 ],
                 static::FILED_DATA => [
                     TableManagerMysql::FIELD_TYPE => "Text",
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => true,
                         'length' => 65536,
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ];
     }
 }

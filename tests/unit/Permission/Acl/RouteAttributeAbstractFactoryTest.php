@@ -9,8 +9,8 @@ namespace rollun\test\unit\Permission\Acl;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Interop\Container\ContainerInterface;
-use rollun\permission\Acl\ResourceProducer\RouteAttributeAbstractFactory;
-use rollun\permission\Acl\ResourceProducer\RouteReceiver\RouteNameReceiverInterface;
+use rollun\permission\Authorization\ResourceProducer\RouteAttributeAbstractFactory;
+use rollun\permission\Authorization\ResourceProducer\RouteReceiver\RouteNameReceiverInterface;
 use Zend\ServiceManager\ServiceManager;
 
 class RouteAttributeAbstractFactoryTest extends TestCase

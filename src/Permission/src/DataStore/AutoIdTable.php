@@ -1,25 +1,20 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 27.10.17
- * Time: 11:40
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\DataStore;
 
+use rollun\datastore\DataStore\DataStoreException;
 use rollun\datastore\DataStore\SerializedDbTable;
+use rollun\datastore\DataStore\Traits\AutoIdGeneratorTrait;
 use rollun\utils\IdGenerator;
 use Zend\Db\TableGateway\TableGateway;
 
 class AutoIdTable extends SerializedDbTable
 {
-    const GEN_ID_MAX_TRY = 5;
-
-    /**
-     * @var IdGenerator
-     */
-    protected $idGenerator;
+    use AutoIdGeneratorTrait;
 
     /**
      * AutoIdTable constructor.
@@ -32,27 +27,12 @@ class AutoIdTable extends SerializedDbTable
     }
 
     /**
-     * Generates an arbitrary length string of cryptographic random bytes
-     * @return string
-     */
-    protected function generateId()
-    {
-        $tryCount = 0;
-        do {
-            $id = $this->idGenerator->generate();
-            $tryCount++;
-        } while($this->has($id) || $tryCount < static::GEN_ID_MAX_TRY);
-        return $id;
-    }
-
-    /**
-     * Generate id to item
      * @param array $itemData
-     * @return void
+     * @throws DataStoreException
      */
     protected function setItemId(array &$itemData)
     {
-        if(!isset($itemData[$this->getIdentifier()])) {
+        if (!isset($itemData[$this->getIdentifier()])) {
             $itemData[$this->getIdentifier()] = $this->generateId();
         }
     }
@@ -67,36 +47,40 @@ class AutoIdTable extends SerializedDbTable
     }
 
     /**
-     * @param array $itemData
+     * @param $itemData
      * @param bool $rewriteIfExist
      * @return array|mixed|null
+     * @throws DataStoreException
      */
     public function create($itemData, $rewriteIfExist = false)
     {
-        if($this->isDataMultipleData($itemData)) {
+        if ($this->isDataMultipleData($itemData)) {
             foreach ($itemData as &$datum) {
                 $this->setItemId($datum);
             }
         } else {
             $this->setItemId($itemData);
         }
+
         return parent::create($itemData, $rewriteIfExist);
     }
 
     /**
-     * @param array $itemData
+     * @param $itemData
      * @param bool $createIfAbsent
-     * @return array
+     * @return array|mixed|null
+     * @throws DataStoreException
      */
     public function update($itemData, $createIfAbsent = false)
     {
-        if($this->isDataMultipleData($itemData)) {
+        if ($this->isDataMultipleData($itemData)) {
             foreach ($itemData as &$datum) {
                 $this->setItemId($datum);
             }
         } else {
             $this->setItemId($itemData);
         }
+
         return parent::update($itemData, $createIfAbsent);
     }
 }
