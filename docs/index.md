@@ -51,17 +51,17 @@ composer lib install
 
 ### Использование
 
-Чтобы начать пользовать библиотекой, нужно подключить `rollun\permission\ConfigProvider` для
+Чтобы начать пользоваться библиотекой, нужно подключить `rollun\permission\ConfigProvider` для
 [ServiceManager](https://github.com/zendframework/zend-servicemanager).
 
 ##### Permissions
 
 `PermissionMiddleware` - это объект который представляет собой основной `middleware pipe` для аутентификации и 
-авторизации, поєтому нужно вызвать эго перед вызовом `endpoint`, к которому нужно получить доступ. Есть как минимум два 
+авторизации, поэтому нужно вызвать его перед вызовом `endpoint`, к которому нужно получить доступ. Есть как минимум два 
 варианта как это сделать.
 
-Первый вариант заключаеться в том чтобы поместить `PermissionMiddleware` в `middleware pipe` вашего приложения (если 
-используеться [zendframework/zend-expressive](https://github.com/zendframework/zend-expressive), то это можна сделать
+Первый вариант заключается в том чтобы поместить `PermissionMiddleware` в `middleware pipe` вашего приложения (если 
+используется [zendframework/zend-expressive](https://github.com/zendframework/zend-expressive), то это можно сделать
 в файле `config/pipeline.php`):
 
 ```php
@@ -71,7 +71,7 @@ $app->pipe(PermissionMiddleware::class);
 В этом случае вызов `PermissionMiddleware` будет для абсолютно всех `endpoint`.
 
 Второй вариант это подключить `PermissionMiddleware` вместе з `endpoint` в настройках роутинга (если 
-используеться [zendframework/zend-expressive](https://github.com/zendframework/zend-expressive), то это можна сделать
+используется [zendframework/zend-expressive](https://github.com/zendframework/zend-expressive), то это можно сделать
 в файле `config/routes.php`):.
 
 ```php
@@ -90,7 +90,7 @@ $app->get(
 Тогда аутентификация и авторизация будет вызвана только для этого роутинга.
 
 
-Также нужно настроить базу данных. Подразумеваеться что конфигурация для БД уже настроена. Здесь также есть два 
+Также нужно настроить базу данных. Подразумевается что конфигурация для БД уже настроена. Здесь также есть два 
 варианта.
 
 * Использовать инсталлер `rollun\Permission\AssetInstaller`:
@@ -104,6 +104,59 @@ composer lib install
 ##### OAuth
 
 Как работет `Google OAuth 2.0` в `rollun-permission`. Для того чтобы получить `authorization code` от Google (который 
-потом будет обемен на `access token`)
+потом будет обменен на `access token`) нужно перенаправить пользователя на страницу google авторизации. Таким
+редиректом занимается `RedirectMiddleware`. 
 
-Для того чтобы спользовать возможность `Google OAuth 2.0` авторизации нужно сконфигуриров
+```php
+$app->get(
+    '/your/oauth/redirect/path',
+    RedirectMiddleware::class,
+    'oauth-redirect-route-name'
+);
+```
+
+`RedirectMiddleware` должен указать куда google отправить пользователя 
+после его успешной авторизации. Поэтому при вызове роута с редиректом нужно указать `action` параметр.
+Есть два варианта этого параметра: `login`, `register` - для обратного редиракта на логин и регистрацию соответственно.
+
+```bash
+curl example.com/your/oauth/redirect/path?action=login
+```
+
+Для обратного редиректа на логин и регистрации нужны соответствующие сконфигурированные роутинги:
+Названия роутов для логина и регистрации должны бить обязательно `ConfigProvider::OAUTH_LOGIN_ROUTE_NAME` и
+`ConfigProvider::OAUTH_REGISTER_ROUTE_NAME` соответственно как показано в примере ниже.
+
+```php
+$app->get(
+    '/your/oauth/login/path',
+    LoginMiddleware::class,
+    ConfigProvider::OAUTH_LOGIN_ROUTE_NAME
+);
+
+$app->get(
+    '/your/oauth/register/path',
+    RegisterMiddleware::class,
+    ConfigProvider::OAUTH_REGISTER_ROUTE_NAME
+);
+```
+
+Пример роутинга для логаута:
+
+```php
+$app->get(
+    '/your/oauth/logout/path',
+    LoginMiddleware::class,
+     'logout-route-name'
+);
+```
+
+В [config/routes.php](/config/routes.php) можно увидеть реальный пример конфигурации роутингов.
+
+Обязательные переменные окружения для корректной работы `oauth`:
+* GOOGLE_CLIENT_SECRET - `client_secret` в личном кабинете google
+* GOOGLE_CLIENT_ID - `client_id` в личном кабинете google
+* GOOGLE_PROJECT_ID - `project_id` в личном кабинете google
+* HOST - домен сайт где происходит авторизация
+* EMAIL_FROM - от кого отправить email для подтверждения регистрации
+* EMAIL_TO - кому отправить email для подтверждения регистрации

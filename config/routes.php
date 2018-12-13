@@ -50,6 +50,14 @@ use Zend\Expressive\MiddlewareFactory;
  * @return void
  */
 return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
+    // Show logs in debugging mode
+    $app->route(
+        '/api/datastore[/{resourceName}[/{id}]]',
+        DataStoreApi::class,
+        ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+        'datastore'
+    );
+
     $app->get(
         '/',
         function (ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface {
@@ -62,13 +70,6 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
         '/oauth/redirect',
         RedirectMiddleware::class,
         'oauth-redirect'
-    );
-
-    $app->route(
-        '/api/datastore[/{resourceName}[/{id}]]',
-        DataStoreApi::class,
-        ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-        'datastore'
     );
 
     $app->get(
