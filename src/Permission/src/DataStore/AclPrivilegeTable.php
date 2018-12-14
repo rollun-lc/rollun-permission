@@ -1,15 +1,11 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 26.10.17
- * Time: 19:10
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\DataStore;
 
-use rollun\datastore\DataStore\SerializedDbTable;
 use rollun\datastore\TableGateway\TableManagerMysql;
 
 class AclPrivilegeTable extends AutoIdTable
@@ -41,16 +37,16 @@ class AclPrivilegeTable extends AutoIdTable
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 10,
-                    ]
+                    ],
                 ],
                 static::FILED_NAME => [
                     TableManagerMysql::FIELD_TYPE => "Varchar",
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 255,
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ];
     }
 }

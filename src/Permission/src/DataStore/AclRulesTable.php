@@ -1,15 +1,11 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 26.10.17
- * Time: 19:10
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\DataStore;
 
-use rollun\datastore\DataStore\SerializedDbTable;
 use rollun\datastore\TableGateway\TableManagerMysql;
 
 class AclRulesTable extends AutoIdTable
@@ -47,7 +43,7 @@ class AclRulesTable extends AutoIdTable
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 6,
-                    ]
+                    ],
                 ],
                 static::FILED_ROLE_ID => [
                     TableManagerMysql::FIELD_TYPE => "Varchar",
@@ -61,7 +57,7 @@ class AclRulesTable extends AutoIdTable
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 6,
-                    ]
+                    ],
                 ],
                 static::FILED_RESOURCE_ID => [
                     TableManagerMysql::FIELD_TYPE => "Varchar",
@@ -75,7 +71,7 @@ class AclRulesTable extends AutoIdTable
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 6,
-                    ]
+                    ],
                 ],
                 static::FILED_PRIVILEGE_ID => [
                     TableManagerMysql::FIELD_TYPE => "Varchar",
@@ -89,16 +85,16 @@ class AclRulesTable extends AutoIdTable
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
                         'length' => 6,
-                    ]
+                    ],
                 ],
                 static::FILED_ALLOW_FLAG => [
                     TableManagerMysql::FIELD_TYPE => "Boolean",
                     TableManagerMysql::FIELD_PARAMS => [
                         'nullable' => false,
-                        'default' => true
-                    ]
+                        'default' => true,
+                    ],
                 ],
-            ]
+            ],
         ];
     }
 }

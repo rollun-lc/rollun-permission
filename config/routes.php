@@ -1,5 +1,24 @@
 <?php
 /**
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
+ */
+
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use rollun\datastore\Middleware\DataStoreApi;
+use rollun\permission\ConfigProvider;
+use rollun\permission\OAuth\LoginMiddleware;
+use rollun\permission\OAuth\LogoutMiddleware;
+use rollun\permission\OAuth\RedirectMiddleware;
+use rollun\permission\OAuth\RegisterMiddleware;
+use Zend\Diactoros\Response\HtmlResponse;
+use Zend\Expressive\Application;
+use Zend\Expressive\MiddlewareFactory;
+
+/**
  * Setup routes with a single request method:
  *
  * $app->get('/', App\Action\HomePageAction::class, 'home');
@@ -24,63 +43,50 @@
  *     Zend\Expressive\Router\Route::HTTP_METHOD_ANY,
  *     'contact'
  * );
+ *
+ * @param Application $app
+ * @param MiddlewareFactory $factory
+ * @param ContainerInterface $container
+ * @return void
  */
-/*$app->get('/', App\Action\HomePageAction::class, 'home');*/
-
-
-if ($container->has('home-service')) {
+return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
+    // Show logs in debugging mode
     $app->route(
+        '/api/datastore[/{resourceName}[/{id}]]',
+        DataStoreApi::class,
+        ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+        'datastore'
+    );
+
+    $app->get(
         '/',
-        'home-service',
-        ['GET'],
+        function (ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface {
+            return new HtmlResponse('Home page!');
+        },
         'home-page'
     );
-}
-if ($container->has('loginPageAR')) {
-    $app->route(
-        '/login',
-        'loginPageAR',
-        ['GET', 'POST'],
-        'login-page'
+
+    $app->get(
+        '/oauth/redirect',
+        RedirectMiddleware::class,
+        'oauth-redirect'
     );
-}
-if ($container->has('loginServiceAR')) {
-    $app->route(
-        '/login/{resourceName}',
-        'loginServiceAR',
-        ['GET', 'POST'],
-        'login-service'
+
+    $app->get(
+        '/oauth/login',
+        LoginMiddleware::class,
+        ConfigProvider::OAUTH_LOGIN_ROUTE_NAME
     );
-}
-if ($container->has('registerServiceAR')) {
-    $app->route(
-        '/register/{resourceName}',
-        'registerServiceAR',
-        ['GET', 'POST'],
-        'register-service'
+
+    $app->get(
+        '/oauth/register',
+        RegisterMiddleware::class,
+        ConfigProvider::OAUTH_REGISTER_ROUTE_NAME
     );
-}
-if ($container->has('loginPrepareServiceAR')) {
-    $app->route(
-        '/login_prepare/{resourceName}',
-        'loginPrepareServiceAR',
-        ['GET', 'POST'],
-        'login-prepare-service'
+
+    $app->get(
+        '/oauth/logout',
+        LogoutMiddleware::class,
+        'oauth-logout'
     );
-}
-if ($container->has('logoutAR')) {
-    $app->route(
-        '/logout',
-        'logoutAR',
-        ['GET', 'POST'],
-        'logout'
-    );
-}
-if ($container->has('user-page')) {
-    $app->route(
-        '/user',
-        'user-page',
-        ['GET', 'POST'],
-        'user-page'
-    );
-}
+};
