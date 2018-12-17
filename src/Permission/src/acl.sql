@@ -4,7 +4,7 @@ CREATE TABLE `acl_users`
   `name`     varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL DEFAULT '',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;  acl_roles |
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_general_ci;
 
 CREATE TABLE `acl_roles`
 (
