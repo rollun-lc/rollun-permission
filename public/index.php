@@ -1,6 +1,9 @@
 <?php
 
 declare(strict_types=1);
+
+use rollun\logger\LifeCycleToken;
+
 error_reporting(E_ALL ^ E_USER_DEPRECATED);
 
 // Delegate static file requests back to the PHP built-in webserver
@@ -29,6 +32,15 @@ call_user_func(function () {
     // configuration statements
     (require 'config/pipeline.php')($app, $factory, $container);
     (require 'config/routes.php')($app, $factory, $container);
+
+    // Init lifecycle token
+    $lifeCycleToken = LifeCycleToken::generateToken();
+
+    if (LifeCycleToken::getAllHeaders() && array_key_exists("LifeCycleToken", LifeCycleToken::getAllHeaders())) {
+        $lifeCycleToken->unserialize(LifeCycleToken::getAllHeaders()["LifeCycleToken"]);
+    }
+
+    $container->setService(LifeCycleToken::class, $lifeCycleToken);
 
     $app->run();
 });

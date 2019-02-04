@@ -56,6 +56,19 @@ class LoginMiddleware extends CredentialMiddleware
     }
 
     /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     */
+    protected function getAuthorizedResponse(ServerRequestInterface $request): ResponseInterface
+    {
+        $response = parent::getAuthorizedResponse($request);
+        $userIdentity = $this->getSession($request)->get(UserInterface::class);
+        $response = $response->withHeader('X-User-Identity', json_encode($userIdentity));
+
+        return $response;
+    }
+
+    /**
      * Convert the iterable user roles to a Traversable
      *
      * @param UserInterface $user

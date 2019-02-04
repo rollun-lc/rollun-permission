@@ -53,16 +53,6 @@
     }
   },
   "scripts": {
-    "post-create-project-cmd": [
-      "@development-enable"
-    ],
-    "development-disable": "zf-development-mode disable",
-    "development-enable": "zf-development-mode enable",
-    "development-status": "zf-development-mode status",
-    "check": [
-      "@cs-check",
-      "@test"
-    ],
     "test": "phpunit --colors=always",
     "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
     "upload-coverage": "coveralls -v",
