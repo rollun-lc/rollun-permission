@@ -1,17 +1,7 @@
-# rollun-permission
+# rollun-datastore
 
----
-## [Оглавление](https://github.com/rollun-com/rollun-skeleton/blob/master/docs/Contents.md)
+`rollun-permission` - это библиотека, которая предоставляет возможность проверять права доступа пользователя 
+используя [ACL](https://en.wikipedia.org/wiki/Access_control_list),
+а также аунтефицировать пользователя с помощью [Google Auth 2.0](https://developers.google.com/identity/protocols/OAuth2).
 
----
-> Все туториалы предполагают что абстрактные фабрики были указаны в конфигах.
-
-Каркас для создания приложений. 
-
-* [Стандарты](https://github.com/rollun-com/rollun-skeleton/blob/master/docs/Standarts.md)
-
-* [ACL](https://github.com/rollun-com/rollun-permission/blob/master/docs/ACL.md)
-
-* [Authentication](https://github.com/rollun-com/rollun-permission/blob/master/docs/Auth.md)
-
-* [Quickstart](https://github.com/avz-cmf/saas/blob/master/docs/Quickstart.md)
+* [Документация](https://rollun-com.github.io/rollun-permission)

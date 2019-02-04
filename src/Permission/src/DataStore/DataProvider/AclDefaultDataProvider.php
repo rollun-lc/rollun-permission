@@ -1,10 +1,7 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: root
- * Date: 27.10.17
- * Time: 14:38
+ * @copyright Copyright © 2014 Rollun LC (http://rollun.com/)
+ * @license LICENSE.md New BSD License
  */
 
 namespace rollun\permission\DataStore\DataProvider;
@@ -16,7 +13,7 @@ class AclDefaultDataProvider
     /**
      * @return array
      */
-    static public function getAclPrivilegeData()
+    public static function getAclPrivilegeData()
     {
         return [
             [AclPrivilegeTable::FILED_NAME => "GET"],
