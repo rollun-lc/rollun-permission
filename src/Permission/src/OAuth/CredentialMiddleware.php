@@ -7,7 +7,6 @@
 namespace rollun\permission\OAuth;
 
 use Exception;
-use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -121,7 +120,9 @@ abstract class CredentialMiddleware extends OAuthMiddleware
      */
     protected function getAuthorizedResponse(ServerRequestInterface $request): ResponseInterface
     {
-        return ($this->authorizedResponseFactory)($request)->withStatus(200);
+        return ($this->authorizedResponseFactory)($request)
+            ->withStatus(301)
+            ->withHeader('Location', '/');
     }
 
     /**
