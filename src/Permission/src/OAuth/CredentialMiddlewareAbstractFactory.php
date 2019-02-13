@@ -72,7 +72,7 @@ class CredentialMiddlewareAbstractFactory extends AbstractOAuthMiddlewareFactory
         }
 
         if (isset($serviceConfig[self::KEY_UN_AUTHORIZE_RESPONSE_FACTORY])) {
-            $unauthorizedResponseFactory = $serviceConfig[self::KEY_UN_AUTHORIZE_RESPONSE_FACTORY];
+            $unauthorizedResponseFactory = $container->get($serviceConfig[self::KEY_UN_AUTHORIZE_RESPONSE_FACTORY]);
         } else {
             $unauthorizedResponseFactory = function () {
                 return new Response();
