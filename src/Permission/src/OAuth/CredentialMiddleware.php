@@ -120,9 +120,7 @@ abstract class CredentialMiddleware extends OAuthMiddleware
      */
     protected function getAuthorizedResponse(ServerRequestInterface $request): ResponseInterface
     {
-        return ($this->authorizedResponseFactory)($request)
-            ->withStatus(301)
-            ->withHeader('Location', '/');
+        return ($this->authorizedResponseFactory)($request);
     }
 
     /**
@@ -131,6 +129,6 @@ abstract class CredentialMiddleware extends OAuthMiddleware
      */
     protected function getUnAuthorizedResponse(ServerRequestInterface $request): ResponseInterface
     {
-        return ($this->unauthorizedResponseFactory)($request)->withStatus(401);
+        return ($this->unauthorizedResponseFactory)($request);
     }
 }
