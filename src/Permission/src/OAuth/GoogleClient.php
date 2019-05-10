@@ -77,6 +77,7 @@ class GoogleClient extends Google_Client
         if ($this->verifyIdToken($idToken)) {
             [$headerEndoced, $payloadEndoced, $signEndoced] = explode('.', $idToken);
             $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($payloadEndoced));
+            $payload = json_decode(json_encode($payload), true);
 
 
             return $payload['sub'];
