@@ -8,7 +8,10 @@ namespace rollun\permission\Authorization\Factory;
 
 use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
+use RecursiveArrayIterator;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
+use rollun\permission\DataStore\AclDataStoreIterator;
+use Xiag\Rql\Parser\Query;
 use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\FactoryInterface;
 
@@ -50,7 +53,7 @@ class AclFromDataStoreFactory implements FactoryInterface
     {
         $serviceConfig = $container->get('config')[self::class] ?? null;
 
-        if (is_null($serviceConfig)) {
+        if ($serviceConfig === null) {
             throw new InvalidArgumentException('Missing config for ' . AclFromDataStoreFactory::class . ' factory');
         }
 
@@ -101,7 +104,8 @@ class AclFromDataStoreFactory implements FactoryInterface
      */
     private function aclAdd(DataStoresInterface $dataStore, Acl $acl, $addType)
     {
-        $iterator = $dataStore->getIterator();
+        $data = $dataStore->query(new Query());
+        $iterator = new AclDataStoreIterator($data);
 
         foreach ($iterator as $record) {
             $parent = isset($record['parent_id']) ? $dataStore->read($record['parent_id'])['name'] : null;
