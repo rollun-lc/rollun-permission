@@ -102,6 +102,12 @@ abstract class OAuthMiddleware implements MiddlewareInterface
                 throw new InvalidArgumentException("Missing '$config' config for redirect");
             }
         }
+        $this->logger->debug('actionToRedirectUri', [
+            'action' => $action,
+            'routeNameConfig' => $routeNameConfig,
+            'host' => $this->getConfig('host'),
+            'path' => $this->urlHelper->generate($this->getConfig($routeNameConfig))
+        ]);
 
         return $this->getConfig('host') . $this->urlHelper->generate($this->getConfig($routeNameConfig));
     }

@@ -71,10 +71,18 @@ class RedirectMiddleware extends OAuthMiddleware
     {
         $action = $request->getQueryParams()[self::KEY_ACTION] ?? null;
 
+
         if (!in_array($action, [LoginMiddleware::ACTION, RegisterMiddleware::ACTION])) {
             return null;
         }
 
-        return $this->actionToRedirectUri($action);
+        $url = $this->actionToRedirectUri($action);
+
+        $this->logger->debug('getRedirectUri', [
+            'action' => $action,
+            'url' => $url
+        ]);
+
+        return $url;
     }
 }

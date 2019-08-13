@@ -78,6 +78,7 @@ class GoogleClient extends Google_Client
             [$headerEndoced, $payloadEndoced, $signEndoced] = explode('.', $idToken);
             $payload = \Firebase\JWT\JWT::jsonDecode(\Firebase\JWT\JWT::urlsafeB64Decode($payloadEndoced));
             $payload = json_decode(json_encode($payload), true);
+            $this->getLogger()->debug('auth payload', ['payload' => $payload]);
 
 
             return $payload['sub'];
@@ -93,6 +94,8 @@ class GoogleClient extends Google_Client
     {
         $service = new Google_Service_Oauth2($this);
         $user = $service->userinfo->get();
+        $this->getLogger()->debug('UserInfo', ['user' => $user]);
+
 
         return $user->email;
     }
