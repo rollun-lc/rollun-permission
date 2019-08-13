@@ -103,6 +103,7 @@ abstract class OAuthMiddleware implements MiddlewareInterface
             }
         }
         $this->logger->debug('actionToRedirectUri', [
+            'config' => $this->config,
             'action' => $action,
             'routeNameConfig' => $routeNameConfig,
             'host' => $this->getConfig('host'),
