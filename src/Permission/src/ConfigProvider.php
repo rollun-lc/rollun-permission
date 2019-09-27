@@ -6,6 +6,7 @@
 
 namespace rollun\permission;
 
+use Psr\Container\ContainerInterface;
 use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\datastore\DataStore\Factory\DbTableAbstractFactory;
 use rollun\datastore\TableGateway\Factory\TableGatewayAbstractFactory;
@@ -45,6 +46,8 @@ use rollun\permission\OAuth\RedirectMiddlewareFactory;
 use rollun\permission\OAuth\RegisterMiddleware;
 use Zend\Expressive\Authentication\AuthenticationInterface;
 use Zend\Expressive\Authentication\AuthenticationMiddleware;
+use Zend\Expressive\Authentication\DefaultUser;
+use Zend\Expressive\Authentication\UserInterface;
 use Zend\Expressive\Authentication\UserRepositoryInterface;
 use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\InvokableFactory;
@@ -148,6 +151,26 @@ class ConfigProvider
                 AclMiddleware::class => AclMiddlewareFactory::class,
                 Acl::class => AclFromDataStoreFactory::class,
                 UserRepository::class => UserRepositoryFactory::class,
+                'SessionUserRepository' => function (ContainerInterface $container) {
+                    $userDataStore = $container->get(AssetInstaller::USER_DATASTORE_SERVICE);
+                    $userRoleDataStore = $container->get(AssetInstaller::USER_ROLE_DATASTORE_SERVICE);
+                    $roleDataStore = $container->get(AssetInstaller::ROLE_DATASTORE_SERVICE);
+                    $config = [
+                        'details' => [AclUsersTable::FILED_NAME],
+                        'without_password' => true
+                    ];
+                    $userFactory = function (string $identity, array $roles = [], array $details = []): UserInterface {
+                        return new DefaultUser($identity, $roles, $details);
+                    };
+
+                    return new UserRepository(
+                        $userDataStore,
+                        $userRoleDataStore,
+                        $roleDataStore,
+                        $userFactory,
+                        $config
+                    );
+                },
                 GuestAuthentication::class => GuestAuthenticationFactory::class,
                 RedirectMiddleware::class => RedirectMiddlewareFactory::class,
                 GoogleClient::class => GoogleClientFactory::class,
@@ -311,7 +334,7 @@ class ConfigProvider
         return [
             'phpSession' => [
                 PhpSessionAbstractFactory::KEY_CONFIG => ['redirect' => '/login'],
-                PhpSessionAbstractFactory::KEY_USER_REPOSITORY => UserRepository::class,
+                PhpSessionAbstractFactory::KEY_USER_REPOSITORY => 'SessionUserRepository',
             ],
         ];
     }

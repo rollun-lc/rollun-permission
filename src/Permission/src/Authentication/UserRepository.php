@@ -112,9 +112,12 @@ class UserRepository implements UserRepositoryInterface
         $user = $this->users->read($credential);
 
         if ($user) {
-            if (!$password || !$this->verifyPassword($user, $password)) {
-                return null;
+            if (!$this->config['without_password']) {
+                if (!$password || !$this->verifyPassword($user, $password)) {
+                    return null;
+                }
             }
+
 
             return ($this->userFactory)(
                 $this->users->getIdentifier(),
