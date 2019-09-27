@@ -13,6 +13,7 @@ use rollun\permission\DataStore\AclRolesTable;
 use rollun\permission\DataStore\AclUserRolesTable;
 use rollun\permission\DataStore\AclUsersTable;
 use Xiag\Rql\Parser\Node\Query\ScalarOperator\EqNode;
+use Xiag\Rql\Parser\Query;
 use Zend\Expressive\Authentication\UserInterface;
 use Zend\Expressive\Authentication\UserRepositoryInterface;
 
@@ -111,7 +112,7 @@ class UserRepository implements UserRepositoryInterface
         $user = $this->users->read($credential);
 
         if ($user) {
-            if ($password && !$this->verifyPassword($user, $password)) {
+            if (!$password || !$this->verifyPassword($user, $password)) {
                 return null;
             }
 
@@ -181,7 +182,9 @@ class UserRepository implements UserRepositoryInterface
     protected function getRoles($userId)
     {
         $roles = [];
-        $result = $this->userRoles->query(new RqlQuery(new EqNode($this->config['userIdInUserRoles'], $userId)));
+        $query = new Query();
+        $query->setQuery(new EqNode($this->config['userIdInUserRoles'], $userId));
+        $result = $this->userRoles->query($query);
 
         foreach ($result as $item) {
             $role = $this->roles->read($item[$this->config['roleIdInUserRoles']]);
