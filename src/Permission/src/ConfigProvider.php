@@ -101,9 +101,11 @@ class ConfigProvider
             CredentialMiddlewareAbstractFactory::class => [
                 LoginMiddleware::class => [
                     CredentialMiddlewareAbstractFactory::KEY_CLASS => LoginMiddleware::class,
+                    CredentialMiddlewareAbstractFactory::KEY_USER_REPOSITORY => 'WithoutPassUserRepository',
                 ],
                 RegisterMiddleware::class => [
                     CredentialMiddlewareAbstractFactory::KEY_CLASS => RegisterMiddleware::class,
+                    CredentialMiddlewareAbstractFactory::KEY_USER_REPOSITORY => 'WithoutPassUserRepository',
                 ],
             ],
             AbstractOAuthMiddlewareFactory::KEY_OAUTH_CONFIG => [
@@ -151,7 +153,7 @@ class ConfigProvider
                 AclMiddleware::class => AclMiddlewareFactory::class,
                 Acl::class => AclFromDataStoreFactory::class,
                 UserRepository::class => UserRepositoryFactory::class,
-                'SessionUserRepository' => function (ContainerInterface $container) {
+                'WithoutPassUserRepository' => function (ContainerInterface $container) {
                     $userDataStore = $container->get(AssetInstaller::USER_DATASTORE_SERVICE);
                     $userRoleDataStore = $container->get(AssetInstaller::USER_ROLE_DATASTORE_SERVICE);
                     $roleDataStore = $container->get(AssetInstaller::ROLE_DATASTORE_SERVICE);
@@ -334,7 +336,7 @@ class ConfigProvider
         return [
             'phpSession' => [
                 PhpSessionAbstractFactory::KEY_CONFIG => ['redirect' => '/login'],
-                PhpSessionAbstractFactory::KEY_USER_REPOSITORY => 'SessionUserRepository',
+                PhpSessionAbstractFactory::KEY_USER_REPOSITORY => 'WithoutPassUserRepository',
             ],
         ];
     }
