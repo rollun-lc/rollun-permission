@@ -143,7 +143,6 @@ class ConfigProvider
             'factories' => [
                 PermissionMiddleware::class => PermissionMiddlewareFactory::class,
                 ExpressiveRouteName::class => InvokableFactory::class,
-                PermissionMiddleware::class => PermissionMiddlewareFactory::class,
                 ResourceResolver::class => ResourceResolverAbstractFactory::class,
                 RoleResolver::class => RoleResolverFactory::class,
                 AclMiddleware::class => AclMiddlewareFactory::class,

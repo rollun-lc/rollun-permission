@@ -8,8 +8,8 @@ namespace rollun\permission\Authentication\Factory;
 
 use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
+use rollun\permission\Authentication\BasicAccess;
 use Zend\Diactoros\Response;
-use Zend\Expressive\Authentication\Basic\BasicAccess;
 use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
