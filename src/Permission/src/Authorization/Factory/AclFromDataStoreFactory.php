@@ -82,15 +82,32 @@ class AclFromDataStoreFactory implements FactoryInterface
         $this->aclAdd($dataStoreRole, $acl, "Role");
         $this->aclAdd($dataStoreResource, $acl, "Resource");
 
-        foreach ($dataStoreRule as $item) {
-            $role = $dataStoreRole->read($item['role_id']);
-            $resource = $dataStoreResource->read($item['resource_id']);
-            $privilege = $dataStorePrivilege->read($item['privilege_id']);
+        $query = new Query();
 
+        $dataStoreRuleList = $dataStoreRule->query($query);
+
+        $dataStoreRoleList = $dataStoreRole->query($query);
+        $roleList = array_combine(array_column($dataStoreRoleList, 'id'), $dataStoreRoleList);
+
+        $dataStoreResourceList = $dataStoreResource->query($query);
+        $resourceList = array_combine(array_column($dataStoreResourceList, 'id'), $dataStoreResourceList);
+
+        $dataStorePrivilegeList = $dataStorePrivilege->query($query);
+        $privilegeList = array_combine(array_column($dataStorePrivilegeList, 'id'), $dataStorePrivilegeList);
+
+        foreach ($dataStoreRuleList as $item) {
             if ($item['allow_flag']) {
-                $acl->allow($role['name'], $resource['name'], $privilege['name']);
+                $acl->allow(
+                    $roleList[$item['role_id']]['name'],
+                    $resourceList[$item['resource_id']]['name'],
+                    $privilegeList[$item['privilege_id']]['name']
+                );
             } else {
-                $acl->deny($role['name'], $resource['name'], $privilege['name']);
+                $acl->deny(
+                    $roleList[$item['role_id']]['name'],
+                    $resourceList[$item['resource_id']]['name'],
+                    $privilegeList[$item['privilege_id']]['name']
+                );
             }
         }
 
@@ -113,3 +130,4 @@ class AclFromDataStoreFactory implements FactoryInterface
         }
     }
 }
+
