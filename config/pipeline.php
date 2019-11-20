@@ -5,6 +5,7 @@
  */
 
 use Psr\Container\ContainerInterface;
+use rollun\permission\PermissionMiddleware;
 use Zend\Expressive\Application;
 use Zend\Expressive\Helper\ServerUrlMiddleware;
 use Zend\Expressive\Helper\UrlHelperMiddleware;
@@ -59,6 +60,7 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // - route-based validation
     // - etc.
     $app->pipe(SessionMiddleware::class);
+    $app->pipe(PermissionMiddleware::class);
     // Register the dispatch middleware in the middleware pipeline
     $app->pipe(DispatchMiddleware::class);
 };
