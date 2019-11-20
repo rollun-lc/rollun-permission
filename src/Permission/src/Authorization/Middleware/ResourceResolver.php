@@ -12,6 +12,7 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\permission\Authorization\ResourceProducer\ResourceProducerInterface;
+use Xiag\Rql\Parser\Query;
 
 class ResourceResolver implements MiddlewareInterface
 {
@@ -42,7 +43,8 @@ class ResourceResolver implements MiddlewareInterface
     {
         $resource = 'none';
 
-        foreach ($this->resourceDataStore as $item) {
+        $resourceList = $this->resourceDataStore->query(new Query());
+        foreach ($resourceList as $item) {
             foreach ($this->resourceProducers as $resourceProducer) {
                 if (!$resourceProducer->canProduce($request)) {
                     continue;
