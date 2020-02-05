@@ -49,6 +49,7 @@ use Zend\Expressive\Authentication\AuthenticationMiddleware;
 use Zend\Expressive\Authentication\DefaultUser;
 use Zend\Expressive\Authentication\UserInterface;
 use Zend\Expressive\Authentication\UserRepositoryInterface;
+use Zend\Expressive\Helper\UrlHelper;
 use Zend\Permissions\Acl\Acl;
 use Zend\ServiceManager\Factory\InvokableFactory;
 
@@ -176,6 +177,10 @@ class ConfigProvider
                 GuestAuthentication::class => GuestAuthenticationFactory::class,
                 RedirectMiddleware::class => RedirectMiddlewareFactory::class,
                 GoogleClient::class => GoogleClientFactory::class,
+                AccessForbiddenHandler::class => function (ContainerInterface $container) {
+                    $urlHelper = $container->get(UrlHelper::class);
+                    return new AccessForbiddenHandler($urlHelper);
+                }
             ],
             'aliases' => [
                 ConfigProvider::AUTHENTICATION_MIDDLEWARE_SERVICE => AuthenticationMiddleware::class,
@@ -201,7 +206,6 @@ class ConfigProvider
             ],
             'invokables' => [
                 PrivilegeResolver::class => PrivilegeResolver::class,
-                AccessForbiddenHandler::class => AccessForbiddenHandler::class,
                 ExpressiveRouteName::class => ExpressiveRouteName::class,
             ],
         ];
