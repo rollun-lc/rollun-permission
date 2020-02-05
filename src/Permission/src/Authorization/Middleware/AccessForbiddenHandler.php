@@ -10,10 +10,19 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Zend\Diactoros\Response\JsonResponse;
+use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Expressive\Authentication\UserInterface;
+use Zend\Expressive\Helper\UrlHelper;
 
 class AccessForbiddenHandler implements RequestHandlerInterface
 {
+    private $urlHelper;
+
+    public function __construct(UrlHelper $urlHelper)
+    {
+        $this->urlHelper = $urlHelper;
+    }
+
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $roles = $request->getAttribute(RoleResolver::KEY_ATTRIBUTE_ROLE);
@@ -33,6 +42,10 @@ class AccessForbiddenHandler implements RequestHandlerInterface
 
         if (!empty($privilege)) {
             $body[] = "with privilege = '$privilege'";
+        }
+
+        if(current($request->getHeader('Accept')) != 'application/json' && $user->getIdentity() == 'guest') {
+            return new RedirectResponse($this->urlHelper->generate('login-action'), 301, ['Cache-Control'=>'no-cache']);
         }
 
         return new JsonResponse(implode(', ', $body), 403);
