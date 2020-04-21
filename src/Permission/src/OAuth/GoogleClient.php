@@ -26,6 +26,7 @@ class GoogleClient extends Google_Client
     public function __construct(array $config = [], LoggerInterface $logger = null)
     {
         parent::__construct($config);
+        $this->setApprovalPrompt(null);
         InsideConstruct::setConstructParams(["logger" => LoggerInterface::class]);
     }
 
