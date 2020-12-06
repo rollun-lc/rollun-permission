@@ -63,7 +63,15 @@ class LoginMiddleware extends CredentialMiddleware
     protected function getAuthorizedResponse(ServerRequestInterface $request): ResponseInterface
     {
         $response = parent::getAuthorizedResponse($request);
-        $userIdentity = $this->getSession($request)->get(UserInterface::class);
+        $session = $this->getSession($request);
+        $userIdentity = $session->get(UserInterface::class);
+        $path = $session->get('base_url');
+        $response = $response->withHeader('X-Redirect-Path', $path ?? '-');
+        if ($path) {
+            $response = $response->withHeader("Location", $path)
+                ->withStatus(301);
+        }
+
         $response = $response->withHeader('X-User-Identity', json_encode($userIdentity));
 
         return $response;

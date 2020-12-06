@@ -13,6 +13,8 @@ use Zend\Diactoros\Response\JsonResponse;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Expressive\Authentication\UserInterface;
 use Zend\Expressive\Helper\UrlHelper;
+use Zend\Expressive\Session\SessionInterface;
+use Zend\Expressive\Session\SessionMiddleware;
 
 class AccessForbiddenHandler implements RequestHandlerInterface
 {
@@ -44,8 +46,19 @@ class AccessForbiddenHandler implements RequestHandlerInterface
             $body[] = "with privilege = '$privilege'";
         }
 
-        if(current($request->getHeader('Accept')) != 'application/json' && $user->getIdentity() == 'guest') {
-            return new RedirectResponse($this->urlHelper->generate('login-action'), 301, ['Cache-Control'=>'no-cache']);
+        /** @var SessionInterface $session */
+        $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
+        $basePath = $request->getUri()->getPath();
+        if ($session) {
+            $session->set('base_url', $basePath);
+        }
+
+        if (current($request->getHeader('Accept')) != 'application/json' && $user->getIdentity() == 'guest') {
+            return new RedirectResponse($this->urlHelper->generate('login-action'), 301,
+                [
+                    'Cache-Control' => 'no-cache',
+                    'X-Base-Path' => $basePath
+                ]);
         }
 
         return new JsonResponse(implode(', ', $body), 403);
