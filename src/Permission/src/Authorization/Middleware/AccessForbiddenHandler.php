@@ -46,14 +46,15 @@ class AccessForbiddenHandler implements RequestHandlerInterface
             $body[] = "with privilege = '$privilege'";
         }
 
-        /** @var SessionInterface $session */
-        $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        $basePath = $request->getUri()->getPath();
-        if ($session && strstr($basePath, "api/") === false) {
-            $session->set('base_url', $basePath);
-        }
-
         if (current($request->getHeader('Accept')) != 'application/json' && $user->getIdentity() == 'guest') {
+
+            /** @var SessionInterface $session */
+            $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
+            $basePath = $request->getUri()->getPath();
+            if ($session && strstr($basePath, "api/") === false) {
+                $session->set('base_url', $basePath);
+            }
+
             return new RedirectResponse($this->urlHelper->generate('login-action'), 301,
                 [
                     'Cache-Control' => 'no-cache',
