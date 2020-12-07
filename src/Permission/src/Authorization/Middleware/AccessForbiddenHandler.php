@@ -49,7 +49,7 @@ class AccessForbiddenHandler implements RequestHandlerInterface
         /** @var SessionInterface $session */
         $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
         $basePath = $request->getUri()->getPath();
-        if ($session) {
+        if ($session && strstr($basePath, "api/") === false) {
             $session->set('base_url', $basePath);
         }
 
