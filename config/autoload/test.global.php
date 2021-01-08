@@ -7,9 +7,6 @@
 use rollun\datastore\DataStore\DbTable;
 use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\datastore\DataStore\Factory\DbTableAbstractFactory;
-use rollun\logger\Formatter\ContextToString;
-use rollun\logger\Processor\ExceptionBacktrace;
-use rollun\logger\Processor\IdMaker;
 use Zend\Db\Adapter\AdapterInterface;
 
 return [
@@ -32,36 +29,5 @@ return [
             DbTableAbstractFactory::KEY_TABLE_NAME => 'logs',
             DbTableAbstractFactory::KEY_DB_ADAPTER => 'db',
         ]
-    ],
-    'log' => [
-        'Psr\Log\LoggerInterface' => [
-            'processors' => [
-                [
-                    'name' => IdMaker::class,
-                ],
-                [
-                    'name' => ExceptionBacktrace::class
-                ]
-            ],
-            'writers' => [
-                [
-                    'name' => 'Zend\Log\Writer\Db',
-                    'options' => [
-                        'db' => 'db',
-                        'table' => 'logs',
-                        'column' => [
-                            'id' => 'id',
-                            'timestamp' => 'timestamp',
-                            'message' => 'message',
-                            'level' => 'level',
-                            'priority' => 'priority',
-                            'context' => 'context',
-                            'lifecycle_token' => 'lifecycle_token',
-                        ],
-                        'formatter' => ContextToString::class,
-                    ],
-                ],
-            ],
-        ],
     ],
 ];
