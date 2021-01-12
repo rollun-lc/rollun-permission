@@ -40,7 +40,7 @@
     "zendframework/zend-config-aggregator": "^1.1",
     "zendframework/zend-expressive": "^3.2",
     "symfony/dotenv": "^4.2",
-    "rollun-com/rollun-logger": "^5.1",
+    "rollun-com/rollun-logger": "^4.0||^5.1",
     "zendframework/zend-expressive-fastroute": "^3.0"
   },
   "autoload": {
