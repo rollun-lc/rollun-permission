@@ -6,6 +6,7 @@
 
 namespace rollun\permission\DataStore;
 
+use rollun\datastore\DataStore\DataStoreException;
 use rollun\datastore\TableGateway\TableManagerMysql;
 
 class AclUsersTable extends AutoIdTable
@@ -57,5 +58,56 @@ class AclUsersTable extends AutoIdTable
                 ],
             ],
         ];
+    }
+
+    /**
+     * @param $itemData
+     * @param bool $rewriteIfExist
+     * @return array|mixed|null
+     * @throws DataStoreException
+     */
+    public function create($itemData, $rewriteIfExist = false)
+    {
+        if ($this->isDataMultipleData($itemData)) {
+            foreach ($itemData as &$datum) {
+                $this->passwordHash($datum);
+            }
+        } else {
+            $this->passwordHash($itemData);
+        }
+
+        return parent::create($itemData, $rewriteIfExist);
+    }
+
+    /**
+     * @param $itemData
+     * @param bool $createIfAbsent
+     * @return array|mixed|null
+     * @throws DataStoreException
+     */
+    public function update($itemData, $createIfAbsent = false)
+    {
+        if ($this->isDataMultipleData($itemData)) {
+            foreach ($itemData as &$datum) {
+                $this->passwordHash($datum);
+            }
+        } else {
+            $this->passwordHash($itemData);
+        }
+
+        return parent::update($itemData, $createIfAbsent);
+    }
+
+    /**
+     * Create password hash using bcrypt algorithm.
+     *
+     * @param array $itemData
+     */
+    private function passwordHash(array &$itemData)
+    {
+        if (isset($itemData[self::FILED_PASSWORD])) {
+            $hashedPassword = password_hash($itemData[self::FILED_PASSWORD], PASSWORD_BCRYPT);
+            $itemData[self::FILED_PASSWORD] = $hashedPassword;
+        }
     }
 }
