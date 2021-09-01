@@ -37,6 +37,10 @@ class ResourceResolverAbstractFactory implements AbstractFactoryInterface
 {
     const KEY_RESOURCE_PRODUCERS = 'resourceProducers';
 
+    const KEY_SERVICE_NAME = 'serviceName';
+
+    const KEY_PRIORITY = 'priority';
+
     /**
      * @param ContainerInterface $container
      * @param string $requestedName
@@ -65,11 +69,20 @@ class ResourceResolverAbstractFactory implements AbstractFactoryInterface
 
         $resourceProducers = [];
 
-        foreach ($serviceConfig[self::KEY_RESOURCE_PRODUCERS] as $resourceProducerServiceName) {
-            $resourceProducers[] = $container->get($resourceProducerServiceName);
-        }
+        // sort resource producers by priority
+        usort($serviceConfig[self::KEY_RESOURCE_PRODUCERS], function ($a, $b) {
+            if (!isset($a[self::KEY_PRIORITY]) || !isset($b[self::KEY_PRIORITY])) {
+                throw new \InvalidArgumentException("Option '" . self::KEY_PRIORITY . "' is required");
+            }
+            return $a[self::KEY_PRIORITY] - $b[self::KEY_PRIORITY];
+        });
 
-        sort($resourceProducers);
+        foreach ($serviceConfig[self::KEY_RESOURCE_PRODUCERS] as $resourceProducer) {
+            if (!isset($resourceProducer[self::KEY_SERVICE_NAME])) {
+                throw new \InvalidArgumentException("Option '" . self::KEY_SERVICE_NAME . "' is required");
+            }
+            $resourceProducers[] = $container->get($resourceProducer[self::KEY_SERVICE_NAME]);
+        }
 
         return new ResourceResolver($dataStorePrivilege, $resourceProducers);
     }

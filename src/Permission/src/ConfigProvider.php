@@ -268,8 +268,14 @@ class ConfigProvider
         return [
             ResourceResolver::class => [
                 ResourceResolverAbstractFactory::KEY_RESOURCE_PRODUCERS => [
-                    'resourceNameAttribute',
-                    'routeName',
+                    [
+                        ResourceResolverAbstractFactory::KEY_SERVICE_NAME => 'resourceNameAttribute',
+                        ResourceResolverAbstractFactory::KEY_PRIORITY => 10
+                    ],
+                    [
+                        ResourceResolverAbstractFactory::KEY_SERVICE_NAME => 'routeName',
+                        ResourceResolverAbstractFactory::KEY_PRIORITY => 20
+                    ],
                 ],
             ],
         ];
