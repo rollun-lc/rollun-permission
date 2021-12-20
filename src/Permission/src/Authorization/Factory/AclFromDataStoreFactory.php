@@ -78,10 +78,6 @@ class AclFromDataStoreFactory implements FactoryInterface
         $dataStorePrivilege = $container->get($serviceConfig[self::KEY_DATASTORE_PRIVILEGE_SERVICE]);
         $dataStoreResource = $container->get($serviceConfig[self::KEY_DATASTORE_RESOURCE_SERVICE]);
 
-        $acl = new Acl();
-        $this->aclAdd($dataStoreRole, $acl, "Role");
-        $this->aclAdd($dataStoreResource, $acl, "Resource");
-
         $query = new Query();
 
         $dataStoreRuleList = $dataStoreRule->query($query);
@@ -91,6 +87,10 @@ class AclFromDataStoreFactory implements FactoryInterface
 
         $dataStoreResourceList = $dataStoreResource->query($query);
         $resourceList = array_combine(array_column($dataStoreResourceList, 'id'), $dataStoreResourceList);
+
+        $acl = new Acl();
+        $this->aclAdd($roleList, $acl, "Role");
+        $this->aclAdd($resourceList, $acl, "Resource");
 
         $dataStorePrivilegeList = $dataStorePrivilege->query($query);
         $privilegeList = array_combine(array_column($dataStorePrivilegeList, 'id'), $dataStorePrivilegeList);
@@ -115,17 +115,16 @@ class AclFromDataStoreFactory implements FactoryInterface
     }
 
     /**
-     * @param DataStoresInterface $dataStore
+     * @param array $data
      * @param Acl $acl
      * @param $addType
      */
-    private function aclAdd(DataStoresInterface $dataStore, Acl $acl, $addType)
+    private function aclAdd(array $data, Acl $acl, $addType)
     {
-        $data = $dataStore->query(new Query());
         $iterator = new AclDataStoreIterator($data);
 
         foreach ($iterator as $record) {
-            $parent = isset($record['parent_id']) ? $dataStore->read($record['parent_id'])['name'] : null;
+            $parent = isset($record['parent_id']) ? $data[$record['parent_id']]['name'] : null;
             $acl->{"add" . $addType}($record['name'], $parent);
         }
     }
