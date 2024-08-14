@@ -4,12 +4,12 @@
  * @license LICENSE.md New BSD License
  */
 
-namespace rollun\test\functional\Permission\Authentication;
+namespace rollun\test\functional\Permission\Authentication\OAuth\Middleware;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
-use rollun\permission\Authentication\OAuth\GoogleClient;
-use rollun\permission\Authentication\OAuth\RedirectMiddleware;
+use rollun\permission\OAuth\GoogleClient;
+use rollun\permission\OAuth\RedirectMiddleware;
 use Zend\Diactoros\Response\RedirectResponse;
 use Zend\Diactoros\ServerRequest;
 
