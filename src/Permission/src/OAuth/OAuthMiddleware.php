@@ -10,10 +10,10 @@ use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Log\LoggerInterface;
-use Zend\Expressive\Authentication\Session\Exception\MissingSessionContainerException;
-use Zend\Expressive\Helper\UrlHelper;
-use Zend\Expressive\Session\SessionInterface;
-use Zend\Expressive\Session\SessionMiddleware;
+use Mezzio\Authentication\Session\Exception\MissingSessionContainerException;
+use Mezzio\Helper\UrlHelper;
+use Mezzio\Session\SessionInterface;
+use Mezzio\Session\SessionMiddleware;
 
 abstract class OAuthMiddleware implements MiddlewareInterface
 {

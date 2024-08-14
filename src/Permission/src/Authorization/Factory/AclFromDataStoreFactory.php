@@ -12,8 +12,8 @@ use RecursiveArrayIterator;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\permission\DataStore\AclDataStoreIterator;
 use Xiag\Rql\Parser\Query;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\FactoryInterface;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 
 /**
  * Create instance of Acl using 'config' service as array in ContainerInterface

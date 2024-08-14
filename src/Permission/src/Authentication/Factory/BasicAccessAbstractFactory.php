@@ -9,8 +9,8 @@ namespace rollun\permission\Authentication\Factory;
 use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
 use rollun\permission\Authentication\BasicAccess;
-use Zend\Diactoros\Response;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\Diactoros\Response;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 /**

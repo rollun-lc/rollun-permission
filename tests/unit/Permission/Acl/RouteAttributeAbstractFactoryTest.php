@@ -11,7 +11,7 @@ use PHPUnit\Framework\TestCase;
 use Interop\Container\ContainerInterface;
 use rollun\permission\Authorization\ResourceProducer\RouteAttributeAbstractFactory;
 use rollun\permission\Authorization\ResourceProducer\RouteReceiver\RouteNameReceiverInterface;
-use Zend\ServiceManager\ServiceManager;
+use Laminas\ServiceManager\ServiceManager;
 
 class RouteAttributeAbstractFactoryTest extends TestCase
 {

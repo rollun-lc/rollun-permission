@@ -10,7 +10,7 @@ use rollun\datastore\DataStore\DataStoreException;
 use rollun\datastore\DataStore\SerializedDbTable;
 use rollun\datastore\DataStore\Traits\AutoIdGeneratorTrait;
 use rollun\utils\IdGenerator;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\TableGateway\TableGateway;
 
 class AutoIdTable extends SerializedDbTable
 {

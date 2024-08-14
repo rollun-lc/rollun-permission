@@ -7,7 +7,7 @@
 namespace rollun\permission\Authorization\ResourceProducer;
 
 use Interop\Container\ContainerInterface;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 
 /**
  * Abstract factories that extend this factory should have possibility

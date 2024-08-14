@@ -9,8 +9,8 @@ namespace rollun\permission\Authentication\Factory;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use rollun\permission\Authentication\UserRepository;
-use Zend\Expressive\Authentication\DefaultUser;
-use Zend\Expressive\Authentication\UserInterface;
+use Mezzio\Authentication\DefaultUser;
+use Mezzio\Authentication\UserInterface;
 
 /**
  * Create instance of DataStore (user repository) using 'config' service of $container

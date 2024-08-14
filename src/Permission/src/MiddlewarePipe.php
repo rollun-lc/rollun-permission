@@ -11,7 +11,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Stratigility\MiddlewarePipe as StratigilityMiddlewarePipe;
+use Laminas\Stratigility\MiddlewarePipe as StratigilityMiddlewarePipe;
 
 class MiddlewarePipe implements MiddlewareInterface
 {

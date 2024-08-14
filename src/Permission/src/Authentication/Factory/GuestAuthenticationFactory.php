@@ -8,8 +8,8 @@ namespace rollun\permission\Authentication\Factory;
 
 use Psr\Container\ContainerInterface;
 use rollun\permission\Authentication\GuestAuthentication;
-use Zend\Diactoros\Response;
-use Zend\Expressive\Authentication\DefaultUser;
+use Laminas\Diactoros\Response;
+use Mezzio\Authentication\DefaultUser;
 
 /**
  * Create instance of GuestAuthentication using 'config' service stored in ContainerInterface

@@ -20,7 +20,7 @@ use rollun\permission\DataStore\AclUserRolesTable;
 use rollun\permission\DataStore\AclUsersTable;
 use rollun\permission\DataStore\DataProvider\AclDefaultDataProvider;
 use rollun\utils\DbInstaller;
-use Zend\Db\TableGateway\TableGateway;
+use Laminas\Db\TableGateway\TableGateway;
 
 class AssetInstaller extends InstallerAbstract
 {

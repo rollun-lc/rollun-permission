@@ -44,14 +44,14 @@ use rollun\permission\OAuth\LoginMiddleware;
 use rollun\permission\OAuth\RedirectMiddleware;
 use rollun\permission\OAuth\RedirectMiddlewareFactory;
 use rollun\permission\OAuth\RegisterMiddleware;
-use Zend\Expressive\Authentication\AuthenticationInterface;
-use Zend\Expressive\Authentication\AuthenticationMiddleware;
-use Zend\Expressive\Authentication\DefaultUser;
-use Zend\Expressive\Authentication\UserInterface;
-use Zend\Expressive\Authentication\UserRepositoryInterface;
-use Zend\Expressive\Helper\UrlHelper;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\InvokableFactory;
+use Mezzio\Authentication\AuthenticationInterface;
+use Mezzio\Authentication\AuthenticationMiddleware;
+use Mezzio\Authentication\DefaultUser;
+use Mezzio\Authentication\UserInterface;
+use Mezzio\Authentication\UserRepositoryInterface;
+use Mezzio\Helper\UrlHelper;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
  * This config providers contain basic rollun-permission configuration

@@ -10,8 +10,8 @@ use Exception;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Zend\Expressive\Authentication\UserRepositoryInterface;
-use Zend\Expressive\Helper\UrlHelper;
+use Mezzio\Authentication\UserRepositoryInterface;
+use Mezzio\Helper\UrlHelper;
 
 abstract class CredentialMiddleware extends OAuthMiddleware
 {

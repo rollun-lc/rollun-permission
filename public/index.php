@@ -20,13 +20,13 @@ require 'vendor/autoload.php';
  * Self-called anonymous function that creates its own scope and keep the global namespace clean.
  */
 call_user_func(function () {
-    /** @var \Interop\Container\ContainerInterface $container */
+    /** @var Laminas\ServiceManager\ServiceManager $container */
     $container = require 'config/container.php';
     \rollun\dic\InsideConstruct::setContainer($container);
 
-    /** @var \Zend\Expressive\Application $app */
-    $app = $container->get(\Zend\Expressive\Application::class);
-    $factory = $container->get(\Zend\Expressive\MiddlewareFactory::class);
+    /** @var \Mezzio\Application $app */
+    $app = $container->get(\Mezzio\Application::class);
+    $factory = $container->get(\Mezzio\MiddlewareFactory::class);
 
     // Import programmatic/declarative middleware pipeline and routing
     // configuration statements

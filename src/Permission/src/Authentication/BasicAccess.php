@@ -4,8 +4,8 @@
 namespace rollun\permission\Authentication;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Expressive\Authentication\Basic\BasicAccess as ZendBasicAccess;
-use Zend\Expressive\Authentication\UserInterface;
+use Mezzio\Authentication\Basic\BasicAccess as ZendBasicAccess;
+use Mezzio\Authentication\UserInterface;
 
 
 class BasicAccess extends ZendBasicAccess

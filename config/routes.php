@@ -14,9 +14,9 @@ use rollun\permission\OAuth\LoginMiddleware;
 use rollun\permission\OAuth\LogoutMiddleware;
 use rollun\permission\OAuth\RedirectMiddleware;
 use rollun\permission\OAuth\RegisterMiddleware;
-use Zend\Diactoros\Response\HtmlResponse;
-use Zend\Expressive\Application;
-use Zend\Expressive\MiddlewareFactory;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Mezzio\Application;
+use Mezzio\MiddlewareFactory;
 
 /**
  * Setup routes with a single request method:
@@ -40,7 +40,7 @@ use Zend\Expressive\MiddlewareFactory;
  * $app->route(
  *     '/contact',
  *     App\Action\ContactAction::class,
- *     Zend\Expressive\Router\Route::HTTP_METHOD_ANY,
+ *     Mezzio\Router\Route::HTTP_METHOD_ANY,
  *     'contact'
  * );
  *

@@ -1,8 +1,8 @@
 <?php
 
 use Symfony\Component\Dotenv\Dotenv;
-use Zend\ConfigAggregator\ConfigAggregator;
-use Zend\ConfigAggregator\PhpFileProvider;
+use Laminas\ConfigAggregator\ConfigAggregator;
+use Laminas\ConfigAggregator\PhpFileProvider;
 
 // Make environment variables stored in .env accessible via getenv(), $_ENV or $_SERVER.
 (new Dotenv())->load('.env');
@@ -12,18 +12,18 @@ $appEnv = getenv('APP_ENV');
 
 $aggregator = new ConfigAggregator([
     // Zend config providers
-    \Zend\Expressive\Session\ConfigProvider::class,
-    \Zend\Expressive\Authentication\ConfigProvider::class,
-    \Zend\Db\ConfigProvider::class,
-    \Zend\Cache\ConfigProvider::class,
-    \Zend\Mail\ConfigProvider::class,
-    \Zend\Validator\ConfigProvider::class,
-    \Zend\Expressive\ConfigProvider::class,
-    \Zend\Expressive\Router\ConfigProvider::class,
-    \Zend\Expressive\Router\FastRouteRouter\ConfigProvider::class,
-    \Zend\Expressive\Helper\ConfigProvider::class,
-    \Zend\Expressive\Session\ConfigProvider::class,
-    \Zend\Expressive\Session\Ext\ConfigProvider::class,
+    \Mezzio\Session\ConfigProvider::class,
+    \Mezzio\Authentication\ConfigProvider::class,
+    \Laminas\Db\ConfigProvider::class,
+    \Laminas\Cache\ConfigProvider::class,
+    \Laminas\Mail\ConfigProvider::class,
+    \Laminas\Validator\ConfigProvider::class,
+    \Mezzio\ConfigProvider::class,
+    \Mezzio\Router\ConfigProvider::class,
+    \Mezzio\Router\FastRouteRouter\ConfigProvider::class,
+    \Mezzio\Helper\ConfigProvider::class,
+    \Mezzio\Session\ConfigProvider::class,
+    \Mezzio\Session\Ext\ConfigProvider::class,
 
     // Rollun config providers
     \rollun\permission\ConfigProvider::class,

@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use PHPUnit\Framework\MockObject\MockObject;
 use rollun\permission\Authorization\ResourceProducer\RouteReceiver\ExpressiveRouteName;
-use Zend\Expressive\Router\RouteResult;
+use Mezzio\Router\RouteResult;
 
 class ExpressiveRouteNameTest extends TestCase
 {

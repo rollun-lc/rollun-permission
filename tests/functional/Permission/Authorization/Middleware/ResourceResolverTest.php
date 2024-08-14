@@ -14,9 +14,9 @@ use rollun\datastore\DataStore\Memory;
 use rollun\permission\Authorization\Middleware\ResourceResolver;
 use rollun\permission\Authorization\ResourceProducer\RouteAttribute;
 use rollun\permission\Authorization\ResourceProducer\RouteReceiver\ExpressiveRouteName;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\ServerRequest;
-use Zend\Expressive\Router\RouteResult;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\ServerRequest;
+use Mezzio\Router\RouteResult;
 
 class ResourceResolverTest extends TestCase
 {

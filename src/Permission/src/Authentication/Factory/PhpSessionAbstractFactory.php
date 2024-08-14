@@ -8,10 +8,10 @@ namespace rollun\permission\Authentication\Factory;
 
 use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
-use Zend\Diactoros\Response;
-use Zend\Expressive\Authentication\DefaultUser;
-use Zend\Expressive\Authentication\Session\PhpSession;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\Diactoros\Response;
+use Mezzio\Authentication\DefaultUser;
+use Mezzio\Authentication\Session\PhpSession;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 
 /**
  * Create instance of PhpSession using 'config' service stored in ContainerInterface

@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Server\RequestHandlerInterface;
 use rollun\permission\OAuth\GoogleClient;
 use rollun\permission\OAuth\RedirectMiddleware;
-use Zend\Diactoros\Response\RedirectResponse;
-use Zend\Diactoros\ServerRequest;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\ServerRequest;
 
 class OAuthRedirectMiddlewareTest extends TestCase
 {

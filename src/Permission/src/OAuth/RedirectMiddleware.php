@@ -10,8 +10,8 @@ use InvalidArgumentException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\Response\RedirectResponse;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\Response\RedirectResponse;
 
 class RedirectMiddleware extends OAuthMiddleware
 {
