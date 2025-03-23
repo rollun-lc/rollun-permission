@@ -110,4 +110,52 @@ class AclUsersTable extends AutoIdTable
             $itemData[self::FILED_PASSWORD] = $hashedPassword;
         }
     }
+
+    public function readByName($id)
+    {
+        $this->checkIdentifierType($id);
+        $identifier = $this->getName();
+
+        $request = [$identifier => $id];
+
+        $logContext = [
+            self::LOG_METHOD => __FUNCTION__,
+            self::LOG_TABLE => $this->dbTable->getTable(),
+            self::LOG_REQUEST => $request,
+        ];
+
+        try {
+            $start = microtime(true);
+            $rowSet = $this->dbTable->select($request);
+            $end = microtime(true);
+        } catch (\Throwable $e) {
+            $logContext['exception'] = $e;
+            $this->writeLogsIfNeeded($logContext, "Request to db table '{$this->dbTable->getTable()}' failed");
+            throw $e;
+        }
+
+        $row = $rowSet->current();
+        $response = null;
+
+        if (isset($row)) {
+            $response = $row->getArrayCopy();
+        }
+
+        $logContext[self::LOG_TIME] = $this->getRequestTime($start, $end);
+        $logContext[self::LOG_RESPONSE] = $response;
+
+        $this->writeLogsIfNeeded($logContext);
+
+        return $response;
+    }
+
+    public function getName()
+    {
+        return self::FILED_NAME;
+    }
+
+    private function getRequestTime(float $start, float $end): float
+    {
+        return round($end - $start, 3);
+    }
 }
