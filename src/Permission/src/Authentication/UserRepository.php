@@ -121,7 +121,7 @@ class UserRepository implements UserRepositoryInterface
 
             return ($this->userFactory)(
                 $this->users->getIdentifier(),
-                $this->getRoles($credential),
+                $this->getRoles($user[$this->users->getIdentifier()]),
                 $this->getDetails($user)
             );
         }
