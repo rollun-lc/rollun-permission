@@ -112,7 +112,12 @@ class UserRepository implements UserRepositoryInterface
     public function authenticate(string $credential, string $password = null): ?UserInterface
     {
         $this->logger->info('Authentication started', ['credential' => $credential]);
-        $user = $this->users->readByName($credential);
+        $user = $this->users->read($credential);
+        $credentialFlag = true;
+        if (!$user) {
+            $user = $this->users->readByName($credential);
+            $credentialFlag = false;
+        }
 
         if ($user) {
             if (!$this->config['without_password']) {
@@ -124,7 +129,7 @@ class UserRepository implements UserRepositoryInterface
 
             return ($this->userFactory)(
                 $this->users->getIdentifier(),
-                $this->getRoles($user[$this->users->getIdentifier()]),
+                $this->getRoles($user[$credentialFlag ? $credential : $this->users->getIdentifier()]),
                 $this->getDetails($user)
             );
         }
