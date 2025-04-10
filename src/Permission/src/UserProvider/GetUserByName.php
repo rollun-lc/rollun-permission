@@ -22,6 +22,6 @@ class GetUserByName implements GetUserInterface
     {
         $query = new Query();
         $query->setQuery(new EqNode(self::FIELD_NAME, $credential));
-        return $this->users->query($query);
+        return array_shift($this->users->query($query));
     }
 }
