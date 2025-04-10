@@ -52,6 +52,8 @@ class UserRepository implements UserRepositoryInterface
      */
     protected $config;
 
+    private $userProviderChain;
+
     /**
      * DataStore constructor.
      * @param DataStoresInterface $users
@@ -74,20 +76,22 @@ class UserRepository implements UserRepositoryInterface
         DataStoresInterface $roles,
         callable $userFactory,
         $config = null,
-        $logger
+        $logger,
+        $userProviderChain
     ) {
         $this->users = $users;
         $this->userRoles = $userRoles;
         $this->roles = $roles;
         $this->setConfigs($config);
         $this->logger = $logger;
+        $this->userProviderChain = $userProviderChain;
 
         // Provide type safety for the composed user factory.
         $this->userFactory = function (
             string $identity,
             array $roles = [],
             array $details = []
-        ) use ($userFactory) : UserInterface {
+        ) use ($userFactory): UserInterface {
             return $userFactory($identity, $roles, $details);
         };
     }
@@ -112,24 +116,16 @@ class UserRepository implements UserRepositoryInterface
     public function authenticate(string $credential, string $password = null): ?UserInterface
     {
         $this->logger->info('Authentication started', ['credential' => $credential]);
-        $user = $this->users->read($credential);
-        $credentialFlag = true;
-        if (!$user) {
-            $user = $this->users->readByName($credential);
-            $credentialFlag = false;
-        }
 
-        if ($user) {
-            if (!$this->config['without_password']) {
-                if (!$password || !$this->verifyPassword($user, $password)) {
-                    return null;
-                }
-            }
+        $user = $this->userProviderChain->getUser($credential);
 
-
+        if ($this->validateUser($user) && $this->validateUserPassword(
+                $user[$this->config['userPassword']],
+                $password
+            )) {
             return ($this->userFactory)(
                 $this->users->getIdentifier(),
-                $this->getRoles($credentialFlag ? $credential : $user[$this->users->getIdentifier()]),
+                $this->getRoles($user[$this->users->getIdentifier()]),
                 $this->getDetails($user)
             );
         }
@@ -137,9 +133,28 @@ class UserRepository implements UserRepositoryInterface
         return null;
     }
 
-    protected function verifyPassword($user, string $password)
+    private function validateUser($user): bool
     {
-        return password_verify($password, $user[$this->config['userPassword']]);
+        return isset($user);
+    }
+
+    private function validateUserPassword($passwordHash, $password): bool
+    {
+        if ($this->config['without_password']) {
+            return true;
+        }
+
+        if ($password && $this->verifyPassword($passwordHash, $password)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
+    protected function verifyPassword(string $passwordHash, string $password)
+    {
+        return password_verify($password, $passwordHash);
     }
 
     /**
