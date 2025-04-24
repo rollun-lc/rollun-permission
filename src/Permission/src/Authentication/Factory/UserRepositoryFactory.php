@@ -9,6 +9,7 @@ namespace rollun\permission\Authentication\Factory;
 use InvalidArgumentException;
 use Psr\Container\ContainerInterface;
 use rollun\permission\Authentication\UserRepository;
+use rollun\permission\UserProvider\UserProviderChain;
 use Zend\Expressive\Authentication\DefaultUser;
 use Zend\Expressive\Authentication\UserInterface;
 use Psr\Log\LoggerInterface;
@@ -89,6 +90,7 @@ class UserRepositoryFactory
             $roleDataStore,
             $userFactory,
             $config,
+            $container->get(UserProviderChain::class),
             $container->get(LoggerInterface::class)
         );
     }

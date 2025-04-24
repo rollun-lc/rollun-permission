@@ -44,6 +44,10 @@ use rollun\permission\OAuth\LoginMiddleware;
 use rollun\permission\OAuth\RedirectMiddleware;
 use rollun\permission\OAuth\RedirectMiddlewareFactory;
 use rollun\permission\OAuth\RegisterMiddleware;
+use rollun\permission\UserProvider\GetUserById;
+use rollun\permission\UserProvider\GetUserByName;
+use rollun\permission\UserProvider\UserProviderChain;
+use rollun\utils\Factory\AbstractServiceAbstractFactory;
 use Zend\Expressive\Authentication\AuthenticationInterface;
 use Zend\Expressive\Authentication\AuthenticationMiddleware;
 use Zend\Expressive\Authentication\DefaultUser;
@@ -94,6 +98,37 @@ class ConfigProvider
             UserRepositoryFactory::class => $this->getUserRepositoryConfig(),
             GoogleClientFactory::class => $this->getGoogleClientConfig(),
             AbstractOAuthMiddlewareFactory::class => $this->getOAuthMiddlewareConfig(),
+            AbstractServiceAbstractFactory::KEY => $this->getAbstractServiceAbstractFactoryConfig(),
+        ];
+    }
+
+    private function getAbstractServiceAbstractFactoryConfig()
+    {
+        return [
+            UserProviderChain::class => [
+                AbstractServiceAbstractFactory::KEY_CLASS => UserProviderChain::class,
+                AbstractServiceAbstractFactory::KEY_DEPENDENCIES => [
+                    'userProviders' => [
+                        AbstractServiceAbstractFactory::KEY_TYPE => AbstractServiceAbstractFactory::TYPE_SERVICES_LIST,
+                        AbstractServiceAbstractFactory::KEY_VALUE => [
+                            GetUserById::class,
+                            GetUserByName::class,
+                        ]
+                    ]
+                ]
+            ],
+            GetUserById::class => [
+                AbstractServiceAbstractFactory::KEY_CLASS => GetUserById::class,
+                AbstractServiceAbstractFactory::KEY_DEPENDENCIES => [
+                    'users' => self::USER_DATASTORE_SERVICE
+                ]
+            ],
+            GetUserByName::class => [
+                AbstractServiceAbstractFactory::KEY_CLASS => GetUserByName::class,
+                AbstractServiceAbstractFactory::KEY_DEPENDENCIES => [
+                    'users' => self::USER_DATASTORE_SERVICE
+                ]
+            ]
         ];
     }
 
@@ -173,6 +208,7 @@ class ConfigProvider
                         $roleDataStore,
                         $userFactory,
                         $config,
+                        $container->get(UserProviderChain::class),
                         $container->get(LoggerInterface::class)
                     );
                 },
