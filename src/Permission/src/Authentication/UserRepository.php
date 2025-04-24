@@ -76,15 +76,15 @@ class UserRepository implements UserRepositoryInterface
         DataStoresInterface $roles,
         callable $userFactory,
         $config = null,
-        $logger,
-        $userProviderChain
+        $userProviderChain,
+        $logger
     ) {
         $this->users = $users;
         $this->userRoles = $userRoles;
         $this->roles = $roles;
         $this->setConfigs($config);
-        $this->logger = $logger;
         $this->userProviderChain = $userProviderChain;
+        $this->logger = $logger;
 
         // Provide type safety for the composed user factory.
         $this->userFactory = function (
