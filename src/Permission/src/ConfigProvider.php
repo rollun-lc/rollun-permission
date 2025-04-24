@@ -209,7 +209,7 @@ class ConfigProvider
                         $userFactory,
                         $config,
                         $container->get(UserProviderChain::class),
-                        $container->get(LoggerInterface::class),
+                        $container->get(LoggerInterface::class)
                     );
                 },
                 GuestAuthentication::class => GuestAuthenticationFactory::class,
