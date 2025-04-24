@@ -1,0 +1,21 @@
+<?php
+return [
+    // Development time modules
+    'modules' => [
+        'OpenAPI\',
+        'Laminas\Serializer',
+        'Laminas\Filter',
+        'Laminas\Cache',
+        'Laminas\Mail',
+        'Laminas\Db',
+        'Laminas\Validator',
+        'Laminas\Diactoros',
+        'Laminas\Cache\Storage\Adapter\BlackHole',
+        'Laminas\Cache\Storage\Adapter\Filesystem',
+    ],
+    'module_listener_options' => [
+        // Turn off caching
+        'config_cache_enabled'     => false,
+        'module_map_cache_enabled' => false,
+    ],
+];
