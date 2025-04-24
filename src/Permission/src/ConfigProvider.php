@@ -208,8 +208,8 @@ class ConfigProvider
                         $roleDataStore,
                         $userFactory,
                         $config,
+                        $container->get(UserProviderChain::class),
                         $container->get(LoggerInterface::class),
-                        $container->get(UserProviderChain::class)
                     );
                 },
                 GuestAuthentication::class => GuestAuthenticationFactory::class,
