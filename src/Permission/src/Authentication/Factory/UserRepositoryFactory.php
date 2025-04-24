@@ -90,8 +90,8 @@ class UserRepositoryFactory
             $roleDataStore,
             $userFactory,
             $config,
-            $container->get(LoggerInterface::class),
-            $container->get(UserProviderChain::class)
+            $container->get(UserProviderChain::class),
+            $container->get(LoggerInterface::class)
         );
     }
 }
