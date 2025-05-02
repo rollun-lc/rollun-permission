@@ -140,7 +140,7 @@ class UserRepository implements UserRepositoryInterface
 
     private function validateUserPassword($passwordHash, $password): bool
     {
-        if ($this->config['without_password']) {
+        if ($this->config['without_password'] ?? null) {
             return true;
         }
 
