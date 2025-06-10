@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\UriInterface;
 use Psr\Http\Server\RequestHandlerInterface as Handler;
-use Zend\Permissions\Acl\AclInterface;
+use Laminas\Permissions\Acl\AclInterface;
 use Psr\Log\LoggerInterface;
 use rollun\permission\Authorization\Middleware\AclMiddleware;
 use rollun\permission\Authorization\Middleware\RoleResolver;
@@ -47,7 +47,7 @@ class AclMiddlewareTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
-            ->method('warning')
+            ->method('error')
             ->with(
                 'Requested api-datastore resource',
                 ['path' => '/foo/bar']
@@ -85,7 +85,7 @@ class AclMiddlewareTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->never())
-            ->method('warning');
+            ->method('error');
 
         $forbiddenHandler = $this->createMock(Handler::class);
 
