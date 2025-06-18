@@ -46,7 +46,7 @@ class AclMiddleware implements MiddlewareInterface
         $isAllowed = false;
 
         if ($resource === 'api-datastore') {
-            $this->logger->error('Requested api-datastore resource', [
+            $this->logger->warning('Requested api-datastore resource', [
                 'path' => $request->getUri()->getPath(),
             ]);
         }
