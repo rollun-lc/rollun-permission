@@ -12,6 +12,7 @@ return [
         'Laminas\Diactoros',
         'Laminas\Cache\Storage\Adapter\BlackHole',
         'Laminas\Cache\Storage\Adapter\Filesystem',
+        'Laminas\Cache\Storage\Adapter\Redis',
     ],
     'module_listener_options' => [
         // Turn off caching
