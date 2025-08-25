@@ -33,7 +33,7 @@
     "mezzio/mezzio-authentication-basic": "^1.1.0",
     "mezzio/mezzio-helpers": "^5.8",
     "mezzio/mezzio-session-ext": "^1.10.0",
-    "rollun-com/rollun-datastore": "^11.0.0",
+    "rollun-com/rollun-datastore": "^10.2.0 || ^11.0.0",
     "rollun-com/rollun-logger": "^7.0.0",
     "google/apiclient": "^2.2",
     "psr/log": "^1.1",
