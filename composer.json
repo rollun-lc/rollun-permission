@@ -39,7 +39,8 @@
     "psr/log": "^1.1",
     "symfony/dotenv": "^6.0.3",
     "mezzio/mezzio": "^3.9",
-    "mezzio/mezzio-fastroute": "^3.4"
+    "mezzio/mezzio-fastroute": "^3.4",
+    "rollun-com/rollun-installer": "^5.1"
   },
   "require-dev": {
     "filp/whoops": "^2.15",
