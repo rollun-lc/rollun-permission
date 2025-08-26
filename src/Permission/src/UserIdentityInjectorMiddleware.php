@@ -8,11 +8,11 @@
 
 namespace rollun\permission;
 
+use Mezzio\Authentication\UserInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Expressive\Authentication\UserInterface;
 
 class UserIdentityInjectorMiddleware implements MiddlewareInterface
 {

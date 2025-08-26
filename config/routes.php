@@ -4,42 +4,46 @@
  * @license LICENSE.md New BSD License
  */
 
+declare(strict_types = 1);
+
+use Laminas\Diactoros\Response\HtmlResponse;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use rollun\callback\Middleware\WebhookMiddleware;
 use rollun\datastore\Middleware\DataStoreApi;
+use Mezzio\Application;
+use Mezzio\MiddlewareFactory;
+use Mezzio\Router\Route;
 use rollun\permission\ConfigProvider;
 use rollun\permission\OAuth\LoginMiddleware;
 use rollun\permission\OAuth\LogoutMiddleware;
 use rollun\permission\OAuth\RedirectMiddleware;
 use rollun\permission\OAuth\RegisterMiddleware;
-use Zend\Diactoros\Response\HtmlResponse;
-use Zend\Expressive\Application;
-use Zend\Expressive\MiddlewareFactory;
 
 /**
  * Setup routes with a single request method:
  *
- * $app->get('/', App\Action\HomePageAction::class, 'home');
- * $app->post('/album', App\Action\AlbumCreateAction::class, 'album.create');
- * $app->put('/album/:id', App\Action\AlbumUpdateAction::class, 'album.put');
- * $app->patch('/album/:id', App\Action\AlbumUpdateAction::class, 'album.patch');
- * $app->delete('/album/:id', App\Action\AlbumDeleteAction::class, 'album.delete');
+ * $app->get('/', App\Handler\HomePageHandler::class, 'home');
+ * $app->post('/album', App\Handler\AlbumCreateHandler::class, 'album.create');
+ * $app->put('/album/:id', App\Handler\AlbumUpdateHandler::class, 'album.put');
+ * $app->patch('/album/:id', App\Handler\AlbumUpdateHandler::class, 'album.patch');
+ * $app->delete('/album/:id', App\Handler\AlbumDeleteHandler::class, 'album.delete');
  *
  * Or with multiple request methods:
  *
- * $app->route('/contact', App\Action\ContactAction::class, ['GET', 'POST', ...], 'contact');
+ * $app->route('/contact', App\Handler\ContactHandler::class, ['GET', 'POST', ...], 'contact');
  *
  * Or handling all request methods:
  *
- * $app->route('/contact', App\Action\ContactAction::class)->setName('contact');
+ * $app->route('/contact', App\Handler\ContactHandler::class)->setName('contact');
  *
  * or:
  *
  * $app->route(
  *     '/contact',
- *     App\Action\ContactAction::class,
+ *     App\Handler\ContactHandler::class,
  *     Zend\Expressive\Router\Route::HTTP_METHOD_ANY,
  *     'contact'
  * );
@@ -50,20 +54,19 @@ use Zend\Expressive\MiddlewareFactory;
  * @return void
  */
 return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
-    // Show logs in debugging mode
-    $app->route(
-        '/api/datastore[/{resourceName}[/{id}]]',
-        DataStoreApi::class,
-        ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-        'datastore'
-    );
-
     $app->get(
         '/',
         function (ServerRequestInterface $request, RequestHandlerInterface $handler) : ResponseInterface {
             return new HtmlResponse('Home page!');
         },
         'home-page'
+    );
+
+    $app->route(
+        '/api/datastore[/{resourceName}[/{id}]]',
+        DataStoreApi::class,
+        ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+        DataStoreApi::class
     );
 
     $app->get(

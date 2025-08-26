@@ -7,6 +7,8 @@
 namespace rollun\permission\Authentication;
 
 use InvalidArgumentException;
+use Mezzio\Authentication\UserInterface;
+use Mezzio\Authentication\UserRepositoryInterface;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\datastore\Rql\RqlQuery;
 use rollun\permission\DataStore\AclRolesTable;
@@ -14,8 +16,6 @@ use rollun\permission\DataStore\AclUserRolesTable;
 use rollun\permission\DataStore\AclUsersTable;
 use Xiag\Rql\Parser\Node\Query\ScalarOperator\EqNode;
 use Xiag\Rql\Parser\Query;
-use Zend\Expressive\Authentication\UserInterface;
-use Zend\Expressive\Authentication\UserRepositoryInterface;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -140,7 +140,7 @@ class UserRepository implements UserRepositoryInterface
 
     private function validateUserPassword($passwordHash, $password): bool
     {
-        if ($this->config['without_password'] ?? null) {
+        if ($this->config['without_password']) {
             return true;
         }
 

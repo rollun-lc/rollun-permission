@@ -1,2 +1,2 @@
-# Created by .ignore support plugin (hsz.mobi)
-*local.php
+local.php
+*.local.php

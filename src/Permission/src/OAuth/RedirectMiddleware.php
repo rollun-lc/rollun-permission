@@ -7,11 +7,11 @@
 namespace rollun\permission\OAuth;
 
 use InvalidArgumentException;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\Response\RedirectResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\Response\RedirectResponse;
 
 class RedirectMiddleware extends OAuthMiddleware
 {

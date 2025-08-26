@@ -6,12 +6,13 @@
 
 namespace rollun\test\unit\Permission\Acl;
 
+use Laminas\ServiceManager\ServiceManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Interop\Container\ContainerInterface;
+use rollun\permission\Authorization\ResourceProducer\AbstractResourceProducerAbstractFactory;
 use rollun\permission\Authorization\ResourceProducer\RouteAttributeAbstractFactory;
 use rollun\permission\Authorization\ResourceProducer\RouteReceiver\RouteNameReceiverInterface;
-use Zend\ServiceManager\ServiceManager;
 
 class RouteAttributeAbstractFactoryTest extends TestCase
 {
@@ -19,9 +20,11 @@ class RouteAttributeAbstractFactoryTest extends TestCase
     {
         $requestedName = 'requestedName';
         $config = [
-            RouteAttributeAbstractFactory::class => [
-                $requestedName => [
-
+            AbstractResourceProducerAbstractFactory::class => [
+                RouteAttributeAbstractFactory::class => [
+                    $requestedName => [
+                        'requestedName' => 'someValue',
+                    ],
                 ],
             ],
         ];
@@ -42,18 +45,38 @@ class RouteAttributeAbstractFactoryTest extends TestCase
 
         $container = new ServiceManager();
         $container->setService($routeNameReceiverServiceName, $routeNameReceiver);
+//        $container->setService('config', [
+//            RouteAttributeAbstractFactory::class => [
+//                $requestedName => [
+//                    RouteAttributeAbstractFactory::KEY_ROUTE_NAME_RECEIVER => $routeNameReceiverServiceName,
+//                    RouteAttributeAbstractFactory::KEY_ATTRIBUTE_NAME => $attributeName,
+//                ],
+//            ],
+//        ]);
         $container->setService('config', [
-            RouteAttributeAbstractFactory::class => [
-                $requestedName => [
-                    RouteAttributeAbstractFactory::KEY_ROUTE_NAME_RECEIVER => $routeNameReceiverServiceName,
-                    RouteAttributeAbstractFactory::KEY_ATTRIBUTE_NAME => $attributeName,
+            AbstractResourceProducerAbstractFactory::class => [
+                RouteAttributeAbstractFactory::class => [
+                    $requestedName => [
+                        RouteAttributeAbstractFactory::KEY_ROUTE_NAME_RECEIVER => $routeNameReceiverServiceName,
+                        RouteAttributeAbstractFactory::KEY_ATTRIBUTE_NAME => $attributeName,
+                    ],
                 ],
             ],
         ]);
 
         $object = new RouteAttributeAbstractFactory();
         $createdObject = $object->__invoke($container, $requestedName);
-        $this->assertAttributeEquals($attributeName, 'attributeName', $createdObject);
-        $this->assertAttributeEquals($routeNameReceiver, 'routeNameReceiver', $createdObject);
+//        $this->assertAttributeEquals($attributeName, 'attributeName', $createdObject);
+//        $this->assertAttributeEquals($routeNameReceiver, 'routeNameReceiver', $createdObject);
+
+        $reflection = new \ReflectionObject($createdObject);
+
+        $attributeNameProp = $reflection->getProperty('attributeName');
+        $attributeNameProp->setAccessible(true);
+        $this->assertSame($attributeName, $attributeNameProp->getValue($createdObject));
+
+        $routeReceiverProp = $reflection->getProperty('routeNameReceiver');
+        $routeReceiverProp->setAccessible(true);
+        $this->assertSame($routeNameReceiver, $routeReceiverProp->getValue($createdObject));
     }
 }

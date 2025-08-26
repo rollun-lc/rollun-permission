@@ -17,15 +17,15 @@ jobs:
     - name: Setup PHP with PECL extension
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '7.2'
+        php-version: '8.0'
         extensions: json, zip, mysqli, pdo_mysql
-        tools: composer:v1
+        tools: composer:v2
 
     - name: Validate composer.json and composer.lock
       run: composer validate
 
     - name: Install dependencies
-      run: composer install --prefer-dist --no-progress --no-suggest
+      run: composer install --prefer-dist --no-progress
       
     - name: Run test suite
       env:

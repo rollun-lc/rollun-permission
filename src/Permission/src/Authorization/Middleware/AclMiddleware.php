@@ -6,11 +6,11 @@
 
 namespace rollun\permission\Authorization\Middleware;
 
+use Laminas\Permissions\Acl\AclInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Permissions\Acl\AclInterface;
 
 class AclMiddleware implements MiddlewareInterface
 {
@@ -46,7 +46,7 @@ class AclMiddleware implements MiddlewareInterface
         $isAllowed = false;
 
         if ($resource === 'api-datastore') {
-            $this->logger->warning('Requested api-datastore resource', [
+            $this->logger->error('Requested api-datastore resource', [
                 'path' => $request->getUri()->getPath(),
             ]);
         }

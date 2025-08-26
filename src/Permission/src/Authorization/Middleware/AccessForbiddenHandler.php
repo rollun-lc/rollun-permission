@@ -6,15 +6,15 @@
 
 namespace rollun\permission\Authorization\Middleware;
 
+use Laminas\Diactoros\Response\JsonResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Mezzio\Authentication\UserInterface;
+use Mezzio\Helper\UrlHelper;
+use Mezzio\Session\SessionInterface;
+use Mezzio\Session\SessionMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Diactoros\Response\JsonResponse;
-use Zend\Diactoros\Response\RedirectResponse;
-use Zend\Expressive\Authentication\UserInterface;
-use Zend\Expressive\Helper\UrlHelper;
-use Zend\Expressive\Session\SessionInterface;
-use Zend\Expressive\Session\SessionMiddleware;
 
 class AccessForbiddenHandler implements RequestHandlerInterface
 {

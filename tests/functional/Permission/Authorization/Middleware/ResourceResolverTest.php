@@ -6,6 +6,9 @@
 
 namespace rollun\test\functional\Permission\Authorization\Middleware;
 
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\ServerRequest;
+use Mezzio\Router\RouteResult;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -14,9 +17,7 @@ use rollun\datastore\DataStore\Memory;
 use rollun\permission\Authorization\Middleware\ResourceResolver;
 use rollun\permission\Authorization\ResourceProducer\RouteAttribute;
 use rollun\permission\Authorization\ResourceProducer\RouteReceiver\ExpressiveRouteName;
-use Zend\Diactoros\Response;
-use Zend\Diactoros\ServerRequest;
-use Zend\Expressive\Router\RouteResult;
+
 
 class ResourceResolverTest extends TestCase
 {

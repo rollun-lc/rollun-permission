@@ -1,9 +1,9 @@
 {
   "name": "rollun-com/rollun-permission",
-  "description": "Skeleton for app or lib",
+  "description": "ACL library for rollun-net",
   "minimum-stability": "stable",
   "license": "proprietary",
-  "type": "project",
+  "type": "library",
   "authors": [
     {
       "name": "avz-cmf",
@@ -15,33 +15,37 @@
     }
   ],
   "require": {
-    "php": "^7.1",
+    "php": "^8.0",
     "ext-json": "*",
     "ext-openssl": "*",
     "ext-intl": "*",
-    "zendframework/zend-servicemanager": "^3",
-    "zendframework/zend-permissions-acl": "^2",
-    "zendframework/zend-authentication": "^2.5",
-    "zendframework/zend-mail": "^2.7",
-    "zendframework/zend-stratigility": "^3",
-    "zendframework/zend-expressive-authentication": "^1.0",
-    "zendframework/zend-expressive-authentication-session": "^1.0",
-    "zendframework/zend-expressive-authentication-basic": "^1.0",
-    "zendframework/zend-expressive-helpers": "^5.1",
-    "zendframework/zend-expressive-session-ext": "^1.3",
-    "rollun-com/rollun-datastore": "^6.6",
+    "laminas/laminas-component-installer": "^2.6",
+    "laminas/laminas-config-aggregator": "^1.7",
+    "laminas/laminas-diactoros": "^2.8",
+    "laminas/laminas-servicemanager": "^3.10",
+    "laminas/laminas-permissions-acl": "^2.8.0",
+    "laminas/laminas-authentication": "^2.8.0",
+    "laminas/laminas-mail": "^2.13.0",
+    "laminas/laminas-stratigility": "^3.3.0",
+    "laminas/laminas-stdlib": "^3.7.0",
+    "mezzio/mezzio-authentication": "^1.2.0",
+    "mezzio/mezzio-authentication-session": "^1.1.0",
+    "mezzio/mezzio-authentication-basic": "^1.1.0",
+    "mezzio/mezzio-helpers": "^5.8",
+    "mezzio/mezzio-session-ext": "^1.10.0",
+    "rollun-com/rollun-datastore": "^10.2.0 || ^11.0.0",
+    "rollun-com/rollun-logger": "^7.0.0",
     "google/apiclient": "^2.2",
     "psr/log": "^1.1",
-    "web-token/jwt-framework": "^1.3"
+    "symfony/dotenv": "^6.0.3",
+    "mezzio/mezzio": "^3.9",
+    "mezzio/mezzio-fastroute": "^3.4",
+    "rollun-com/rollun-installer": "^5.1"
   },
   "require-dev": {
-    "phpunit/phpunit": "^7",
-    "squizlabs/php_codesniffer": "^3",
-    "zendframework/zend-config-aggregator": "^1.1",
-    "zendframework/zend-expressive": "^3.2",
-    "symfony/dotenv": "^4.2",
-    "rollun-com/rollun-logger": "^4.0||^5.1",
-    "zendframework/zend-expressive-fastroute": "^3.0"
+    "filp/whoops": "^2.15",
+    "phpunit/phpunit": "^9.6.20",
+    "squizlabs/php_codesniffer": "^3"
   },
   "autoload": {
     "psr-4": {
@@ -54,11 +58,23 @@
     }
   },
   "scripts": {
+    "post-create-project-cmd": [
+      "@development-enable"
+    ],
+    "development-disable": "./vendor/bin/laminas-development-mode disable",
+    "development-enable": "./vendor/bin/laminas-development-mode enable",
+    "development-status": "./vendor/bin/laminas-development-mode status",
     "test": "phpunit --colors=always",
     "test-coverage": "phpunit --colors=always --coverage-clover clover.xml",
     "upload-coverage": "coveralls -v",
     "code-sniffer": "phpcs .",
     "code-beautiful": "phpcbf .",
     "server": "php -S 0.0.0.0:8000 -t public public/index.php"
+  },
+  "config": {
+    "allow-plugins": {
+      "rollun-com/rollun-installer": true,
+      "laminas/laminas-component-installer": true
+    }
   }
 }

@@ -7,6 +7,7 @@
 namespace rollun\permission;
 
 use Exception;
+use Laminas\Db\TableGateway\TableGateway;
 use rollun\datastore\DataStore\DbTable;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
 use rollun\datastore\TableGateway\DbSql\MultiInsertSql;
@@ -20,7 +21,6 @@ use rollun\permission\DataStore\AclUserRolesTable;
 use rollun\permission\DataStore\AclUsersTable;
 use rollun\permission\DataStore\DataProvider\AclDefaultDataProvider;
 use rollun\utils\DbInstaller;
-use Zend\Db\TableGateway\TableGateway;
 
 class AssetInstaller extends InstallerAbstract
 {

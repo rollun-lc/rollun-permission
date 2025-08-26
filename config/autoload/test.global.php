@@ -4,10 +4,10 @@
  * @license LICENSE.md New BSD License
  */
 
+use Laminas\Db\Adapter\AdapterInterface;
 use rollun\datastore\DataStore\DbTable;
 use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\datastore\DataStore\Factory\DbTableAbstractFactory;
-use Zend\Db\Adapter\AdapterInterface;
 
 return [
     'dependencies' => [

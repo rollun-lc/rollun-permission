@@ -3,12 +3,11 @@
 
 namespace rollun\permission\Authentication;
 
+use Mezzio\Authentication\UserInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Zend\Expressive\Authentication\Basic\BasicAccess as ZendBasicAccess;
-use Zend\Expressive\Authentication\UserInterface;
+use Mezzio\Authentication\Basic\BasicAccess as MezzioBasicAccess;
 
-
-class BasicAccess extends ZendBasicAccess
+class BasicAccess extends MezzioBasicAccess
 {
     public function authenticate(ServerRequestInterface $request): ?UserInterface
     {

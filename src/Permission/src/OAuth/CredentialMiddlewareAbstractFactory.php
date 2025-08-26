@@ -8,9 +8,9 @@ namespace rollun\permission\OAuth;
 
 use Interop\Container\ContainerInterface;
 use InvalidArgumentException;
-use Zend\Diactoros\Response;
-use Zend\Expressive\Authentication\UserRepositoryInterface;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
+use Laminas\Diactoros\Response;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
+use Mezzio\Authentication\UserRepositoryInterface;
 
 /**
  * Create instance of CredentialMiddleware using 'config' service from ContainerInterface

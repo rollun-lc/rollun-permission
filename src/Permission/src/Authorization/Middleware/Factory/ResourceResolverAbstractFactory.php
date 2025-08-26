@@ -7,10 +7,10 @@
 namespace rollun\permission\Authorization\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Exception\ServiceNotCreatedException;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 use rollun\permission\Authorization\Factory\AclFromDataStoreFactory;
 use rollun\permission\Authorization\Middleware\ResourceResolver;
-use Zend\ServiceManager\Exception\ServiceNotCreatedException;
-use Zend\ServiceManager\Factory\AbstractFactoryInterface;
 
 /**
  * Create instance of ResourceResolver using 'config' service as array in ContainerInterface

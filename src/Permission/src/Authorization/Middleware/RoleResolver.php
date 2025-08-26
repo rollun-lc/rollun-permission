@@ -6,11 +6,11 @@
 
 namespace rollun\permission\Authorization\Middleware;
 
+use Mezzio\Authentication\UserInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Expressive\Authentication\UserInterface;
 
 class RoleResolver implements MiddlewareInterface
 {

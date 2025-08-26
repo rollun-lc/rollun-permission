@@ -6,11 +6,11 @@
 
 namespace rollun\permission\DataStore;
 
+use Laminas\Db\TableGateway\TableGateway;
 use rollun\datastore\DataStore\DataStoreException;
 use rollun\datastore\DataStore\SerializedDbTable;
 use rollun\datastore\DataStore\Traits\AutoIdGeneratorTrait;
 use rollun\utils\IdGenerator;
-use Zend\Db\TableGateway\TableGateway;
 
 class AutoIdTable extends SerializedDbTable
 {

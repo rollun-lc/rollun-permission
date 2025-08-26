@@ -6,7 +6,16 @@
 
 namespace rollun\permission;
 
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\InvokableFactory;
+use Mezzio\Authentication\AuthenticationInterface;
+use Mezzio\Authentication\AuthenticationMiddleware;
+use Mezzio\Authentication\DefaultUser;
+use Mezzio\Authentication\UserInterface;
+use Mezzio\Authentication\UserRepositoryInterface;
+use Mezzio\Helper\UrlHelper;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\datastore\DataStore\Factory\DbTableAbstractFactory;
 use rollun\datastore\TableGateway\Factory\TableGatewayAbstractFactory;
@@ -48,15 +57,6 @@ use rollun\permission\UserProvider\GetUserById;
 use rollun\permission\UserProvider\GetUserByName;
 use rollun\permission\UserProvider\UserProviderChain;
 use rollun\utils\Factory\AbstractServiceAbstractFactory;
-use Zend\Expressive\Authentication\AuthenticationInterface;
-use Zend\Expressive\Authentication\AuthenticationMiddleware;
-use Zend\Expressive\Authentication\DefaultUser;
-use Zend\Expressive\Authentication\UserInterface;
-use Zend\Expressive\Authentication\UserRepositoryInterface;
-use Zend\Expressive\Helper\UrlHelper;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\InvokableFactory;
-use Psr\Log\LoggerInterface;
 
 /**
  * This config providers contain basic rollun-permission configuration

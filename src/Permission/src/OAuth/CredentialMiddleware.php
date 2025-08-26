@@ -7,11 +7,11 @@
 namespace rollun\permission\OAuth;
 
 use Exception;
+use Mezzio\Authentication\UserRepositoryInterface;
+use Mezzio\Helper\UrlHelper;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Zend\Expressive\Authentication\UserRepositoryInterface;
-use Zend\Expressive\Helper\UrlHelper;
 
 abstract class CredentialMiddleware extends OAuthMiddleware
 {

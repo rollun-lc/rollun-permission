@@ -6,11 +6,12 @@
 
 namespace rollun\test\unit\Permission\Acl\RouteReceiver;
 
+use Mezzio\Router\RouteResult;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use PHPUnit\Framework\MockObject\MockObject;
 use rollun\permission\Authorization\ResourceProducer\RouteReceiver\ExpressiveRouteName;
-use Zend\Expressive\Router\RouteResult;
+
 
 class ExpressiveRouteNameTest extends TestCase
 {

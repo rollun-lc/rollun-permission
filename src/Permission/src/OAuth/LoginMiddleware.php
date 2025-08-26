@@ -7,12 +7,12 @@
 namespace rollun\permission\OAuth;
 
 use Exception;
+use Mezzio\Authentication\UserInterface;
+use Mezzio\Session\SessionPersistenceInterface;
 use Traversable;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Zend\Expressive\Authentication\UserInterface;
-use Zend\Expressive\Session\SessionPersistenceInterface;
 
 class LoginMiddleware extends CredentialMiddleware
 {

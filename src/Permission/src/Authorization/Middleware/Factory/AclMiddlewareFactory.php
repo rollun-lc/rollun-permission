@@ -7,10 +7,10 @@
 namespace rollun\permission\Authorization\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
+use Laminas\Permissions\Acl\Acl;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use rollun\permission\Authorization\Middleware\AccessForbiddenHandler;
 use rollun\permission\Authorization\Middleware\AclMiddleware;
-use Zend\Permissions\Acl\Acl;
-use Zend\ServiceManager\Factory\FactoryInterface;
 use Psr\Log\LoggerInterface;
 
 /**

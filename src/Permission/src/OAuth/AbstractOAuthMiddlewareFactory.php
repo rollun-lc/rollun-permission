@@ -7,8 +7,8 @@
 namespace rollun\permission\OAuth;
 
 use Interop\Container\ContainerInterface;
+use Mezzio\Helper\UrlHelper;
 use Psr\Log\LoggerInterface;
-use Zend\Expressive\Helper\UrlHelper;
 
 abstract class AbstractOAuthMiddlewareFactory
 {

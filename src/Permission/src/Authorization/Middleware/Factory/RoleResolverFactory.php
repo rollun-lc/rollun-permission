@@ -7,8 +7,8 @@
 namespace rollun\permission\Authorization\Middleware\Factory;
 
 use Interop\Container\ContainerInterface;
+use Laminas\ServiceManager\Factory\FactoryInterface;
 use rollun\permission\Authorization\Middleware\RoleResolver;
-use Zend\ServiceManager\Factory\FactoryInterface;
 
 class RoleResolverFactory implements FactoryInterface
 {

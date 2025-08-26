@@ -13,7 +13,7 @@ class ExpressiveRouteName implements RouteNameReceiverInterface
 {
     public function receiveRouteName(Request $request)
     {
-        $expressiveRouteClassName = 'Zend\Expressive\Router\RouteResult';
+        $expressiveRouteClassName = 'Mezzio\Router\RouteResult';
         $routeResult = $request->getAttribute($expressiveRouteClassName);
 
         if (!is_a($routeResult, $expressiveRouteClassName, true)) {

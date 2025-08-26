@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use Mezzio\Application;
+use Mezzio\MiddlewareFactory;
 use rollun\logger\LifeCycleToken;
 
+ini_set('display_errors', '1');
 error_reporting(E_ALL ^ E_USER_DEPRECATED);
 
 // Delegate static file requests back to the PHP built-in webserver
@@ -20,13 +23,13 @@ require 'vendor/autoload.php';
  * Self-called anonymous function that creates its own scope and keep the global namespace clean.
  */
 call_user_func(function () {
-    /** @var \Interop\Container\ContainerInterface $container */
+    /** @var \Laminas\ServiceManager\ServiceManager $container */
     $container = require 'config/container.php';
     \rollun\dic\InsideConstruct::setContainer($container);
 
-    /** @var \Zend\Expressive\Application $app */
-    $app = $container->get(\Zend\Expressive\Application::class);
-    $factory = $container->get(\Zend\Expressive\MiddlewareFactory::class);
+    /** @var Application $app */
+    $app = $container->get(Application::class);
+    $factory = $container->get(MiddlewareFactory::class);
 
     // Import programmatic/declarative middleware pipeline and routing
     // configuration statements
