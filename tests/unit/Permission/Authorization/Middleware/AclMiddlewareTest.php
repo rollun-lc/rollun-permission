@@ -47,7 +47,7 @@ class AclMiddlewareTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->once())
-            ->method('error')
+            ->method('warning')
             ->with(
                 'Requested api-datastore resource',
                 ['path' => '/foo/bar']
@@ -85,7 +85,7 @@ class AclMiddlewareTest extends TestCase
 
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects($this->never())
-            ->method('error');
+            ->method('warning');
 
         $forbiddenHandler = $this->createMock(Handler::class);
 
