@@ -24,13 +24,10 @@ class AclMiddleware implements MiddlewareInterface
      */
     protected $accessForbiddenHandler;
 
-    protected $logger;
-
-    public function __construct(AclInterface $acl, RequestHandlerInterface $accessForbiddenHandler, $logger)
+    public function __construct(AclInterface $acl, RequestHandlerInterface $accessForbiddenHandler)
     {
         $this->acl = $acl;
         $this->accessForbiddenHandler = $accessForbiddenHandler;
-        $this->logger = $logger;
     }
 
     /**
@@ -44,12 +41,6 @@ class AclMiddleware implements MiddlewareInterface
         $resource = $request->getAttribute(ResourceResolver::KEY_ATTRIBUTE_RESOURCE);
         $privilege = $request->getAttribute(PrivilegeResolver::KEY_ATTRIBUTE_PRIVILEGE);
         $isAllowed = false;
-
-        if ($resource === 'api-datastore') {
-            $this->logger->warning('Requested api-datastore resource', [
-                'path' => $request->getUri()->getPath(),
-            ]);
-        }
 
         if ($this->acl->hasResource($resource)) {
             foreach ($roles as $role) {

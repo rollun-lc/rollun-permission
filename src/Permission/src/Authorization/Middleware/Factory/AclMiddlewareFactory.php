@@ -11,7 +11,6 @@ use Laminas\Permissions\Acl\Acl;
 use Laminas\ServiceManager\Factory\FactoryInterface;
 use rollun\permission\Authorization\Middleware\AccessForbiddenHandler;
 use rollun\permission\Authorization\Middleware\AclMiddleware;
-use Psr\Log\LoggerInterface;
 
 /**
  * Create instance of AclMiddleware
@@ -32,6 +31,6 @@ class AclMiddlewareFactory implements FactoryInterface
         $acl = $container->get(Acl::class);
         $accessForbiddenHandler = $container->get(AccessForbiddenHandler::class);
 
-        return new AclMiddleware($acl, $accessForbiddenHandler, $container->get(LoggerInterface::class));
+        return new AclMiddleware($acl, $accessForbiddenHandler);
     }
 }
