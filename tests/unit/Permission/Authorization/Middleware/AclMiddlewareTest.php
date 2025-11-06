@@ -45,15 +45,7 @@ class AclMiddlewareTest extends TestCase
             ->with($request)
             ->willReturn($forbiddenResponse);
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->once())
-            ->method('warning')
-            ->with(
-                'Requested api-datastore resource',
-                ['path' => '/foo/bar']
-            );
-
-        $middleware = new AclMiddleware($acl, $forbiddenHandler, $logger);
+        $middleware = new AclMiddleware($acl, $forbiddenHandler);
         $response = $middleware->process($request, $this->createMock(Handler::class));
 
         $this->assertSame($forbiddenResponse, $response);
@@ -83,13 +75,9 @@ class AclMiddlewareTest extends TestCase
             ->with($request)
             ->willReturn($okResponse);
 
-        $logger = $this->createMock(LoggerInterface::class);
-        $logger->expects($this->never())
-            ->method('warning');
-
         $forbiddenHandler = $this->createMock(Handler::class);
 
-        $middleware = new AclMiddleware($acl, $forbiddenHandler, $logger);
+        $middleware = new AclMiddleware($acl, $forbiddenHandler);
         $response = $middleware->process($request, $mainHandler);
 
         $this->assertSame($okResponse, $response);
