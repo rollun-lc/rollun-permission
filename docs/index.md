@@ -42,6 +42,60 @@ composer lib install
 а для авторизации используется последовательный вызов посредников (`middleware pipe`): `RoleResolver`,
 `ResourceResolver`, `PrivilegeResolver`, `AclMiddleware`.
 
+##### Resource Resolution
+
+Система ресурсов определяет **что** защищается в ACL. `ResourceResolver` извлекает имя ресурса из HTTP-запроса
+используя цепочку `ResourceProducer`'ов.
+
+**ResourceProducer'ы** — стратегии извлечения имени ресурса:
+
+| Producer | Приоритет | Результат | Пример |
+|----------|-----------|-----------|--------|
+| `RouteAttribute` | 10 (первый) | `routeName-attributeValue` | `users-123` |
+| `RouteName` | 20 (второй) | `routeName` | `users` |
+
+**Алгоритм разрешения:**
+
+1. `ResourceResolver` загружает все ресурсы из таблицы `acl_resource`
+2. Каждый producer (по возрастанию приоритета) пытается сгенерировать имя ресурса
+3. Первое совпадение с БД становится итоговым ресурсом
+4. Если совпадений нет — ресурс = `'none'`
+
+**Конфигурация producer'ов:**
+
+```php
+use rollun\permission\Authorization\ResourceProducer\RouteNameAbstractFactory;
+use rollun\permission\Authorization\ResourceProducer\RouteAttributeAbstractFactory;
+use rollun\permission\Authorization\ResourceProducer\AbstractResourceProducerAbstractFactory;
+
+return [
+    AbstractResourceProducerAbstractFactory::KEY => [
+        RouteAttributeAbstractFactory::class => [
+            'resourceNameAttribute' => [
+                'attributeName' => 'resourceName',
+                'routeNameReceiver' => ExpressiveRouteName::class,
+            ],
+        ],
+        RouteNameAbstractFactory::class => [
+            'routeName' => [
+                'routeNameReceiver' => ExpressiveRouteName::class,
+            ],
+        ],
+    ],
+];
+```
+
+**Кастомный ResourceProducer:**
+
+Реализуйте `ResourceProducerInterface`:
+
+```php
+interface ResourceProducerInterface {
+    public function produce(Request $request): string;
+    public function canProduce(Request $request): bool;
+}
+```
+
 ##### OAuth
 
 `OAuth` предоставляет возможность логинить и регистрировать пользователя через
