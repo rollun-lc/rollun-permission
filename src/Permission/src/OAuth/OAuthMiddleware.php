@@ -138,7 +138,9 @@ abstract class OAuthMiddleware implements MiddlewareInterface
             return $fallback;
         }
 
-        $requestHost = $request->getUri()->getHost();
+        $requestHost = $request->getHeaderLine('X-Forwarded-Host')
+            ?: $request->getHeaderLine('Host')
+            ?: $request->getUri()->getHost();
 
         foreach ($whitelist as $entry) {
             if (parse_url($entry, PHP_URL_HOST) === $requestHost) {
