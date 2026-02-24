@@ -6,6 +6,7 @@
 
 namespace rollun\test\functional\Permission\Authentication\OAuth\Middleware;
 
+use Google_Client;
 use Laminas\Diactoros\ServerRequest;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\SessionInterface;
@@ -15,30 +16,52 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
-use rollun\dic\InsideConstruct;
 use rollun\permission\OAuth\GoogleClient;
 use rollun\permission\OAuth\RedirectMiddleware;
 
 class OAuthRedirectMiddlewareTest extends TestCase
 {
     private $clientId = 'client-id';
-    private $projectId = 'rollun-test';
-    private $approvalPrompt = 'auto';
-    private $state = 'someState';
     private $scope = 'openid';
     private $accessType = 'online';
 
+    private function createGoogleClientMock(): GoogleClient
+    {
+        $redirectUri = null;
+        $state = null;
+
+        $googleClient = $this->getMockBuilder(GoogleClient::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $googleClient->method('setRedirectUri')->willReturnCallback(function ($uri) use (&$redirectUri) {
+            $redirectUri = $uri;
+        });
+        $googleClient->method('getRedirectUri')->willReturnCallback(function () use (&$redirectUri) {
+            return $redirectUri;
+        });
+        $googleClient->method('setState')->willReturnCallback(function ($s) use (&$state) {
+            $state = $s;
+        });
+        $googleClient->method('setScopes')->willReturn(null);
+
+        $googleClient->method('createAuthUrl')->willReturnCallback(function () use (&$redirectUri, &$state) {
+            $params = [
+                'response_type' => 'code',
+                'access_type' => $this->accessType,
+                'client_id' => $this->clientId,
+                'redirect_uri' => $redirectUri,
+                'state' => $state,
+                'scope' => $this->scope,
+            ];
+            return 'https://accounts.google.com/o/oauth2/v2/auth?' . http_build_query($params);
+        });
+
+        return $googleClient;
+    }
+
     private function createRedirectMiddleware(string $host): RedirectMiddleware
     {
-        $googleClientConfig = [
-            'client_id'        => $this->clientId,
-            'project_id'       => $this->projectId,
-            'redirect_uri'     => 'http://localhost',
-            'access_type'      => $this->accessType,
-            'approval_prompt'  => $this->approvalPrompt,
-            'state'            => $this->state,
-        ];
-
         $urlHelper = $this->createMock(UrlHelper::class);
         $urlHelper->expects($this->any())
             ->method('generate')
@@ -46,8 +69,8 @@ class OAuthRedirectMiddlewareTest extends TestCase
             ->willReturn('/login');
 
         $logger = $this->getMockBuilder(LoggerInterface::class)->getMock();
+        $googleClient = $this->createGoogleClientMock();
 
-        $googleClient = new GoogleClient($googleClientConfig);
         $config = [
             'scopes'         => $this->scope,
             'host'           => $host,
@@ -77,9 +100,6 @@ class OAuthRedirectMiddlewareTest extends TestCase
 
     public function testProcess()
     {
-        $container = require 'config/container.php';
-        InsideConstruct::setContainer($container);
-
         $redirectUrl = 'http://localhost';
         $object = $this->createRedirectMiddleware($redirectUrl);
         $request = $this->createRequest('http://localhost/oauth/redirect');
@@ -111,9 +131,6 @@ class OAuthRedirectMiddlewareTest extends TestCase
 
     public function testRedirectUriUsesRequestHostFromWhitelist()
     {
-        $container = require 'config/container.php';
-        InsideConstruct::setContainer($container);
-
         $object = $this->createRedirectMiddleware('http://primary.com,http://secondary.com');
         $request = $this->createRequest('http://secondary.com/oauth/redirect');
         $handler = $this->getMockBuilder(RequestHandlerInterface::class)->getMock();
@@ -126,9 +143,6 @@ class OAuthRedirectMiddlewareTest extends TestCase
 
     public function testRedirectUriFallsBackToFirstHostWhenRequestHostNotInWhitelist()
     {
-        $container = require 'config/container.php';
-        InsideConstruct::setContainer($container);
-
         $object = $this->createRedirectMiddleware('http://primary.com,http://secondary.com');
         $request = $this->createRequest('http://unknown.com/oauth/redirect');
         $handler = $this->getMockBuilder(RequestHandlerInterface::class)->getMock();
