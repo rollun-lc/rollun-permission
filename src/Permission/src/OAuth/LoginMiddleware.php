@@ -26,7 +26,7 @@ class LoginMiddleware extends CredentialMiddleware
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $this->googleClient->setRedirectUri($this->actionToRedirectUri(self::ACTION));
+        $this->googleClient->setRedirectUri($this->actionToRedirectUri(self::ACTION, $request));
 
         if ($this->getSession($request)->has(UserInterface::class)) {
             return $this->getAuthorizedResponse($request);

@@ -76,7 +76,7 @@ class RedirectMiddleware extends OAuthMiddleware
             return null;
         }
 
-        $url = $this->actionToRedirectUri($action);
+        $url = $this->actionToRedirectUri($action, $request);
 
         $this->logger->debug('getRedirectUri', [
             'action' => $action,
