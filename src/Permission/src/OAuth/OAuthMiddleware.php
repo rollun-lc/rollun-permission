@@ -138,10 +138,12 @@ abstract class OAuthMiddleware implements MiddlewareInterface
             return $fallback;
         }
 
-        $requestHost = $request->getUri()->getScheme() . '://' . $request->getUri()->getHost();
+        $requestHost = $request->getUri()->getHost();
 
-        if (in_array($requestHost, $whitelist, true)) {
-            return $requestHost;
+        foreach ($whitelist as $entry) {
+            if (parse_url($entry, PHP_URL_HOST) === $requestHost) {
+                return $entry;
+            }
         }
 
         $this->logger->debug('resolveHost: request host not in whitelist, using fallback', [
