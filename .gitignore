@@ -90,5 +90,23 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
-// Google auth
+# Google auth
 credentials.json
+
+/.npm/
+/.specify/
+/.codex/
+/.claude/
+/.bmad/
+/specs/
+docker-compose.override.yml
+gemini_analysis
+.command
+.gemini
+.cursor
+/bmad_docs
+
+.dockerignore
+/xxx
+/_bmad
+/_bmad-output
