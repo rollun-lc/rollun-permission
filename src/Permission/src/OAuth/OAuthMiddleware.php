@@ -150,6 +150,11 @@ abstract class OAuthMiddleware implements MiddlewareInterface
 
         $this->logger->debug('resolveHost: request host not in whitelist, using fallback', [
             'requestHost' => $requestHost,
+            'X-Forwarded-Host' => $request->getHeaderLine('X-Forwarded-Host'),
+            'X-Forwarded-Proto' => $request->getHeaderLine('X-Forwarded-Proto'),
+            'X-Original-Host' => $request->getHeaderLine('X-Original-Host'),
+            'Host' => $request->getHeaderLine('Host'),
+            'uriHost' => $request->getUri()->getHost(),
             'whitelist' => $whitelist,
             'fallback' => $fallback,
         ]);
