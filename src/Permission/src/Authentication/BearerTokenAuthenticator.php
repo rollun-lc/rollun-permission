@@ -14,18 +14,18 @@ use rollun\permission\UserProvider\UserProviderChain;
 class BearerTokenAuthenticator
 {
     private JwtAccessTokenValidatorInterface $jwtAccessTokenValidator;
-    private OAuth2ServerTokenStatusRepository $tokenStatusRepository;
+    private TokenStatusCheckerInterface $tokenStatusChecker;
     private UserProviderChain $userProviderChain;
     private UserRolesResolver $userRolesResolver;
 
     public function __construct(
         JwtAccessTokenValidatorInterface $jwtAccessTokenValidator,
-        OAuth2ServerTokenStatusRepository $tokenStatusRepository,
+        TokenStatusCheckerInterface $tokenStatusChecker,
         UserProviderChain $userProviderChain,
         UserRolesResolver $userRolesResolver
     ) {
         $this->jwtAccessTokenValidator = $jwtAccessTokenValidator;
-        $this->tokenStatusRepository = $tokenStatusRepository;
+        $this->tokenStatusChecker = $tokenStatusChecker;
         $this->userProviderChain = $userProviderChain;
         $this->userRolesResolver = $userRolesResolver;
     }
@@ -36,8 +36,7 @@ class BearerTokenAuthenticator
     public function authenticate(string $jwtToken): BearerTokenAuthenticatedIdentity
     {
         $claims = $this->jwtAccessTokenValidator->validate($jwtToken);
-        $this->tokenStatusRepository->assertAccessTokenIsActive($claims->getTokenId());
-        $this->tokenStatusRepository->assertClientIsActiveAndTrusted($claims->getAudience());
+        $this->tokenStatusChecker->checkAccessToken($claims);
 
         $user = $this->userProviderChain->getUser($claims->getSubject());
         if (!isset($user)) {
@@ -57,4 +56,3 @@ class BearerTokenAuthenticator
         );
     }
 }
-

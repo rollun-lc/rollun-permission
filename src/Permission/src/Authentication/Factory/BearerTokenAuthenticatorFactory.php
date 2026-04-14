@@ -11,7 +11,7 @@ namespace rollun\permission\Authentication\Factory;
 use Psr\Container\ContainerInterface;
 use rollun\permission\Authentication\BearerTokenAuthenticator;
 use rollun\permission\Authentication\JwtAccessTokenValidatorInterface;
-use rollun\permission\Authentication\OAuth2ServerTokenStatusRepository;
+use rollun\permission\Authentication\TokenStatusCheckerInterface;
 use rollun\permission\Authentication\UserRolesResolver;
 use rollun\permission\UserProvider\UserProviderChain;
 
@@ -21,7 +21,7 @@ class BearerTokenAuthenticatorFactory
     {
         return new BearerTokenAuthenticator(
             $container->get(JwtAccessTokenValidatorInterface::class),
-            new OAuth2ServerTokenStatusRepository($container->get(OAuth2ServerPdoFactory::SERVICE_NAME)),
+            $container->get(TokenStatusCheckerInterface::class),
             $container->get(UserProviderChain::class),
             $container->get(UserRolesResolver::class)
         );

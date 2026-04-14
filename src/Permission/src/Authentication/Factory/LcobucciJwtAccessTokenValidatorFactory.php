@@ -15,9 +15,9 @@ class LcobucciJwtAccessTokenValidatorFactory
 {
     public function __invoke(ContainerInterface $container): LcobucciJwtAccessTokenValidator
     {
-        $publicKeyPath = getenv('OAUTH2_SERVER_PUBLIC_KEY_PATH') ?: '/data/oauth/public.key';
+        $config = $container->get('config');
+        $publicKeyPath = $config['oauth2']['public_key_path'] ?? '/data/oauth/public.key';
 
         return new LcobucciJwtAccessTokenValidator($publicKeyPath);
     }
 }
-
