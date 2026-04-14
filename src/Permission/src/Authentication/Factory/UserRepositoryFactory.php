@@ -11,6 +11,7 @@ use Mezzio\Authentication\DefaultUser;
 use Mezzio\Authentication\UserInterface;
 use Psr\Container\ContainerInterface;
 use rollun\permission\Authentication\UserRepository;
+use rollun\permission\Authentication\UserRolesResolver;
 use rollun\permission\UserProvider\UserProviderChain;
 use Psr\Log\LoggerInterface;
 
@@ -91,7 +92,8 @@ class UserRepositoryFactory
             $userFactory,
             $config,
             $container->get(UserProviderChain::class),
-            $container->get(LoggerInterface::class)
+            $container->get(LoggerInterface::class),
+            $container->get(UserRolesResolver::class)
         );
     }
 }

@@ -36,6 +36,7 @@
     "rollun-com/rollun-datastore": "^10.2.0 || ^11.0.0",
     "rollun-com/rollun-logger": "^7.0.0",
     "google/apiclient": "^2.2",
+    "lcobucci/jwt": "^4.3",
     "psr/log": "^1.1",
     "symfony/dotenv": "^6.0.3",
     "mezzio/mezzio": "^3.9",

@@ -19,6 +19,7 @@ use Mezzio\Router\Middleware\MethodNotAllowedMiddleware;
 use Mezzio\Router\Middleware\RouteMiddleware;
 use Mezzio\Session\SessionMiddleware;
 use Laminas\Stratigility\Middleware\ErrorHandler;
+use rollun\permission\Middleware\BearerTokenAuthenticationMiddleware;
 use rollun\permission\PermissionMiddleware;
 
 /**
@@ -83,6 +84,7 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // Check permissions using ACL
     // $app->pipe(PermissionMiddleware::class)
     $app->pipe(SessionMiddleware::class);
+    $app->pipe(BearerTokenAuthenticationMiddleware::class);
     $app->pipe(PermissionMiddleware::class);
 
     // Register the dispatch middleware in the middleware pipeline

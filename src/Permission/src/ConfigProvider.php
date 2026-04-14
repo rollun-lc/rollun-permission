@@ -20,12 +20,23 @@ use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\datastore\DataStore\Factory\DbTableAbstractFactory;
 use rollun\datastore\TableGateway\Factory\TableGatewayAbstractFactory;
 use rollun\permission\Authentication\Factory\AuthenticationChainAbstractFactory;
+use rollun\permission\Authentication\Factory\BearerTokenAuthenticatorFactory;
+use rollun\permission\Authentication\Factory\LcobucciJwtAccessTokenValidatorFactory;
+use rollun\permission\Authentication\Factory\OAuth2ServerPdoFactory;
 use rollun\permission\Authentication\Factory\BasicAccessAbstractFactory;
 use rollun\permission\Authentication\Factory\GuestAuthenticationFactory;
 use rollun\permission\Authentication\Factory\PhpSessionAbstractFactory;
+use rollun\permission\Authentication\Factory\UserRolesResolverFactory;
 use rollun\permission\Authentication\Factory\UserRepositoryFactory;
+use rollun\permission\Authentication\BearerTokenAuthenticator;
 use rollun\permission\Authentication\GuestAuthentication;
+use rollun\permission\Authentication\JwtAccessTokenValidatorInterface;
+use rollun\permission\Authentication\LcobucciJwtAccessTokenValidator;
+use rollun\permission\Authentication\RequestAttributeAuthentication;
 use rollun\permission\Authentication\UserRepository;
+use rollun\permission\Authentication\UserRolesResolver;
+use rollun\permission\Middleware\BearerTokenAuthenticationMiddleware;
+use rollun\permission\Middleware\Factory\BearerTokenAuthenticationMiddlewareFactory;
 use rollun\permission\Authorization\Factory\AclFromDataStoreFactory;
 use rollun\permission\Authorization\Middleware\AccessForbiddenHandler;
 use rollun\permission\Authorization\Middleware\AclMiddleware;
@@ -184,12 +195,17 @@ class ConfigProvider
         return [
             'factories' => [
                 PermissionMiddleware::class => PermissionMiddlewareFactory::class,
+                BearerTokenAuthenticationMiddleware::class => BearerTokenAuthenticationMiddlewareFactory::class,
                 ExpressiveRouteName::class => InvokableFactory::class,
                 ResourceResolver::class => ResourceResolverAbstractFactory::class,
                 RoleResolver::class => RoleResolverFactory::class,
                 AclMiddleware::class => AclMiddlewareFactory::class,
                 Acl::class => AclFromDataStoreFactory::class,
                 UserRepository::class => UserRepositoryFactory::class,
+                UserRolesResolver::class => UserRolesResolverFactory::class,
+                BearerTokenAuthenticator::class => BearerTokenAuthenticatorFactory::class,
+                LcobucciJwtAccessTokenValidator::class => LcobucciJwtAccessTokenValidatorFactory::class,
+                OAuth2ServerPdoFactory::SERVICE_NAME => OAuth2ServerPdoFactory::class,
                 'WithoutPassUserRepository' => function (ContainerInterface $container) {
                     $userDataStore = $container->get(AssetInstaller::USER_DATASTORE_SERVICE);
                     $userRoleDataStore = $container->get(AssetInstaller::USER_ROLE_DATASTORE_SERVICE);
@@ -209,7 +225,8 @@ class ConfigProvider
                         $userFactory,
                         $config,
                         $container->get(UserProviderChain::class),
-                        $container->get(LoggerInterface::class)
+                        $container->get(LoggerInterface::class),
+                        $container->get(UserRolesResolver::class)
                     );
                 },
                 GuestAuthentication::class => GuestAuthenticationFactory::class,
@@ -224,6 +241,7 @@ class ConfigProvider
                 ConfigProvider::AUTHENTICATION_MIDDLEWARE_SERVICE => AuthenticationMiddleware::class,
                 AuthenticationInterface::class => 'authenticationServiceChain',
                 UserRepositoryInterface::class => UserRepository::class,
+                JwtAccessTokenValidatorInterface::class => LcobucciJwtAccessTokenValidator::class,
 
                 self::RULE_DATASTORE_SERVICE => AclRulesTable::class,
                 self::ROLE_DATASTORE_SERVICE => AclRolesTable::class,
@@ -245,6 +263,7 @@ class ConfigProvider
             'invokables' => [
                 PrivilegeResolver::class => PrivilegeResolver::class,
                 ExpressiveRouteName::class => ExpressiveRouteName::class,
+                RequestAttributeAuthentication::class => RequestAttributeAuthentication::class,
             ],
         ];
     }
@@ -397,6 +416,7 @@ class ConfigProvider
         return [
             'authenticationServiceChain' => [
                 AuthenticationChainAbstractFactory::KEY_AUTHENTICATION_SERVICES => [
+                    RequestAttributeAuthentication::class,
                     'basicAccess',
                     'phpSession',
                     GuestAuthentication::class,
