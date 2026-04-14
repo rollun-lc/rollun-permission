@@ -10,27 +10,55 @@ use Mezzio\Authentication\UserInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use rollun\permission\Authentication\BearerTokenAuthenticatedIdentity;
+use rollun\permission\Authentication\BearerTokenClaims;
 use rollun\permission\Authentication\BearerTokenAuthenticationException;
 use rollun\permission\Authentication\BearerTokenAuthenticator;
+use rollun\permission\Authentication\JwtAccessTokenValidatorInterface;
+use rollun\permission\Authentication\TokenStatusCheckerInterface;
+use rollun\permission\Authentication\UserRolesResolver;
+use rollun\permission\DataStore\AclUsersTable;
 use rollun\permission\Middleware\BearerTokenAuthenticationMiddleware;
+use rollun\permission\UserProvider\UserProviderChain;
 
 class BearerTokenAuthenticationMiddlewareTest extends TestCase
 {
     public function testProcessSetsIdentityForValidBearerJwt(): void
     {
-        $authenticator = $this->createMock(BearerTokenAuthenticator::class);
-        $authenticator->expects($this->once())
-            ->method('authenticate')
+        $claims = new BearerTokenClaims(
+            'user-123',
+            'crm-client',
+            'token-jti-1',
+            ['crm.read']
+        );
+        $validator = $this->createMock(JwtAccessTokenValidatorInterface::class);
+        $validator->expects($this->once())
+            ->method('validate')
             ->with('eyJ.valid.token')
-            ->willReturn(new BearerTokenAuthenticatedIdentity(
-                'user-123',
-                ['manager', 'viewer'],
-                'John Doe',
-                'crm-client',
-                'token-jti-1',
-                ['crm.read']
-            ));
+            ->willReturn($claims);
+        $statusChecker = $this->createMock(TokenStatusCheckerInterface::class);
+        $statusChecker->expects($this->once())
+            ->method('checkAccessToken')
+            ->with($claims);
+        $userProvider = $this->createMock(UserProviderChain::class);
+        $userProvider->expects($this->once())
+            ->method('getUser')
+            ->with('user-123')
+            ->willReturn([
+                AclUsersTable::FILED_ID => 'user-123',
+                AclUsersTable::FILED_NAME => 'John Doe',
+            ]);
+        $rolesResolver = $this->createMock(UserRolesResolver::class);
+        $rolesResolver->expects($this->once())
+            ->method('getRolesByUserId')
+            ->with('user-123')
+            ->willReturn(['manager', 'viewer']);
+
+        $authenticator = new BearerTokenAuthenticator(
+            $validator,
+            $statusChecker,
+            $userProvider,
+            $rolesResolver
+        );
 
         $request = (new ServerRequest())->withHeader('Authorization', 'Bearer eyJ.valid.token');
         $handler = $this->createMock(RequestHandlerInterface::class);
@@ -172,4 +200,3 @@ class BearerTokenAuthenticationMiddlewareTest extends TestCase
         $this->assertSame($expectedDescription, $decoded['error_description'] ?? null);
     }
 }
-
