@@ -74,10 +74,10 @@ class UserRepository implements UserRepositoryInterface
         DataStoresInterface $userRoles,
         DataStoresInterface $roles,
         callable $userFactory,
-        $config = null,
         $userProviderChain,
-        $logger,
-        ?UserRolesResolver $userRolesResolver = null
+        ?UserRolesResolver $userRolesResolver = null,
+        $config = null,
+        $logger = null
     ) {
         $this->users = $users;
         $this->userRoles = $userRoles;

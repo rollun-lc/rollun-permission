@@ -239,10 +239,10 @@ class ConfigProvider
                         $userRoleDataStore,
                         $roleDataStore,
                         $userFactory,
-                        $config,
                         $container->get(UserProviderChain::class),
-                        $container->get(LoggerInterface::class),
-                        $container->get(UserRolesResolver::class)
+                        $container->get(UserRolesResolver::class),
+                        $config,
+                        $container->get(LoggerInterface::class)
                     );
                 },
                 GuestAuthentication::class => GuestAuthenticationFactory::class,
