@@ -9,21 +9,25 @@ declare(strict_types=1);
 namespace rollun\permission\Authentication;
 
 use DateTimeZone;
+use InvalidArgumentException;
 use Lcobucci\Clock\SystemClock;
 use Lcobucci\JWT\Configuration;
 use Lcobucci\JWT\Signer\Key\InMemory;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use Lcobucci\JWT\Token\Plain;
 use Lcobucci\JWT\Token\RegisteredClaims;
+use Lcobucci\JWT\Validation\Constraint;
+use Lcobucci\JWT\Validation\Constraint\IssuedBy;
+use Lcobucci\JWT\Validation\Constraint\PermittedFor;
 use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Lcobucci\JWT\Validation\Constraint\StrictValidAt;
 use Throwable;
 
 use function array_filter;
 use function array_map;
-use function array_shift;
 use function array_values;
 use function is_array;
+use function is_readable;
 use function is_string;
 use function preg_split;
 use function trim;
@@ -31,26 +35,53 @@ use function trim;
 class LcobucciJwtAccessTokenValidator implements JwtAccessTokenValidatorInterface
 {
     private string $publicKeyPath;
+    private string $expectedAudience;
+    private ?string $expectedIssuer;
+    private Configuration $configuration;
+    /** @var Constraint[] */
+    private array $constraints;
 
-    public function __construct(string $publicKeyPath)
-    {
-        $this->publicKeyPath = $publicKeyPath;
-    }
+    public function __construct(
+        string $publicKeyPath,
+        string $expectedAudience,
+        ?string $expectedIssuer = null
+    ) {
+        if (trim($expectedAudience) === '') {
+            throw new InvalidArgumentException(
+                'Expected audience must be a non-empty string; '
+                . 'JWT validator cannot operate without a known audience.'
+            );
+        }
 
-    public function validate(string $jwtToken): BearerTokenClaims
-    {
-        if (!is_readable($this->publicKeyPath)) {
+        if (!is_readable($publicKeyPath)) {
             throw new BearerTokenAuthenticationException('OAuth2 public key is not readable.');
         }
 
-        $configuration = Configuration::forAsymmetricSigner(
+        $this->publicKeyPath = $publicKeyPath;
+        $this->expectedAudience = $expectedAudience;
+        $this->expectedIssuer = $expectedIssuer;
+
+        $this->configuration = Configuration::forAsymmetricSigner(
             new Sha256(),
             InMemory::empty(),
             InMemory::file($this->publicKeyPath)
         );
 
+        $this->constraints = [
+            new SignedWith($this->configuration->signer(), $this->configuration->verificationKey()),
+            new StrictValidAt(new SystemClock(new DateTimeZone('UTC'))),
+            new PermittedFor($this->expectedAudience),
+        ];
+
+        if ($this->expectedIssuer !== null) {
+            $this->constraints[] = new IssuedBy($this->expectedIssuer);
+        }
+    }
+
+    public function validate(string $jwtToken): BearerTokenClaims
+    {
         try {
-            $token = $configuration->parser()->parse($jwtToken);
+            $token = $this->configuration->parser()->parse($jwtToken);
         } catch (Throwable $e) {
             throw new BearerTokenAuthenticationException('Access token format is invalid.', 0, $e);
         }
@@ -59,18 +90,12 @@ class LcobucciJwtAccessTokenValidator implements JwtAccessTokenValidatorInterfac
             throw new BearerTokenAuthenticationException('Access token format is invalid.');
         }
 
-        $constraints = [
-            new SignedWith($configuration->signer(), $configuration->verificationKey()),
-            new StrictValidAt(new SystemClock(new DateTimeZone('UTC'))),
-        ];
-
-        if (!$configuration->validator()->validate($token, ...$constraints)) {
+        if (!$this->configuration->validator()->validate($token, ...$this->constraints)) {
             throw new BearerTokenAuthenticationException('Access token signature or claims are invalid.');
         }
 
         $subject = $token->claims()->get(RegisteredClaims::SUBJECT, null);
         $tokenId = $token->claims()->get(RegisteredClaims::ID, null);
-        $audience = $this->extractAudience($token->claims()->get(RegisteredClaims::AUDIENCE, null));
 
         if (!is_string($subject) || $subject === '') {
             throw new BearerTokenAuthenticationException('Access token does not contain valid "sub" claim.');
@@ -80,30 +105,12 @@ class LcobucciJwtAccessTokenValidator implements JwtAccessTokenValidatorInterfac
             throw new BearerTokenAuthenticationException('Access token does not contain valid "jti" claim.');
         }
 
-        if ($audience === '') {
-            throw new BearerTokenAuthenticationException('Access token does not contain valid "aud" claim.');
-        }
-
         return new BearerTokenClaims(
             $subject,
-            $audience,
+            $this->expectedAudience,
             $tokenId,
             $this->extractScopes($token->claims()->get('scopes', []))
         );
-    }
-
-    private function extractAudience($audienceClaim): string
-    {
-        if (is_string($audienceClaim)) {
-            return $audienceClaim;
-        }
-
-        if (!is_array($audienceClaim) || $audienceClaim === []) {
-            return '';
-        }
-
-        $audience = array_shift($audienceClaim);
-        return is_string($audience) ? $audience : '';
     }
 
     /**

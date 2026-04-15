@@ -195,7 +195,9 @@ class ConfigProvider
     protected function getOAuth2Config(): array
     {
         return [
-            'public_key_path' => '/data/oauth/public.key',
+            'public_key_path'   => getenv('OAUTH2_SERVER_PUBLIC_KEY_PATH') ?: '/data/oauth/public.key',
+            'expected_audience' => getenv('OAUTH2_EXPECTED_AUDIENCE') ?: null,
+            'expected_issuer'   => getenv('OAUTH2_EXPECTED_ISSUER') ?: null,
         ];
     }
 
