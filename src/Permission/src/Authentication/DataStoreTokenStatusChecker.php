@@ -40,7 +40,7 @@ class DataStoreTokenStatusChecker implements TokenStatusCheckerInterface
                 throw new RevokedTokenException('Access token has been revoked.');
             }
 
-            if ($this->isTruthy($tokenRow[OAuthAccessTokensTable::FILED_REVOKED] ?? null)) {
+            if ($this->isRevoked($tokenRow[OAuthAccessTokensTable::FILED_REVOKED] ?? null)) {
                 throw new RevokedTokenException('Access token has been revoked.');
             }
 
@@ -53,7 +53,7 @@ class DataStoreTokenStatusChecker implements TokenStatusCheckerInterface
                 throw new InactiveClientException('OAuth client is inactive or untrusted.');
             }
 
-            if ($this->isTruthy($clientRow[OAuthClientsTable::FILED_REVOKED] ?? null)) {
+            if ($this->isRevoked($clientRow[OAuthClientsTable::FILED_REVOKED] ?? null)) {
                 throw new InactiveClientException('OAuth client is inactive or untrusted.');
             }
 
@@ -107,6 +107,39 @@ class DataStoreTokenStatusChecker implements TokenStatusCheckerInterface
         }
 
         return false;
+    }
+
+    /**
+     * Fail-closed revocation check: unknown/missing values are treated as revoked.
+     */
+    private function isRevoked($value): bool
+    {
+        if ($value === null) {
+            return true;
+        }
+
+        if (is_bool($value)) {
+            return $value;
+        }
+
+        if (is_int($value) || is_float($value)) {
+            return (int)$value !== 0;
+        }
+
+        if (is_string($value)) {
+            if ($value === '') {
+                return true;
+            }
+
+            $normalized = strtolower($value);
+            if ($normalized === '0' || $normalized === 'false') {
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
     }
 
     private function isExpired($expiresAt): bool

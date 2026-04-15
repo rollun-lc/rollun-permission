@@ -228,6 +228,83 @@ class DataStoreTokenStatusCheckerTest extends TestCase
         $checker->checkAccessToken($this->createClaims());
     }
 
+    /**
+     * @dataProvider revokedLikeValueProvider
+     */
+    public function testCheckAccessTokenFailsClosedForRevokedTokenField($revokedValue): void
+    {
+        $accessTokens = $this->createMock(DataStoresInterface::class);
+        $accessTokens->expects($this->once())
+            ->method('read')
+            ->with('jti-1')
+            ->willReturn($this->createValidTokenRow([OAuthAccessTokensTable::FILED_REVOKED => $revokedValue]));
+
+        $clients = $this->createMock(DataStoresInterface::class);
+        $clients->expects($this->never())->method('query');
+
+        $checker = new DataStoreTokenStatusChecker($accessTokens, $clients);
+
+        $this->expectException(RevokedTokenException::class);
+        $this->expectExceptionMessage('Access token has been revoked.');
+
+        $checker->checkAccessToken($this->createClaims());
+    }
+
+    /**
+     * @dataProvider revokedLikeValueProvider
+     */
+    public function testCheckAccessTokenFailsClosedForRevokedClientField($revokedValue): void
+    {
+        $accessTokens = $this->createMock(DataStoresInterface::class);
+        $accessTokens->method('read')->willReturn($this->createValidTokenRow());
+
+        $clients = $this->createMock(DataStoresInterface::class);
+        $clients->expects($this->once())
+            ->method('query')
+            ->willReturn([
+                $this->createActiveTrustedClientRow([OAuthClientsTable::FILED_REVOKED => $revokedValue]),
+            ]);
+
+        $checker = new DataStoreTokenStatusChecker($accessTokens, $clients);
+
+        $this->expectException(InactiveClientException::class);
+        $this->expectExceptionMessage('OAuth client is inactive or untrusted.');
+
+        $checker->checkAccessToken($this->createClaims());
+    }
+
+    public function revokedLikeValueProvider(): array
+    {
+        return [
+            'null'              => [null],
+            'empty string'      => [''],
+            'unrecognized str'  => ['yes'],
+            'numeric string 2'  => ['2'],
+            'int 2'             => [2],
+            'bool true'         => [true],
+        ];
+    }
+
+    public function testCheckAccessTokenPassesForExplicitFalseRevokedValues(): void
+    {
+        $falsyValues = [0, '0', 'false', 'FALSE', false];
+
+        foreach ($falsyValues as $value) {
+            $accessTokens = $this->createMock(DataStoresInterface::class);
+            $accessTokens->method('read')->willReturn(
+                $this->createValidTokenRow([OAuthAccessTokensTable::FILED_REVOKED => $value])
+            );
+
+            $clients = $this->createMock(DataStoresInterface::class);
+            $clients->method('query')->willReturn([$this->createActiveTrustedClientRow()]);
+
+            $checker = new DataStoreTokenStatusChecker($accessTokens, $clients);
+            $checker->checkAccessToken($this->createClaims());
+        }
+
+        $this->addToAssertionCount(1);
+    }
+
     public function testCheckAccessTokenWrapsDataStoreException(): void
     {
         $original = new RuntimeException('datastore read failed');
