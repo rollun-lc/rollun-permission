@@ -20,12 +20,25 @@ use rollun\datastore\DataStore\Factory\DataStoreAbstractFactory;
 use rollun\datastore\DataStore\Factory\DbTableAbstractFactory;
 use rollun\datastore\TableGateway\Factory\TableGatewayAbstractFactory;
 use rollun\permission\Authentication\Factory\AuthenticationChainAbstractFactory;
+use rollun\permission\Authentication\Factory\BearerTokenAuthenticatorFactory;
+use rollun\permission\Authentication\Factory\DataStoreTokenStatusCheckerFactory;
+use rollun\permission\Authentication\Factory\LcobucciJwtAccessTokenValidatorFactory;
 use rollun\permission\Authentication\Factory\BasicAccessAbstractFactory;
 use rollun\permission\Authentication\Factory\GuestAuthenticationFactory;
 use rollun\permission\Authentication\Factory\PhpSessionAbstractFactory;
+use rollun\permission\Authentication\Factory\UserRolesResolverFactory;
 use rollun\permission\Authentication\Factory\UserRepositoryFactory;
+use rollun\permission\Authentication\BearerTokenAuthenticator;
+use rollun\permission\Authentication\DataStoreTokenStatusChecker;
 use rollun\permission\Authentication\GuestAuthentication;
+use rollun\permission\Authentication\JwtAccessTokenValidatorInterface;
+use rollun\permission\Authentication\LcobucciJwtAccessTokenValidator;
+use rollun\permission\Authentication\RequestAttributeAuthentication;
+use rollun\permission\Authentication\TokenStatusCheckerInterface;
 use rollun\permission\Authentication\UserRepository;
+use rollun\permission\Authentication\UserRolesResolver;
+use rollun\permission\Middleware\BearerTokenAuthenticationMiddleware;
+use rollun\permission\Middleware\Factory\BearerTokenAuthenticationMiddlewareFactory;
 use rollun\permission\Authorization\Factory\AclFromDataStoreFactory;
 use rollun\permission\Authorization\Middleware\AccessForbiddenHandler;
 use rollun\permission\Authorization\Middleware\AclMiddleware;
@@ -45,6 +58,8 @@ use rollun\permission\DataStore\AclRolesTable;
 use rollun\permission\DataStore\AclRulesTable;
 use rollun\permission\DataStore\AclUserRolesTable;
 use rollun\permission\DataStore\AclUsersTable;
+use rollun\permission\DataStore\OAuthAccessTokensTable;
+use rollun\permission\DataStore\OAuthClientsTable;
 use rollun\permission\OAuth\AbstractOAuthMiddlewareFactory;
 use rollun\permission\OAuth\CredentialMiddlewareAbstractFactory;
 use rollun\permission\OAuth\GoogleClient;
@@ -77,6 +92,8 @@ class ConfigProvider
     const RULE_DATASTORE_SERVICE = 'ruleDataStore';
     const RESOURCE_DATASTORE_SERVICE = 'resourceDataStore';
     const PRIVILEGE_DATASTORE_SERVICE = 'privilegeDataStore';
+    const OAUTH_ACCESS_TOKENS_DATASTORE_SERVICE = 'oauthAccessTokensDataStore';
+    const OAUTH_CLIENTS_DATASTORE_SERVICE = 'oauthClientsDataStore';
 
     const OAUTH_LOGIN_ROUTE_NAME = 'google-oauth-login';
     const OAUTH_REGISTER_ROUTE_NAME = 'google-oauth-register';
@@ -97,6 +114,7 @@ class ConfigProvider
             PhpSessionAbstractFactory::class => $this->getPhpSessionConfig(),
             UserRepositoryFactory::class => $this->getUserRepositoryConfig(),
             GoogleClientFactory::class => $this->getGoogleClientConfig(),
+            'oauth2' => $this->getOAuth2Config(),
             AbstractOAuthMiddlewareFactory::class => $this->getOAuthMiddlewareConfig(),
             AbstractServiceAbstractFactory::KEY => $this->getAbstractServiceAbstractFactoryConfig(),
         ];
@@ -174,6 +192,15 @@ class ConfigProvider
         ];
     }
 
+    protected function getOAuth2Config(): array
+    {
+        return [
+            'public_key_path'   => getenv('OAUTH2_SERVER_PUBLIC_KEY_PATH') ?: '/data/oauth/public.key',
+            'expected_audience' => getenv('OAUTH2_EXPECTED_AUDIENCE') ?: null,
+            'expected_issuer'   => getenv('OAUTH2_EXPECTED_ISSUER') ?: null,
+        ];
+    }
+
     /**
      * Returns the container dependencies
      *
@@ -184,12 +211,17 @@ class ConfigProvider
         return [
             'factories' => [
                 PermissionMiddleware::class => PermissionMiddlewareFactory::class,
+                BearerTokenAuthenticationMiddleware::class => BearerTokenAuthenticationMiddlewareFactory::class,
                 ExpressiveRouteName::class => InvokableFactory::class,
                 ResourceResolver::class => ResourceResolverAbstractFactory::class,
                 RoleResolver::class => RoleResolverFactory::class,
                 AclMiddleware::class => AclMiddlewareFactory::class,
                 Acl::class => AclFromDataStoreFactory::class,
                 UserRepository::class => UserRepositoryFactory::class,
+                UserRolesResolver::class => UserRolesResolverFactory::class,
+                BearerTokenAuthenticator::class => BearerTokenAuthenticatorFactory::class,
+                LcobucciJwtAccessTokenValidator::class => LcobucciJwtAccessTokenValidatorFactory::class,
+                DataStoreTokenStatusChecker::class => DataStoreTokenStatusCheckerFactory::class,
                 'WithoutPassUserRepository' => function (ContainerInterface $container) {
                     $userDataStore = $container->get(AssetInstaller::USER_DATASTORE_SERVICE);
                     $userRoleDataStore = $container->get(AssetInstaller::USER_ROLE_DATASTORE_SERVICE);
@@ -207,8 +239,9 @@ class ConfigProvider
                         $userRoleDataStore,
                         $roleDataStore,
                         $userFactory,
-                        $config,
                         $container->get(UserProviderChain::class),
+                        $container->get(UserRolesResolver::class),
+                        $config,
                         $container->get(LoggerInterface::class)
                     );
                 },
@@ -224,6 +257,8 @@ class ConfigProvider
                 ConfigProvider::AUTHENTICATION_MIDDLEWARE_SERVICE => AuthenticationMiddleware::class,
                 AuthenticationInterface::class => 'authenticationServiceChain',
                 UserRepositoryInterface::class => UserRepository::class,
+                JwtAccessTokenValidatorInterface::class => LcobucciJwtAccessTokenValidator::class,
+                TokenStatusCheckerInterface::class => DataStoreTokenStatusChecker::class,
 
                 self::RULE_DATASTORE_SERVICE => AclRulesTable::class,
                 self::ROLE_DATASTORE_SERVICE => AclRolesTable::class,
@@ -231,6 +266,8 @@ class ConfigProvider
                 self::PRIVILEGE_DATASTORE_SERVICE => AclPrivilegeTable::class,
                 self::USER_DATASTORE_SERVICE => AclUsersTable::class,
                 self::USER_ROLE_DATASTORE_SERVICE => AclUserRolesTable::class,
+                self::OAUTH_ACCESS_TOKENS_DATASTORE_SERVICE => OAuthAccessTokensTable::class,
+                self::OAUTH_CLIENTS_DATASTORE_SERVICE => OAuthClientsTable::class,
             ],
             'abstract_factories' => [
                 ResourceResolverAbstractFactory::class,
@@ -245,6 +282,7 @@ class ConfigProvider
             'invokables' => [
                 PrivilegeResolver::class => PrivilegeResolver::class,
                 ExpressiveRouteName::class => ExpressiveRouteName::class,
+                RequestAttributeAuthentication::class => RequestAttributeAuthentication::class,
             ],
         ];
     }
@@ -397,6 +435,7 @@ class ConfigProvider
         return [
             'authenticationServiceChain' => [
                 AuthenticationChainAbstractFactory::KEY_AUTHENTICATION_SERVICES => [
+                    RequestAttributeAuthentication::class,
                     'basicAccess',
                     'phpSession',
                     GuestAuthentication::class,

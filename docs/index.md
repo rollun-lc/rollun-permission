@@ -155,6 +155,18 @@ composer lib install
 
 * Использовать `sql` [файл](/src/Permission/src/acl.sql).
 
+##### Bearer JWT (OAuth2 token status)
+
+Для проверки статуса Bearer JWT токена библиотека использует `TokenStatusCheckerInterface`,
+который по умолчанию резолвится в `DataStoreTokenStatusChecker`.
+Потребитель должен зарегистрировать в контейнере два `DataStore` сервиса:
+
+* `rollun\permission\DataStore\OAuthAccessTokensTable::class` - datastore для таблицы `oauth_access_tokens`
+* `rollun\permission\DataStore\OAuthClientsTable::class` - datastore для таблицы `oauth_clients`
+
+Либо эквивалентные алиасы `ConfigProvider::OAUTH_ACCESS_TOKENS_DATASTORE_SERVICE` и
+`ConfigProvider::OAUTH_CLIENTS_DATASTORE_SERVICE`.
+
 ##### OAuth
 
 Как работет `Google OAuth 2.0` в `rollun-permission`. Для того чтобы получить `authorization code` от Google (который 

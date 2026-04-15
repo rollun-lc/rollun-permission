@@ -10,12 +10,9 @@ use InvalidArgumentException;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Authentication\UserRepositoryInterface;
 use rollun\datastore\DataStore\Interfaces\DataStoresInterface;
-use rollun\datastore\Rql\RqlQuery;
 use rollun\permission\DataStore\AclRolesTable;
 use rollun\permission\DataStore\AclUserRolesTable;
 use rollun\permission\DataStore\AclUsersTable;
-use Xiag\Rql\Parser\Node\Query\ScalarOperator\EqNode;
-use Xiag\Rql\Parser\Query;
 
 class UserRepository implements UserRepositoryInterface
 {
@@ -54,6 +51,8 @@ class UserRepository implements UserRepositoryInterface
 
     private $userProviderChain;
 
+    private UserRolesResolver $userRolesResolver;
+
     /**
      * DataStore constructor.
      * @param DataStoresInterface $users
@@ -75,9 +74,10 @@ class UserRepository implements UserRepositoryInterface
         DataStoresInterface $userRoles,
         DataStoresInterface $roles,
         callable $userFactory,
-        $config = null,
         $userProviderChain,
-        $logger
+        ?UserRolesResolver $userRolesResolver = null,
+        $config = null,
+        $logger = null
     ) {
         $this->users = $users;
         $this->userRoles = $userRoles;
@@ -85,6 +85,11 @@ class UserRepository implements UserRepositoryInterface
         $this->setConfigs($config);
         $this->userProviderChain = $userProviderChain;
         $this->logger = $logger;
+        $this->userRolesResolver = $userRolesResolver ?? new UserRolesResolver(
+            $this->userRoles,
+            $this->roles,
+            $this->config
+        );
 
         // Provide type safety for the composed user factory.
         $this->userFactory = function (
@@ -207,19 +212,6 @@ class UserRepository implements UserRepositoryInterface
      */
     protected function getRoles($userId)
     {
-        $roles = [];
-        $query = new Query();
-        $query->setQuery(new EqNode($this->config['userIdInUserRoles'], $userId));
-        $result = $this->userRoles->query($query);
-
-        foreach ($result as $item) {
-            $role = $this->roles->read($item[$this->config['roleIdInUserRoles']]);
-
-            if (isset($role[$this->config['roleName']])) {
-                $roles[] = $role[$this->config['roleName']];
-            }
-        }
-
-        return $roles;
+        return $this->userRolesResolver->getRolesByUserId((string)$userId);
     }
 }
