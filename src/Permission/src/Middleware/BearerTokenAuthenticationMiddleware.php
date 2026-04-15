@@ -53,10 +53,22 @@ class BearerTokenAuthenticationMiddleware implements MiddlewareInterface
         try {
             $identity = $this->authenticator->authenticate($token);
         } catch (BearerTokenAuthenticationException $exception) {
-            return new JsonResponse([
-                'error' => BearerTokenAuthenticationException::ERROR_CODE,
-                'error_description' => $exception->getMessage(),
-            ], 401);
+            $message = $exception->getMessage();
+            $safeDescription = $this->sanitizeHeaderValue($message);
+            $headerValue = sprintf(
+                'Bearer error="%s", error_description="%s"',
+                BearerTokenAuthenticationException::ERROR_CODE,
+                $safeDescription
+            );
+
+            return new JsonResponse(
+                [
+                    'error' => BearerTokenAuthenticationException::ERROR_CODE,
+                    'error_description' => $message,
+                ],
+                401,
+                ['WWW-Authenticate' => $headerValue]
+            );
         }
 
         $user = new DefaultUser(
@@ -72,5 +84,10 @@ class BearerTokenAuthenticationMiddleware implements MiddlewareInterface
             ->withAttribute(self::ATTRIBUTE_SCOPES, $identity->getScopes());
 
         return $handler->handle($request);
+    }
+
+    private function sanitizeHeaderValue(string $value): string
+    {
+        return (string)preg_replace('/[^\x20-\x21\x23-\x7E]/', ' ', $value);
     }
 }

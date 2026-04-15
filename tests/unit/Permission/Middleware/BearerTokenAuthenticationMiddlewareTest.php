@@ -175,6 +175,39 @@ class BearerTokenAuthenticationMiddlewareTest extends TestCase
         $this->assertSame(200, $response->getStatusCode());
     }
 
+    public function testProcessPassesThroughWhenMultipleAuthorizationHeadersPresent(): void
+    {
+        $authenticator = $this->createMock(BearerTokenAuthenticator::class);
+        $authenticator->expects($this->never())->method('authenticate');
+
+        $request = (new ServerRequest())
+            ->withHeader('Authorization', 'Basic QWxhZGRpbjpPcGVuU2VzYW1l')
+            ->withAddedHeader('Authorization', 'Bearer eyJ.valid.token');
+
+        $handler = $this->createMock(RequestHandlerInterface::class);
+        $handler->expects($this->once())
+            ->method('handle')
+            ->willReturn(new JsonResponse(['ok' => true], 200));
+
+        $middleware = new BearerTokenAuthenticationMiddleware($authenticator);
+        $response = $middleware->process($request, $handler);
+
+        $this->assertSame(200, $response->getStatusCode());
+    }
+
+    public function testProcessResponseHasWwwAuthenticateHeaderOn401(): void
+    {
+        $response = $this->processWithAuthenticatorException('Access token has been revoked.');
+
+        $this->assertSame(401, $response->getStatusCode());
+        $this->assertTrue($response->hasHeader('WWW-Authenticate'));
+
+        $wwwAuthenticate = $response->getHeaderLine('WWW-Authenticate');
+        $this->assertStringStartsWith('Bearer ', $wwwAuthenticate);
+        $this->assertStringContainsString('error="invalid_token"', $wwwAuthenticate);
+        $this->assertStringContainsString('error_description="Access token has been revoked."', $wwwAuthenticate);
+    }
+
     private function processWithAuthenticatorException(string $errorDescription): ResponseInterface
     {
         $authenticator = $this->createMock(BearerTokenAuthenticator::class);
